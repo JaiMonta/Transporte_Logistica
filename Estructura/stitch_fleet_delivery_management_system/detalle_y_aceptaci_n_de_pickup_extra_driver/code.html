@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400..700;1,400..700&amp;family=Space+Grotesk:wght@400..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "surface-bright": "#faf8ff", "error": "#ba1a1a", "secondary": "#865223", "surface-container-low": "#f4f3f9", "on-primary-container": "#fffdff", "tertiary": "#00694f", "on-primary-fixed": "#001847", "on-primary": "#ffffff", "primary-container": "#5673bb", "on-background": "#1a1b20", "outline": "#747782", "on-tertiary": "#ffffff", "surface-container": "#eeedf4", "on-tertiary-container": "#f8fff9", "on-primary-fixed-variant": "#234489", "on-tertiary-fixed": "#002116", "on-surface": "#1a1b20", "surface-variant": "#e3e2e8", "tertiary-fixed": "#7df9cc", "primary-fixed": "#dae2ff", "inverse-on-surface": "#f1f0f7", "secondary-fixed-dim": "#fdb880", "on-secondary-fixed-variant": "#6a3b0d", "surface-container-high": "#e8e7ee", "surface-tint": "#3e5ca2", "error-container": "#ffdad6", "surface-container-lowest": "#ffffff", "inverse-primary": "#b1c5ff", "primary": "#3c5aa0", "on-error": "#ffffff", "on-secondary-container": "#784619", "on-surface-variant": "#444651", "surface-container-highest": "#e3e2e8", "tertiary-fixed-dim": "#5fdcb1", "tertiary-container": "#008565", "outline-variant": "#c4c6d2", "background": "#faf8ff", "on-secondary": "#ffffff", "on-secondary-fixed": "#2f1500", "on-tertiary-fixed-variant": "#00513c", "primary-fixed-dim": "#b1c5ff", "surface": "#faf8ff", "secondary-fixed": "#ffdcc3", "on-error-container": "#93000a", "secondary-container": "#fdb880", "surface-dim": "#dad9e0", "inverse-surface": "#2f3035" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-md": "1rem", "margin-tablet": "1.5rem", "gutter": "1rem", "space-xs": "0.375rem", "space-lg": "1.5rem", "gutter-sm": "0.75rem", "space-sm": "0.75rem", "space-xl": "2rem", "margin": "1rem" }, fontFamily: { "label-md": ["Space Grotesk"], "body-md": ["Hanken Grotesk"], "headline-md": ["Space Grotesk"], "headline-lg-mobile": ["Space Grotesk"], "display-lg": ["Space Grotesk"], "title-lg": ["Hanken Grotesk"], "label-lg": ["Space Grotesk"], "headline-lg": ["Space Grotesk"], "label-sm": ["Space Grotesk"], "body-lg": ["Hanken Grotesk"] }, fontSize: { "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.04em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }], "headline-md": ["20px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-lg-mobile": ["24px", { "lineHeight": "30px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "display-lg": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "title-lg": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "label-lg": ["15px", { "lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "700" }], "headline-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "500" }] } } } }</script><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen antialiased"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 px-margin flex items-center justify-between gap-space-xs"><div class="flex flex-col min-w-0 flex-1 justify-center"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-primary text-[20px]">local_shipping</span><span class="font-headline-md text-headline-md text-on-surface truncate">Maldonado Logistics Fleet</span></div><div class="flex items-center gap-space-xs mt-0.5"><div class="inline-flex items-center gap-1 bg-surface-container-high px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span><span class="font-label-sm text-label-sm text-tertiary uppercase">En Línea / GPS Activo</span></div><button class="inline-flex items-center gap-1 bg-surface-container-lowest px-2 py-0.5 rounded-full shadow-[0_1px_4px_rgba(0,0,0,0.05)] text-on-surface-variant hover:text-on-surface" type="button"><span class="material-symbols-outlined text-[13px] text-secondary">swap_horiz</span><span class="font-label-sm text-label-sm">Modo Chofer / Admin</span></button></div></div><div class="flex items-center gap-space-xs flex-shrink-0"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-20 pb-20 bg-surface px-margin"><div class="flex flex-col w-full pb-8">
+<!-- Top Notification & Urgency Banner -->
+<div class="bg-secondary-container text-on-secondary-container p-space-md rounded-xl shadow-md mb-space-md flex items-start gap-space-sm relative overflow-hidden">
+<div class="absolute -right-6 -bottom-6 opacity-10 pointer-events-none">
+<span class="material-symbols-outlined text-[100px] text-on-secondary-container">assignment_late</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">priority_high</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center gap-space-xs flex-wrap mb-1">
+<span class="bg-error text-on-error font-label-sm text-label-sm uppercase px-2 py-0.5 rounded-full tracking-wider font-bold animate-pulse">Prioridad Alta</span>
+<span class="font-label-sm text-label-sm text-on-secondary-container/80 tracking-wide font-semibold">Despacho Maldonado Fleet</span>
+</div>
+<p class="font-body-md text-body-md text-on-secondary-container font-semibold leading-snug">
+        Asignado por Armando Maldonado (Administrador)
+      </p>
+<p class="font-label-sm text-label-sm text-on-secondary-container/85 mt-0.5">
+        Requiere confirmación antes de <span class="font-bold underline">12:30 CST</span>
+</p>
+</div>
+</div>
+<!-- Screen Subtitle Indicator -->
+<div class="flex items-center justify-between px-1 mb-space-sm">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[20px]">add_task</span>
+<h1 class="font-headline-md text-headline-md text-on-surface">Nuevo Pickup Extra Asignado</h1>
+</div>
+<span class="font-label-sm text-label-sm bg-primary-fixed text-on-primary-fixed px-2.5 py-1 rounded-full font-bold">1 de 1</span>
+</div>
+<!-- Prominent Incentive & Earnings Card -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-md mb-space-md relative overflow-hidden">
+<div class="flex items-start justify-between gap-space-sm">
+<div class="min-w-0">
+<span class="font-label-sm text-label-sm uppercase text-tertiary tracking-widest font-bold block mb-1">Bonificación Neta por Viaje</span>
+<div class="flex items-baseline gap-1">
+<span class="font-display-lg text-display-lg text-tertiary leading-none font-black">+ $140.00</span>
+<span class="font-title-lg text-title-lg text-tertiary font-bold">USD</span>
+</div>
+</div>
+<div class="w-12 h-12 rounded-xl bg-tertiary/10 text-tertiary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[30px]" style="font-variation-settings: 'FILL' 1;">payments</span>
+</div>
+</div>
+<!-- Impact telemetry pill -->
+<div class="mt-space-sm bg-surface-container-high p-space-sm rounded-lg flex items-center justify-between text-on-surface flex-wrap gap-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">timelapse</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">+18 min de trayecto</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]">straighten</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">+12.4 km adicionales</span>
+</div>
+</div>
+<!-- Legal payout subtext -->
+<div class="mt-space-sm flex items-start gap-2 bg-surface-container-low p-2.5 rounded-lg">
+<span class="material-symbols-outlined text-outline text-[18px] flex-shrink-0 mt-0.5">verified_user</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant leading-relaxed">
+        Pago adicional directo acreditado a tu liquidación 1099 semanal/quincenal al subir foto del comprobante sellado en rampa.
+      </p>
+</div>
+</div>
+<!-- Interactive Map Preview Anchor -->
+<div class="relative w-full h-44 rounded-xl overflow-hidden shadow-md mb-space-md bg-surface-container">
+<div class="w-full h-full bg-cover bg-center" data-location="Dallas, TX" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDWifRzLfqz3HvCdbSmlaAPMdMYg0vxrviRs5CpRiKHC5ZGiGx2R4WzUm9Huc-V6PoQfPWndFF9N4g5hr-JJuMivjJqOeNqmhNfMKPTy99UWVrLIJSo2J_LWbF1LQRSTmozaFb6TF1qTYESjuoOlHz8S_E6SwhBl5lm-SXJj_gheKHOtsGxPdZ0UlrR1QxqiCt1r-XzzY9MVwI81-tyh1vGh8ymrRccRjapi5983tepNhe9UiFXO8s');">
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 via-transparent to-transparent flex flex-col justify-end p-space-sm text-on-primary">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-tertiary-fixed">route</span>
+<span class="font-label-md text-label-md text-on-primary">Desvío mínimo sugerido: I-30 W a Loop 12</span>
+</div>
+<span class="bg-primary/90 text-on-primary font-label-sm text-label-sm px-2 py-0.5 rounded-full font-bold backdrop-blur-sm">En Vivo</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Technical Load Sheet Card (Ficha Técnica) -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-md mb-space-md">
+<div class="flex items-center justify-between mb-space-sm pb-2 bg-surface-container-low px-3 py-2 rounded-lg">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">inventory_2</span>
+<span class="font-title-lg text-title-lg text-on-surface font-bold">Ficha Técnica de Carga</span>
+</div>
+<span class="font-label-sm text-label-sm bg-surface-container-highest text-on-surface-variant px-2.5 py-0.5 rounded-full font-bold">#PK-8801</span>
+</div>
+<!-- Details Grid -->
+<div class="grid grid-cols-2 gap-space-sm">
+<div class="bg-surface-container-low p-2.5 rounded-lg flex flex-col justify-center">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Folio / Guía</span>
+<span class="font-label-md text-label-md text-on-surface font-bold truncate">UPS-7740-EX</span>
+</div>
+<div class="bg-surface-container-low p-2.5 rounded-lg flex flex-col justify-center">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Cliente</span>
+<span class="font-label-md text-label-md text-on-surface font-bold truncate">UPS Supply Chain</span>
+</div>
+<div class="col-span-2 bg-surface-container-low p-2.5 rounded-lg">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold block mb-0.5">Mercancía Clasificada</span>
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-error flex-shrink-0 animate-ping"></span>
+<span class="font-label-md text-label-md text-on-surface font-bold">Insumos Médicos Prioritarios (Manejo Cuidadoso)</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-2.5 rounded-lg">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Peso Bruto</span>
+<div class="font-label-lg text-label-lg text-on-surface font-black mt-0.5">1,850 kg</div>
+<span class="font-label-sm text-label-sm text-secondary font-bold">(4 Tarimas estándar)</span>
+</div>
+<div class="bg-surface-container-low p-2.5 rounded-lg">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold">Caja Requerida</span>
+<div class="font-label-md text-label-md text-on-surface font-bold mt-0.5">Caja Seca</div>
+<span class="font-label-sm text-label-sm text-tertiary font-semibold">Estiba Protegida</span>
+</div>
+<div class="col-span-2 bg-surface-container-high p-2.5 rounded-lg flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[18px]">lock</span>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider font-semibold block">Sello Fiscal Asignado</span>
+<span class="font-label-md text-label-md text-on-surface font-mono font-bold">#SEC-5541-UPS</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary bg-surface-container-lowest px-2 py-1 rounded font-bold">Verificado</span>
+</div>
+</div>
+</div>
+<!-- Logistics Routing & Stops Section -->
+<div class="mb-space-md">
+<div class="flex items-center justify-between mb-space-sm px-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[22px]">alt_route</span>
+<h2 class="font-title-lg text-title-lg text-on-surface font-bold">Secuencia Logística y Rampas</h2>
+</div>
+<span class="font-label-sm text-label-sm bg-surface-container text-on-surface-variant font-bold px-2 py-0.5 rounded-full">2 Paradas</span>
+</div>
+<!-- Stop 1: Pickup -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-md mb-space-sm relative">
+<div class="flex items-start gap-space-sm">
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary font-headline-md text-headline-md flex items-center justify-center font-bold shadow-sm">
+            01
+          </div>
+<div class="w-1 h-20 bg-primary/30 my-1 rounded-full"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-1 mb-1">
+<span class="bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm uppercase px-2 py-0.5 rounded font-bold">Punto de Carga</span>
+<span class="font-label-sm text-label-sm text-error font-bold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">schedule</span> 13:00 - 14:15 CST
+            </span>
+</div>
+<h3 class="font-title-lg text-title-lg text-on-surface font-bold">UPS Distribution Hub - Rampa 18</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-0.5 flex items-start gap-1">
+<span class="material-symbols-outlined text-[16px] text-outline flex-shrink-0 mt-0.5">pin_drop</span>
+<span>8400 Transport Blvd, Dallas TX 75247</span>
+</p>
+<div class="mt-space-sm bg-surface-container-low p-space-sm rounded-lg flex items-center justify-between">
+<div class="min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant block uppercase font-semibold">Contacto en Rampa</span>
+<span class="font-label-md text-label-md text-on-surface font-bold truncate block">Mike Stevens (Supervisor)</span>
+</div>
+<a aria-label="Llamar a Muelle" class="w-11 h-11 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-md active:scale-95 transition-transform flex-shrink-0" href="tel:+12145550192">
+<span class="material-symbols-outlined text-[20px]">call</span>
+</a>
+</div>
+<!-- Action buttons for Stop 1 -->
+<div class="mt-space-sm grid grid-cols-2 gap-2">
+<button class="min-h-[48px] bg-surface-container-high hover:bg-surface-variant active:scale-98 text-on-surface rounded-lg font-label-md text-label-md font-bold flex items-center justify-center gap-1.5 transition-all" onclick="alert('Iniciando navegación GPS hacia UPS Hub Dallas (Rampa 18)');" type="button">
+<span class="material-symbols-outlined text-primary text-[18px]">navigation</span>
+<span>Navegar GPS</span>
+</button>
+<a class="min-h-[48px] bg-surface-container-high hover:bg-surface-variant active:scale-98 text-on-surface rounded-lg font-label-md text-label-md font-bold flex items-center justify-center gap-1.5 transition-all text-center" href="tel:+12145550192">
+<span class="material-symbols-outlined text-secondary text-[18px]">support_agent</span>
+<span>Llamar Muelle</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Stop 2: Delivery -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-md relative">
+<div class="flex items-start gap-space-sm">
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-secondary text-on-secondary font-headline-md text-headline-md flex items-center justify-center font-bold shadow-sm">
+            02
+          </div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-1 mb-1">
+<span class="bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm uppercase px-2 py-0.5 rounded font-bold">Entrega / Descarga</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-bold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">event_available</span> Antes de 17:30
+            </span>
+</div>
+<h3 class="font-title-lg text-title-lg text-on-surface font-bold">Dallas Medical Supply - Nave 3</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-0.5 flex items-start gap-1">
+<span class="material-symbols-outlined text-[16px] text-outline flex-shrink-0 mt-0.5">location_on</span>
+<span>1200 Industrial Pkwy, Arlington TX 76006</span>
+</p>
+<!-- Critical Protocol Instruction Box -->
+<div class="mt-space-sm bg-surface-container-high p-space-sm rounded-lg flex items-start gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px] flex-shrink-0 mt-0.5">announcement</span>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface font-bold uppercase block">Instrucción Especial Obligatoria</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5 leading-snug">
+                Entrar por caseta de proveedores, registrar gafete y solicitar firma en comprobante físico para escaneo en app.
+              </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Proof of Delivery Visual Context (Image Placeholder) -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md shadow-md mb-space-lg flex items-center gap-space-sm">
+<div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 relative">
+<img class="w-full h-full object-cover" data-alt="A modern commercial shipping yard warehouse loading dock with bright sunlight, a white clean tractor-trailer backed up to a clean concrete industrial bay, realistic logistics photography, high dynamic range." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3Af5lfZueOAqFXVB3_n5H1GRz9OVQqFS5LrIbnD4i2h871UulD5QXKWvJFhGPzHyyMvBk4bKEhlux1wOqgZlU6RLYmxDXtZTOAHgdqFsWrKbiMnw_wnUjyoWGDfW-C5PQ94BQBP4uWBug2BTPunc4qJ7SJuzPOUcZ30yuB6ETnLcd28M4OUdUVTL8qNMYOq7zli7HLrRfrnkbysc90rfMzFRapX8Qlr61x5fTGppKyk-aUtRAP5M"/>
+</div>
+<div class="flex-1 min-w-0">
+<span class="font-label-md text-label-md text-on-surface font-bold block">Protocolo de Evidencia Fotográfica</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">
+        Se habilitará el botón de escaneo POD en la pestaña 'Escáner' una vez que marques llegada al Muelle 18.
+      </p>
+</div>
+</div>
+<!-- Bottom Interactive Decision Hub (Ergonomic Finger Reach) -->
+<div class="flex flex-col gap-space-sm w-full sticky bottom-2 z-40 bg-surface/95 backdrop-blur-md p-space-sm rounded-2xl shadow-xl" id="actionContainer">
+<!-- Feedback Banner (Hidden by default) -->
+<div class="hidden bg-tertiary text-on-tertiary p-space-sm rounded-xl text-center font-label-md text-label-md font-bold shadow-md animate-bounce" id="statusToast">
+      ¡Pickup Extra Aceptado! Redirigiendo a tu Bitácora activa...
+    </div>
+<!-- Main Acceptance Action -->
+<button class="w-full min-h-[58px] bg-primary-container hover:bg-primary active:scale-98 text-on-primary rounded-xl font-label-lg text-label-lg font-bold shadow-lg flex items-center justify-center gap-space-sm transition-all tracking-wide" id="btnAcceptPickup" type="button">
+<span class="material-symbols-outlined text-[26px]">task_alt</span>
+<span class="text-center">ACEPTAR PICKUP E INTEGRAR A MI BITÁCORA</span>
+</button>
+<!-- Reject or Negotiate Action -->
+<button class="w-full min-h-[50px] bg-surface-container-high hover:bg-error-container hover:text-on-error-container active:scale-98 text-on-surface-variant rounded-xl font-label-md text-label-md font-bold transition-all flex items-center justify-center gap-1.5" id="btnRejectPickup" type="button">
+<span class="material-symbols-outlined text-[20px]">cancel</span>
+<span>Rechazar (Notificar motivo a despacho)</span>
+</button>
+</div>
+</div>
+<script>
+  (function() {
+    const acceptBtn = document.getElementById('btnAcceptPickup');
+    const rejectBtn = document.getElementById('btnRejectPickup');
+    const toast = document.getElementById('statusToast');
+
+    if (acceptBtn) {
+      acceptBtn.addEventListener('click', function() {
+        acceptBtn.disabled = true;
+        acceptBtn.classList.add('opacity-80', 'cursor-not-allowed');
+        acceptBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[24px]">progress_activity</span> <span>Actualizando hoja de ruta...</span>';
+        
+        if (toast) {
+          toast.classList.remove('hidden');
+        }
+
+        setTimeout(() => {
+          acceptBtn.innerHTML = '<span class="material-symbols-outlined text-[24px]">check_circle</span> <span>¡ASIGNADO A TU RUTA!</span>';
+          acceptBtn.classList.remove('bg-primary-container');
+          acceptBtn.classList.add('bg-tertiary');
+        }, 1200);
+      });
+    }
+
+    if (rejectBtn) {
+      rejectBtn.addEventListener('click', function() {
+        const reason = prompt('Indica el motivo para rechazar la carga (e.g. Falta de espacio, Horas de servicio HOS al límite, Falla mecánica):');
+        if (reason !== null && reason.trim() !== '') {
+          alert('Notificación enviada a Armando Maldonado: "' + reason + '". Se reasignará la parada.');
+          rejectBtn.parentElement.classList.add('opacity-40', 'pointer-events-none');
+        }
+      });
+    }
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.05)]" data-active-classes="text-primary font-bold"><div class="flex items-center justify-around h-16 px-space-xs"><a class="flex flex-col items-center justify-center min-w-[64px] min-h-[48px] px-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="rutas-and-bitacora" href="#"><span class="material-symbols-outlined text-[24px]">alt_route</span><span class="font-label-sm text-label-sm mt-0.5">Rutas</span></a><a class="flex flex-col items-center justify-center min-w-[64px] min-h-[48px] px-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="escaner-pod" href="#"><span class="material-symbols-outlined text-[24px]">qr_code_scanner</span><span class="font-label-sm text-label-sm mt-0.5">Escáner</span></a><a aria-current="page" class="flex flex-col items-center justify-center min-w-[64px] min-h-[48px] px-1 transition-colors text-primary font-bold" data-path="pickups-extras" href="#"><span class="material-symbols-outlined text-[24px]">add_box</span><span class="font-label-sm text-label-sm mt-0.5">Pickups</span></a><a class="flex flex-col items-center justify-center min-w-[64px] min-h-[48px] px-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="panel-admin" href="#"><span class="material-symbols-outlined text-[24px]">admin_panel_settings</span><span class="font-label-sm text-label-sm mt-0.5">Admin</span></a></div></nav></body></html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&amp;family=Space+Grotesk:wght@300..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"surface-bright":"#faf8ff","error":"#ba1a1a","secondary":"#865223","surface-container-low":"#f4f3f9","on-primary-container":"#fffdff","tertiary":"#00694f","on-primary-fixed":"#001847","on-primary":"#ffffff","primary-container":"#5673bb","on-background":"#1a1b20","outline":"#747782","on-tertiary":"#ffffff","surface-container":"#eeedf4","on-tertiary-container":"#f8fff9","on-primary-fixed-variant":"#234489","on-tertiary-fixed":"#002116","on-surface":"#1a1b20","surface-variant":"#e3e2e8","tertiary-fixed":"#7df9cc","primary-fixed":"#dae2ff","inverse-on-surface":"#f1f0f7","secondary-fixed-dim":"#fdb880","on-secondary-fixed-variant":"#6a3b0d","surface-container-high":"#e8e7ee","surface-tint":"#3e5ca2","error-container":"#ffdad6","surface-container-lowest":"#ffffff","inverse-primary":"#b1c5ff","primary":"#3c5aa0","on-error":"#ffffff","on-secondary-container":"#784619","on-surface-variant":"#444651","surface-container-highest":"#e3e2e8","tertiary-fixed-dim":"#5fdcb1","tertiary-container":"#008565","outline-variant":"#c4c6d2","background":"#faf8ff","on-secondary":"#ffffff","on-secondary-fixed":"#2f1500","on-tertiary-fixed-variant":"#00513c","primary-fixed-dim":"#b1c5ff","surface":"#faf8ff","secondary-fixed":"#ffdcc3","on-error-container":"#93000a","secondary-container":"#fdb880","surface-dim":"#dad9e0","inverse-surface":"#2f3035"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-md":"1rem","margin-tablet":"1.5rem","gutter":"1rem","space-xs":"0.375rem","space-lg":"1.5rem","gutter-sm":"0.75rem","space-sm":"0.75rem","space-xl":"2rem","margin":"1rem"},"fontFamily":{"label-md":["Space Grotesk"],"body-md":["Hanken Grotesk"],"headline-md":["Space Grotesk"],"headline-lg-mobile":["Space Grotesk"],"display-lg":["Space Grotesk"],"title-lg":["Hanken Grotesk"],"label-lg":["Space Grotesk"],"headline-lg":["Space Grotesk"],"label-sm":["Space Grotesk"],"body-lg":["Hanken Grotesk"]},"fontSize":{"label-md":["13px",{"lineHeight":"18px","letterSpacing":"0.04em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"500"}],"headline-md":["20px",{"lineHeight":"26px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-lg-mobile":["24px",{"lineHeight":"30px","letterSpacing":"-0.02em","fontWeight":"700"}],"display-lg":["36px",{"lineHeight":"44px","letterSpacing":"-0.03em","fontWeight":"700"}],"title-lg":["18px",{"lineHeight":"24px","fontWeight":"600"}],"label-lg":["15px",{"lineHeight":"20px","letterSpacing":"0.02em","fontWeight":"700"}],"headline-lg":["28px",{"lineHeight":"34px","letterSpacing":"-0.02em","fontWeight":"700"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.06em","fontWeight":"700"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"500"}]}}}}</script></head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-full w-80 bg-surface-container-low z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex flex-col flex-1 overflow-y-auto"><div class="px-6 pt-6 pb-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-on-primary shadow-sm"><span class="material-symbols-outlined text-[24px]">local_shipping</span></div><div><span class="font-headline-md text-headline-md tracking-tight uppercase text-primary block leading-tight">MALDOWEB</span><span class="font-label-sm text-label-sm tracking-widest text-on-surface-variant block uppercase">Logistics Fleet Ops</span></div></div></div><div class="px-4 py-2 mx-4 mb-4 rounded-xl bg-surface-container border-0 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-label-lg text-label-lg shrink-0">AM</div><div class="min-w-0 flex-1"><p class="font-label-md text-label-md text-on-surface truncate">Armando Maldonado</p><div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-tertiary animate-pulse shrink-0"></span><p class="font-label-sm text-label-sm text-on-surface-variant truncate">Admin &amp; Cabina Activa</p></div></div><span class="material-symbols-outlined text-outline text-[18px]">unfold_more</span></div><div class="px-4 flex-1"><nav class="flex flex-col gap-1" data-active-classes="bg-primary-container text-on-primary-container font-label-lg rounded-xl shadow-sm"><div class="px-3 pt-3 pb-1"><span class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Operaciones</span></div><a class="flex items-center gap-3 px-3.5 py-3 rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="monitoreo-gps-flota" href="#"><span class="material-symbols-outlined text-[20px]">fmd_good</span><span>Monitoreo GPS Flota 7 Camiones</span></a><a class="flex items-center gap-3 px-3.5 py-3 rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="despacho-pickups-diarios" href="#"><span class="material-symbols-outlined text-[20px]">alt_route</span><span>Despacho &amp; Pickups Diarios</span></a><a class="flex items-center gap-3 px-3.5 py-3 rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="manifiestos-y-bitacoras-pdf" href="#"><span class="material-symbols-outlined text-[20px]">picture_as_pdf</span><span>Manifiestos y Bitácoras PDF</span></a><div class="px-3 pt-5 pb-1"><span class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Finanzas &amp; 1099</span></div><a class="flex items-center gap-3 px-3.5 py-3 rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="liquidacion-1099-choferes" href="#"><span class="material-symbols-outlined text-[20px]">payments</span><span>Liquidación 1099 Choferes</span></a><a class="flex items-center gap-3 px-3.5 py-3 rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="facturacion-subcontratista" href="#"><span class="material-symbols-outlined text-[20px]">receipt_long</span><span>Facturación UPS / All Freight</span></a><div class="px-3 pt-5 pb-1"><span class="font-label-sm text-label-sm uppercase tracking-wider text-outline">Sistema</span></div><a class="flex items-center gap-3 px-3.5 py-3 rounded-xl font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="configuracion" href="#"><span class="material-symbols-outlined text-[20px]">settings</span><span>Configuración</span></a></nav></div></div><div class="p-4 bg-surface-container-low"><div class="p-3 rounded-xl bg-surface-container flex items-center justify-between"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-tertiary text-[20px]">verified</span><div><span class="font-label-sm text-label-sm block text-on-surface leading-none">DOT &amp; ELD Conectado</span><span class="font-label-sm text-label-sm text-outline">USA Interstate Active</span></div></div><span class="w-2.5 h-2.5 rounded-full bg-tertiary"></span></div></div></aside><div class="pl-80"><header class="fixed top-0 left-80 right-0 h-20 bg-surface/85 backdrop-blur-xl z-40 flex items-center justify-between px-8 shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex-1 max-w-xl"><div class="relative flex items-center w-full"><span class="material-symbols-outlined absolute left-4 text-outline text-[22px]">search</span><input class="w-full h-12 pl-12 pr-4 bg-surface-container-low rounded-xl text-on-surface placeholder:text-outline font-body-md text-body-md outline-none focus:bg-surface-container transition-colors" placeholder="Buscar folios de despacho, paradas, camión o chofer..." type="text"/></div></div><div class="flex items-center gap-4 ml-6"><div class="flex items-center gap-2 bg-tertiary-container/15 text-tertiary px-3.5 py-1.5 rounded-full"><span class="material-symbols-outlined text-[18px]">radar</span><span class="font-label-md text-label-md">7/7 Camiones USA Activos</span></div><button class="relative p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">notification_important</span><span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-error ring-2 ring-surface"></span></button><div class="flex items-center gap-3 pl-3"><div class="text-right hidden xl:block"><span class="block font-label-md text-label-md text-on-surface leading-tight">Armando M.</span><span class="block font-label-sm text-label-sm text-outline">Despachador Maestro</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-20 px-8 bg-surface min-h-screen"><div class="flex flex-col w-full pb-16">
+<!-- Top Command & Telemetry Header -->
+<section class="mb-8">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6">
+<div class="space-y-1">
+<div class="flex items-center gap-3">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Despacho y Asignación de Pickups Diarios y Cargas Extras</h1>
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-container text-on-primary-container font-label-sm text-label-sm uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim animate-ping"></span>
+            En Vivo (CST)
+          </span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Flota 7 Unidades • Asignación inmediata por proximidad, capacidad y ventana horaria • Subcontratista UPS / All Freight</p>
+</div>
+<!-- Armando Dual Role Tag -->
+<div class="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-surface-container-high shadow-sm">
+<div class="w-10 h-10 rounded-lg bg-primary text-on-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">badge</span>
+</div>
+<div class="leading-tight">
+<div class="flex items-center gap-1.5">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-bold">Modo Dual Activo</span>
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Armando Maldonado • Admin &amp; Chofer Unidad #01</span>
+</div>
+</div>
+</div>
+<!-- Quick Action Bar -->
+<div class="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-surface-container shadow-sm">
+<div class="flex flex-wrap items-center gap-3">
+<button class="h-12 px-5 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg flex items-center gap-2 hover:bg-primary-container transition-all shadow-sm active:scale-95" id="btnOpenNewPickupModal" type="button">
+<span class="material-symbols-outlined text-[20px]">add_box</span>
+<span>+ Crear Pickup Diario / Carga Extra</span>
+</button>
+<button class="h-12 px-5 rounded-xl bg-surface-container-lowest text-on-surface hover:bg-surface-container-high font-label-lg text-label-lg flex items-center gap-2 transition-all shadow-sm active:scale-95" type="button">
+<span class="material-symbols-outlined text-secondary text-[20px]">file_download</span>
+<span>Importar Desbordes UPS / All Freight</span>
+</button>
+<button class="h-12 px-5 rounded-xl bg-surface-container-lowest text-tertiary hover:bg-surface-container-high font-label-lg text-label-lg flex items-center gap-2 transition-all shadow-sm active:scale-95" type="button">
+<span class="material-symbols-outlined text-[20px]">hub</span>
+<span>Auto-Asignar por Algoritmo de Distancia</span>
+</button>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-tertiary"></span> 6 Disponibles</span>
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-secondary"></span> 1 En Taller</span>
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-error"></span> 2 Desbordes Pendientes</span>
+</div>
+</div>
+</section>
+<!-- Main 60 / 40 Split View -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- LEFT COLUMN (60% ~ 7 cols): Pickups Recibidos y Creación Rápida -->
+<div class="lg:col-span-7 space-y-6">
+<!-- Pending Pickups Header -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">pending_actions</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface tracking-tight leading-none">Pickups Extras Recibidos Hoy</h2>
+<span class="font-label-sm text-label-sm text-outline">2 Cargas listas para confirmación y despacho satelital</span>
+</div>
+</div>
+<span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-bold">2 PENDIENTES</span>
+</div>
+<!-- Card Item 1: UPS Express -->
+<div class="rounded-xl bg-surface-container-lowest p-6 shadow-md transition-all hover:shadow-lg relative overflow-hidden">
+<div class="absolute top-0 left-0 bottom-0 w-1.5 bg-primary"></div>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4">
+<div class="flex items-center gap-2.5">
+<span class="px-2.5 py-1 rounded-lg bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm">#PK-8801</span>
+<span class="font-title-lg text-title-lg text-on-surface font-bold">Desborde UPS Express</span>
+</div>
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container font-label-sm text-label-sm text-on-surface font-semibold">
+<span class="material-symbols-outlined text-[16px] text-tertiary">schedule</span>
+<span>Ventana: 13:00 - 14:15 CST</span>
+</div>
+</div>
+<!-- Route Path Visualizer -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-4 p-4 rounded-xl bg-surface-container-low">
+<div class="space-y-1">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline block">Origen / Recolección</span>
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">warehouse</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-bold leading-tight">UPS Distribution Hub Dallas</p>
+<p class="font-body-md text-body-md text-on-surface-variant">8400 Transport Blvd, Dallas TX</p>
+</div>
+</div>
+</div>
+<div class="space-y-1">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline block">Destino / Entrega</span>
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px] shrink-0 mt-0.5">location_on</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-bold leading-tight">Dallas Medical Supply</p>
+<p class="font-body-md text-body-md text-on-surface-variant">1200 Industrial Pkwy, Arlington TX</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Cargo & Financial Metrics Row -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 py-3 font-label-sm text-label-sm">
+<div class="p-2.5 rounded-lg bg-surface-container">
+<span class="text-outline block">Carga • Peso</span>
+<span class="text-on-surface font-label-md text-label-md font-bold block mt-0.5">1,850 kg (4 Tarimas)</span>
+<span class="text-tertiary text-xs">Insumos Médicos</span>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container">
+<span class="text-outline block">Tarifa Subcontratista</span>
+<span class="text-on-surface font-label-md text-label-md font-bold block mt-0.5">$380.00 USD</span>
+<span class="text-outline text-xs">Tarifa UPS Nivel 1</span>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container">
+<span class="text-outline block">Extra Chofer 1099</span>
+<span class="text-secondary font-label-md text-label-md font-bold block mt-0.5">+$140.00 USD</span>
+<span class="text-outline text-xs">Bono ruta express</span>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container">
+<span class="text-outline block">Margen Neto Armando</span>
+<span class="text-tertiary font-label-md text-label-md font-bold block mt-0.5">$240.00 USD</span>
+<span class="text-tertiary text-xs font-bold">63.1% Margen</span>
+</div>
+</div>
+<!-- Driver Assignment Action Box -->
+<div class="mt-4 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 bg-surface-bright p-4 rounded-xl shadow-sm">
+<div class="flex items-center gap-3 w-full sm:w-auto">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-label-lg text-label-lg shrink-0">
+              04
+            </div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-label-md text-label-md text-on-surface font-bold">David Chen</span>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-sm text-label-sm">Match 96%</span>
+</div>
+<p class="font-body-md text-body-md text-outline">Unidad #04 • A 6.2 km de bodega • 45% espacio libre en caja</p>
+</div>
+</div>
+<div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+<select class="h-12 px-3 rounded-xl bg-surface-container text-on-surface font-label-sm text-label-sm outline-none">
+<option selected="" value="04">Unidad #04 - David Chen (Sugerido)</option>
+<option value="01">Unidad #01 - Armando M. (Yo)</option>
+<option value="02">Unidad #02 - Marcus Vance</option>
+<option value="06">Unidad #06 - Mateo Álvarez</option>
+</select>
+<button class="h-12 px-6 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg hover:bg-primary-container transition-all active:scale-95 shadow-sm whitespace-nowrap" type="button">
+              Asignar a David
+            </button>
+</div>
+</div>
+</div>
+<!-- Card Item 2: All Freight Logistics -->
+<div class="rounded-xl bg-surface-container-lowest p-6 shadow-md transition-all hover:shadow-lg relative overflow-hidden">
+<div class="absolute top-0 left-0 bottom-0 w-1.5 bg-secondary"></div>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4">
+<div class="flex items-center gap-2.5">
+<span class="px-2.5 py-1 rounded-lg bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm">#PK-8805</span>
+<span class="font-title-lg text-title-lg text-on-surface font-bold">Carga Adicional All Freight Logistics</span>
+</div>
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container font-label-sm text-label-sm text-on-surface font-semibold">
+<span class="material-symbols-outlined text-[16px] text-secondary">schedule</span>
+<span>Ventana: 15:30 - 16:30 CST</span>
+</div>
+</div>
+<!-- Route Path Visualizer -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-4 p-4 rounded-xl bg-surface-container-low">
+<div class="space-y-1">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline block">Origen / Recolección</span>
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px] shrink-0 mt-0.5">local_shipping</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-bold leading-tight">All Freight Freight Terminal</p>
+<p class="font-body-md text-body-md text-on-surface-variant">500 Logistics Way, Fort Worth TX</p>
+</div>
+</div>
+</div>
+<div class="space-y-1">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-outline block">Destino / Descarga</span>
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-outline text-[20px] shrink-0 mt-0.5">pin_drop</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-bold leading-tight">Retail Center West</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Weatherford TX Commercial Park</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Cargo & Financial Metrics Row -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 py-3 font-label-sm text-label-sm">
+<div class="p-2.5 rounded-lg bg-surface-container">
+<span class="text-outline block">Carga • Peso</span>
+<span class="text-on-surface font-label-md text-label-md font-bold block mt-0.5">920 kg (2 Tarimas)</span>
+<span class="text-secondary text-xs">Repuestos Auto</span>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container">
+<span class="text-outline block">Tarifa Subcontratista</span>
+<span class="text-on-surface font-label-md text-label-md font-bold block mt-0.5">$260.00 USD</span>
+<span class="text-outline text-xs">All Freight Direct</span>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container">
+<span class="text-outline block">Extra Chofer 1099</span>
+<span class="text-secondary font-label-md text-label-md font-bold block mt-0.5">+$95.00 USD</span>
+<span class="text-outline text-xs">Carga rápida</span>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container">
+<span class="text-outline block">Margen Neto Armando</span>
+<span class="text-tertiary font-label-md text-label-md font-bold block mt-0.5">$165.00 USD</span>
+<span class="text-tertiary text-xs font-bold">63.4% Margen</span>
+</div>
+</div>
+<!-- Driver Assignment Action Box -->
+<div class="mt-4 pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 bg-surface-bright p-4 rounded-xl shadow-sm">
+<div class="flex items-center gap-3 w-full sm:w-auto">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-label-lg text-label-lg shrink-0">
+              02
+            </div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-label-md text-label-md text-on-surface font-bold">Marcus Vance</span>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary font-label-sm text-label-sm">Match 91%</span>
+</div>
+<p class="font-body-md text-body-md text-outline">Unidad #02 • A 8.5 km • Libre 2,100 kg capacidad</p>
+</div>
+</div>
+<div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+<select class="h-12 px-3 rounded-xl bg-surface-container text-on-surface font-label-sm text-label-sm outline-none">
+<option selected="" value="02">Unidad #02 - Marcus Vance (Sugerido)</option>
+<option value="01">Unidad #01 - Armando M. (Yo)</option>
+<option value="03">Unidad #03 - Sarah Jenkins</option>
+<option value="06">Unidad #06 - Mateo Álvarez</option>
+</select>
+<button class="h-12 px-6 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg hover:bg-primary-container transition-all active:scale-95 shadow-sm whitespace-nowrap" type="button">
+              Asignar a Marcus
+            </button>
+</div>
+</div>
+</div>
+<!-- Quick New Pickup Collapse Form -->
+<div class="rounded-xl bg-surface-container-low p-6 shadow-sm" id="quickPickupCard">
+<div class="flex items-center justify-between pb-4">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-primary text-[24px]">playlist_add</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Formulario Rápido: Nuevo Pickup Diario</h3>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Alta Directa</span>
+</div>
+<form class="space-y-4" onsubmit="event.preventDefault(); alert('Pickup creado y listo para algoritmos de proximidad.');">
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">Cliente Solicitante</label>
+<select class="w-full h-12 px-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm outline-none">
+<option value="UPS">UPS Logistics Contract</option>
+<option value="ALL">All Freight Logistics</option>
+<option value="SPOT">Spot Broker Direct</option>
+</select>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">Ventana Horaria de Carga</label>
+<input class="w-full h-12 px-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm outline-none" type="text" value="14:00 - 15:30 CST"/>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">Tarifa Facturable Subcontrato</label>
+<input class="w-full h-12 px-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm outline-none" placeholder="$320.00 USD" type="text"/>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">Dirección Completa de Carga (Origen)</label>
+<input class="w-full h-12 px-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm outline-none" placeholder="Ej. 1400 Freeport Pkwy, Coppell TX" type="text"/>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">Dirección Completa de Descarga (Destino)</label>
+<input class="w-full h-12 px-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm outline-none" placeholder="Ej. Distribution Hub South, Fort Worth TX" type="text"/>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">Peso en Kilos / Tarimas</label>
+<input class="w-full h-12 px-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm outline-none" placeholder="1,200 kg (3 pallets)" type="text"/>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">Monto Extra Chofer 1099</label>
+<input class="w-full h-12 px-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm outline-none" placeholder="$110.00 USD" type="text"/>
+</div>
+<div>
+<label class="block font-label-sm text-label-sm text-outline mb-1">Notas de Rampa / Precinto</label>
+<input class="w-full h-12 px-3 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md shadow-sm outline-none" placeholder="Rampa 14 - Puerta Trasera" type="text"/>
+</div>
+</div>
+<div class="pt-2 flex justify-end gap-3">
+<button class="h-12 px-5 rounded-xl bg-surface-container text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high transition-colors" type="reset">
+              Limpiar
+            </button>
+<button class="h-12 px-6 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg hover:bg-primary-container transition-all shadow-sm" type="submit">
+              Guardar y Calcular Match GPS
+            </button>
+</div>
+</form>
+</div>
+</div>
+<!-- RIGHT COLUMN (40% ~ 5 cols): Status of 7 Trucks & Fleet Financial Pulse -->
+<div class="lg:col-span-5 space-y-6">
+<!-- Trucks Status Header -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">local_shipping</span>
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface tracking-tight leading-none">Estado de los 7 Camiones</h2>
+<span class="font-label-sm text-label-sm text-outline">Disponibilidad en tiempo real para pickups extras</span>
+</div>
+</div>
+<span class="px-2.5 py-1 rounded-full bg-tertiary-container/20 text-tertiary font-label-sm text-label-sm font-bold">7 REGISTRADOS</span>
+</div>
+<!-- Truck List Container -->
+<div class="rounded-xl bg-surface-container-lowest p-5 shadow-md space-y-3.5">
+<!-- Unit 01 - Armando (Self Admin & Active Driver) -->
+<div class="p-3.5 rounded-xl bg-surface-container-low transition-all hover:bg-surface-container flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="px-2 py-0.5 rounded bg-primary text-on-primary font-label-sm text-label-sm font-bold">#01</span>
+<div>
+<span class="font-label-md text-label-md text-on-surface font-bold">Armando Maldonado</span>
+<span class="ml-1.5 px-1.5 py-0.5 rounded-full bg-primary-container text-on-primary-container font-label-sm text-label-sm">Admin en Cabina</span>
+</div>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary font-bold">3 paradas rest.</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span>Dallas North Corridor</span>
+<span class="text-tertiary font-semibold">70% capacidad disponible</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5">
+<div class="bg-tertiary h-1.5 rounded-full" style="width: 30%"></div>
+</div>
+<div class="pt-1 flex items-center justify-between">
+<span class="text-outline font-label-sm text-label-sm">Kenworth T680 • Libre 4,200 kg</span>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-highest text-primary hover:bg-primary hover:text-on-primary font-label-sm text-label-sm font-bold transition-all shadow-sm" type="button">
+              + Auto-asignarme Pickup
+            </button>
+</div>
+</div>
+<!-- Unit 02 - Marcus Vance -->
+<div class="p-3.5 rounded-xl bg-surface-container-low transition-all hover:bg-surface-container flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface font-label-sm text-label-sm font-bold">#02</span>
+<span class="font-label-md text-label-md text-on-surface font-bold">Marcus Vance</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-bold">Libre en 25m</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span>Fort Worth South</span>
+<span class="text-secondary font-semibold">50% capacidad libre (2,100 kg)</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5">
+<div class="bg-secondary h-1.5 rounded-full" style="width: 50%"></div>
+</div>
+<div class="flex items-center justify-between font-label-sm text-label-sm text-outline">
+<span>Freightliner Cascadia</span>
+<span class="text-tertiary font-semibold">Óptimo para PK-8805</span>
+</div>
+</div>
+<!-- Unit 03 - Sarah Jenkins -->
+<div class="p-3.5 rounded-xl bg-surface-container-low transition-all hover:bg-surface-container flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface font-label-sm text-label-sm font-bold">#03</span>
+<span class="font-label-md text-label-md text-on-surface font-bold">Sarah Jenkins</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">En entrega #4</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span>Arlington East</span>
+<span class="text-outline">20% espacio restante</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5">
+<div class="bg-outline h-1.5 rounded-full" style="width: 80%"></div>
+</div>
+<span class="text-outline font-label-sm text-label-sm">Volvo VNL • Capacidad limitada hoy</span>
+</div>
+<!-- Unit 04 - David Chen -->
+<div class="p-3.5 rounded-xl bg-surface-container-low transition-all hover:bg-surface-container flex flex-col gap-2 ring-1 ring-tertiary/30">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="px-2 py-0.5 rounded bg-tertiary text-on-tertiary font-label-sm text-label-sm font-bold">#04</span>
+<span class="font-label-md text-label-md text-on-surface font-bold">David Chen</span>
+<span class="px-2 py-0.2 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm">Alta Proximidad</span>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary font-bold">6.2 km de UPS Hub</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span>Dallas Hub West</span>
+<span class="text-tertiary font-semibold">60% espacio libre (3,400 kg)</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5">
+<div class="bg-tertiary h-1.5 rounded-full" style="width: 40%"></div>
+</div>
+<span class="text-tertiary font-label-sm text-label-sm font-semibold">Óptimo recomendado para #PK-8801</span>
+</div>
+<!-- Unit 05 - Elena Rostova -->
+<div class="p-3.5 rounded-xl bg-surface-container-low transition-all hover:bg-surface-container flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface font-label-sm text-label-sm font-bold">#05</span>
+<span class="font-label-md text-label-md text-on-surface font-bold">Elena Rostova</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">En Tránsito</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span>Denton Loop I-35</span>
+<span class="text-outline">40% capacidad libre</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5">
+<div class="bg-outline h-1.5 rounded-full" style="width: 60%"></div>
+</div>
+<span class="text-outline font-label-sm text-label-sm">International LT • 2 entregas restantes</span>
+</div>
+<!-- Unit 06 - Mateo Álvarez -->
+<div class="p-3.5 rounded-xl bg-surface-container-low transition-all hover:bg-surface-container flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface font-label-sm text-label-sm font-bold">#06</span>
+<span class="font-label-md text-label-md text-on-surface font-bold">Mateo Álvarez</span>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary font-bold">Caja Vacía Pronto</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span>Irving Industrial</span>
+<span class="text-tertiary font-semibold">80% libre (4,500 kg)</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5">
+<div class="bg-tertiary h-1.5 rounded-full" style="width: 20%"></div>
+</div>
+<span class="text-outline font-label-sm text-label-sm">Peterbilt 579 • Termina ruta base a las 14:00</span>
+</div>
+<!-- Unit 07 - Carlos Villalobos (En Taller) -->
+<div class="p-3.5 rounded-xl bg-surface-container-low opacity-70 flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="px-2 py-0.5 rounded bg-error-container text-on-error-container font-label-sm text-label-sm font-bold">#07</span>
+<span class="font-label-md text-label-md text-on-surface font-bold">Carlos Villalobos</span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-bold">No Disponible</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span>Grand Prairie Repair Shop</span>
+<span class="text-error font-semibold">Mantenimiento Preventivo Frenos</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5">
+<div class="bg-error h-1.5 rounded-full" style="width: 100%"></div>
+</div>
+<span class="text-outline font-label-sm text-label-sm">Regreso estimado: Mañana 06:00 CST</span>
+</div>
+</div>
+<!-- Financial Snapshot Widget -->
+<div class="rounded-xl bg-surface-container-low p-6 shadow-sm">
+<div class="flex items-center justify-between pb-4">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-secondary text-[22px]">account_balance_wallet</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Mini Resumen Financiero del Día</h3>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary font-bold">MARGEN: 45.6%</span>
+</div>
+<div class="space-y-3 font-label-md text-label-md">
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-lowest shadow-sm">
+<span class="text-outline">Facturado Subcontrato Hoy (UPS / All Freight):</span>
+<span class="text-on-surface font-bold">$3,450.00 USD</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-lowest shadow-sm">
+<span class="text-outline">Total Pagos Base 1099 ($200/día x 7 choferes):</span>
+<span class="text-on-surface-variant font-bold">$1,400.00 USD</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container-lowest shadow-sm">
+<span class="text-outline">Extras Acumulados Asignados Hoy:</span>
+<span class="text-secondary font-bold">+$475.00 USD</span>
+</div>
+<div class="flex items-center justify-between p-3.5 rounded-xl bg-tertiary-container/15 text-tertiary">
+<span class="font-label-md text-label-md font-bold">Utilidad Neta Armando Maldonado:</span>
+<span class="font-headline-md text-headline-md font-bold">$1,575.00 USD</span>
+</div>
+</div>
+<!-- Inline Sparkline / Financial Progress -->
+<div class="mt-4 pt-3 flex items-center justify-between text-outline font-label-sm text-label-sm">
+<span>Meta diaria neta: $1,200.00 USD</span>
+<span class="text-tertiary font-bold">131% de objetivo cubierto</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  document.getElementById('btnOpenNewPickupModal')?.addEventListener('click', () => {
+    const el = document.getElementById('quickPickupCard');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('ring-2', 'ring-primary');
+      setTimeout(() => el.classList.remove('ring-2', 'ring-primary'), 1200);
+    }
+  });
+</script></main></div></body></html>

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>Dashboard Flota &amp; Dual Driver</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#faf8ff",
+            "surface-dim": "#dad9e0",
+            "surface-bright": "#faf8ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f4f3f9",
+            "surface-container": "#eeedf4",
+            "surface-container-high": "#e8e7ee",
+            "surface-container-highest": "#e3e2e8",
+            "on-surface": "#1a1b20",
+            "on-surface-variant": "#444651",
+            "outline": "#747782",
+            "outline-variant": "#c4c6d2",
+            "primary": "#3c5aa0",
+            "primary-container": "#5673bb",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#fffdff",
+            "primary-fixed": "#dae2ff",
+            "primary-fixed-dim": "#b1c5ff",
+            "on-primary-fixed": "#001847",
+            "secondary": "#865223",
+            "secondary-container": "#fdb880",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#784619",
+            "secondary-fixed": "#ffdcc3",
+            "tertiary": "#00694f",
+            "tertiary-container": "#008565",
+            "on-tertiary": "#ffffff",
+            "on-tertiary-container": "#f8fff9",
+            "tertiary-fixed": "#7df9cc",
+            "error": "#ba1a1a",
+            "error-container": "#ffdad6",
+            "on-error": "#ffffff",
+            "on-error-container": "#93000a",
+            "inverse-surface": "#2f3035",
+            "inverse-on-surface": "#f1f0f7"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            display: ["Space Grotesk", "sans-serif"]
+          },
+          borderRadius: {
+            "2xl": "1rem",
+            "3xl": "1.5rem"
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    body {
+      -webkit-tap-highlight-color: transparent;
+      font-family: 'Inter', sans-serif;
+    }
+    .font-headline {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .pb-safe {
+      padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+    }
+    .pt-safe {
+      padding-top: max(env(safe-area-inset-top, 0px), 12px);
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .material-symbols-outlined.fill {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- 1. Top App Bar Flutter M3 -->
+<header class="sticky top-0 z-40 bg-surface/95 backdrop-blur-md border-b border-surface-container-high pt-safe transition-all shadow-sm">
+<div class="px-4 py-3 flex items-center justify-between gap-3">
+<!-- Brand & Fleet Info -->
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-11 h-11 rounded-2xl bg-primary text-on-primary flex items-center justify-center shadow-md shadow-primary/20 shrink-0">
+<span class="material-symbols-outlined text-[24px]">local_shipping</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<h1 class="font-headline font-bold text-base text-on-surface truncate tracking-tight">Maldonado Fleet</h1>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-tertiary font-medium text-[11px] shrink-0">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse"></span>
+              GPS Activo
+            </span>
+</div>
+<p class="text-xs text-on-surface-variant truncate font-medium">Laredo, TX • 7 Unidades 1099</p>
+</div>
+</div>
+<!-- Quick Actions & User Avatar -->
+<div class="flex items-center gap-1.5 shrink-0">
+<button aria-label="Notificaciones" class="w-11 h-11 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 relative" type="button">
+<span class="material-symbols-outlined text-[22px]">notifications</span>
+<span class="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-error rounded-full ring-2 ring-surface"></span>
+</button>
+<button aria-label="Perfil Armando" class="p-0.5 rounded-full ring-2 ring-primary/40 active:scale-95 transition-transform" type="button">
+<img alt="Armando Maldonado" class="w-9 h-9 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtbbs9LgNUruGZ6l7V2NfH7eXUhlECA3pXzBCg5C4K4yCjSG8uuFX35wV65jF0jZkt_XYzPOSQhJdnuTdtXo_OWD-FCjWWfqDfpdHklFVjyG8HSOpsnFH3SqQsIL2xsgNDkARf-Xh1jjM2cj0t7w4caH6ma7TjAkvhp7Q35h3bASazkhCvmZvwahOOFFmtCHiwK5v5aA0qrGq_NStxy1i7JRf1HdmNDV4kIDmdyPYW9rJnd1Gvt5Y"/>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Scrollable Content -->
+<main class="flex-1 w-full max-w-xl mx-auto px-4 py-4 space-y-5 pb-28">
+<!-- 2. Selector de Modo Dual (Hero Card M3) -->
+<section class="bg-surface-container-lowest border border-surface-container-high rounded-3xl p-4 shadow-sm shadow-black/5">
+<div class="flex flex-col gap-3">
+<!-- Switch Pill Flutter M3 -->
+<div class="bg-surface-container p-1 rounded-2xl flex items-center relative">
+<button class="flex-1 py-2.5 px-3 rounded-xl bg-surface-container-lowest text-primary font-headline font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-1.5 transition-all" id="mode-admin-btn" onclick="switchMode('admin')" type="button">
+<span class="material-symbols-outlined text-[18px] fill">shield_person</span>
+<span>✓ Modo Admin (7 Camiones)</span>
+</button>
+<button class="flex-1 py-2.5 px-3 rounded-xl text-on-surface-variant font-headline font-medium text-xs sm:text-sm hover:text-on-surface flex items-center justify-center gap-1.5 transition-all" id="mode-driver-btn" onclick="switchMode('driver')" type="button">
+<span class="material-symbols-outlined text-[18px]">local_shipping</span>
+<span>Modo Chofer (TX-01)</span>
+</button>
+</div>
+<!-- Contextual Notice -->
+<div class="flex items-start gap-2.5 px-1 pt-1">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">verified_user</span>
+<div class="min-w-0">
+<h2 class="font-headline font-semibold text-sm text-on-surface">Armando Maldonado (Dueño / Operador)</h2>
+<p class="text-xs text-on-surface-variant leading-relaxed mt-0.5">Operando como subcontratista comodín para UPS y All Freight desde smartphone.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. Métricas Rápidas del Día (KPI Cards Flutter M3) -->
+<section class="space-y-2.5">
+<div class="flex items-center justify-between px-1">
+<h3 class="font-headline font-bold text-base text-on-surface">Métricas Rápidas del Día</h3>
+<span class="text-xs font-medium text-tertiary bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">En tiempo real</span>
+</div>
+<div class="grid grid-cols-3 gap-2.5">
+<!-- KPI 1: Camiones en ruta -->
+<div class="bg-surface-container-lowest rounded-2xl p-3 border border-surface-container-high shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-primary">
+<span class="material-symbols-outlined text-[20px]">near_me</span>
+<span class="text-[10px] font-bold uppercase tracking-wider bg-primary-fixed text-on-primary-fixed px-1.5 py-0.5 rounded">7 Unidades</span>
+</div>
+<div class="mt-2">
+<p class="font-headline text-2xl font-bold text-on-surface tracking-tight leading-none">5<span class="text-sm font-normal text-on-surface-variant"> / 7</span></p>
+<p class="text-[11px] font-semibold text-tertiary mt-1">Activos en ruta</p>
+<p class="text-[10px] text-on-surface-variant leading-tight mt-0.5">1 en rampa • 1 taller</p>
+</div>
+</div>
+<!-- KPI 2: Pickups Extras -->
+<div class="bg-surface-container-lowest rounded-2xl p-3 border border-surface-container-high shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-secondary">
+<span class="material-symbols-outlined text-[20px]">add_box</span>
+<span class="text-[10px] font-bold uppercase tracking-wider bg-secondary-fixed text-on-secondary-container px-1.5 py-0.5 rounded">Hoy</span>
+</div>
+<div class="mt-2">
+<p class="font-headline text-2xl font-bold text-secondary tracking-tight leading-none">3 <span class="text-xs font-semibold">Extras</span></p>
+<p class="text-[11px] font-semibold text-secondary mt-1">+$535 USD</p>
+<p class="text-[10px] text-on-surface-variant leading-tight mt-0.5">Ganancia flota est.</p>
+</div>
+</div>
+<!-- KPI 3: Utilidad Armando -->
+<div class="bg-surface-container-lowest rounded-2xl p-3 border border-surface-container-high shadow-sm flex flex-col justify-between">
+<div class="flex items-center justify-between text-tertiary">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+<span class="text-[10px] font-bold uppercase tracking-wider bg-tertiary-fixed text-on-tertiary-fixed px-1.5 py-0.5 rounded">Neto</span>
+</div>
+<div class="mt-2">
+<p class="font-headline text-xl sm:text-2xl font-bold text-tertiary tracking-tight leading-none">$1,575</p>
+<p class="text-[11px] font-semibold text-on-surface mt-1">Utilidad neta</p>
+<p class="text-[10px] text-on-surface-variant leading-tight mt-0.5">Proyección personal</p>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. Acción Inmediata / Pickups Urgentes Asignables -->
+<section class="space-y-2.5">
+<div class="flex items-center justify-between px-1">
+<div class="flex items-center gap-2">
+<span class="flex h-2.5 w-2.5 relative">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+</span>
+<h3 class="font-headline font-bold text-base text-on-surface">Acción Inmediata</h3>
+</div>
+<span class="text-xs font-semibold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full">Desborde Prioritario</span>
+</div>
+<!-- Tarjeta destacada de desborde UPS -->
+<div class="bg-gradient-to-br from-amber-50 via-white to-surface-container-lowest border-2 border-amber-300 rounded-3xl p-4 shadow-sm relative overflow-hidden">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-headline font-bold shadow-md shadow-amber-500/20 shrink-0">
+              UPS
+            </div>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold text-amber-900 uppercase tracking-wide">Desborde Hub Laredo</span>
+<span class="text-[11px] font-semibold text-amber-800 bg-amber-200/70 px-1.5 py-0.2 rounded">Vence en 25m</span>
+</div>
+<h4 class="font-headline font-bold text-base text-on-surface mt-0.5">Cross-Border Fast Pickup</h4>
+<p class="text-xs text-on-surface-variant">Laredo Distribution Hub → San Antonio SAT-1</p>
+</div>
+</div>
+<div class="text-right shrink-0">
+<span class="text-xs text-on-surface-variant font-medium block">Tarifa Chofer</span>
+<span class="font-headline text-xl font-bold text-tertiary">+$140 <span class="text-xs">USD</span></span>
+</div>
+</div>
+<div class="mt-3 py-2 px-3 bg-surface-container-low/70 rounded-xl flex items-center justify-between text-xs text-on-surface-variant">
+<span class="flex items-center gap-1 font-medium"><span class="material-symbols-outlined text-[16px] text-primary">inventory_2</span> 18 Paquetes high-priority</span>
+<span class="flex items-center gap-1 font-medium"><span class="material-symbols-outlined text-[16px] text-tertiary">schedule</span> Ventana: 13:45 - 15:30</span>
+</div>
+<!-- Botones con altura táctil >=48dp -->
+<div class="grid grid-cols-2 gap-2.5 mt-3 pt-1">
+<button class="min-h-[48px] px-3 rounded-2xl bg-surface-container-highest hover:bg-surface-container text-on-surface font-headline font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-transform active:scale-95" type="button">
+<span class="material-symbols-outlined text-[18px]">group_add</span>
+<span>Asignar a Chofer</span>
+</button>
+<button class="min-h-[48px] px-3 rounded-2xl bg-primary hover:bg-primary/90 text-on-primary font-headline font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md shadow-primary/25 transition-transform active:scale-95" type="button">
+<span class="material-symbols-outlined text-[18px] fill">assignment_ind</span>
+<span>Asignarme a mí</span>
+</button>
+</div>
+</div>
+</section>
+<!-- 5. Estado y Telemetría en Vivo de los 7 Choferes 1099 -->
+<section class="space-y-3">
+<div class="flex items-center justify-between px-1">
+<div>
+<h3 class="font-headline font-bold text-base text-on-surface">Telemetría en Vivo</h3>
+<p class="text-xs text-on-surface-variant font-medium">7 Choferes 1099 • Subcontratistas UPS &amp; All Freight</p>
+</div>
+<button class="text-xs font-bold text-primary flex items-center gap-0.5 hover:underline" type="button">
+<span class="material-symbols-outlined text-[16px]">tune</span>
+          Filtros
+        </button>
+</div>
+<div class="space-y-2.5">
+<!-- 1. Armando M. (Tú) -->
+<div class="bg-surface-container-lowest border-2 border-primary/30 rounded-2xl p-3.5 shadow-sm space-y-2.5">
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative shrink-0">
+<img alt="Armando M." class="w-10 h-10 rounded-full object-cover ring-2 ring-primary" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtbbs9LgNUruGZ6l7V2NfH7eXUhlECA3pXzBCg5C4K4yCjSG8uuFX35wV65jF0jZkt_XYzPOSQhJdnuTdtXo_OWD-FCjWWfqDfpdHklFVjyG8HSOpsnFH3SqQsIL2xsgNDkARf-Xh1jjM2cj0t7w4caH6ma7TjAkvhp7Q35h3bASazkhCvmZvwahOOFFmtCHiwK5v5aA0qrGq_NStxy1i7JRf1HdmNDV4kIDmdyPYW9rJnd1Gvt5Y"/>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h4 class="font-headline font-bold text-sm text-on-surface truncate">Armando M. <span class="text-primary">(Tú)</span></h4>
+<span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-primary-fixed text-on-primary-fixed">TX-01</span>
+</div>
+<p class="text-xs text-on-surface-variant truncate">Cascadia 2022 • All Freight &amp; UPS</p>
+</div>
+</div>
+<span class="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">En Ruta Activa</span>
+</div>
+<!-- Capacity & Quick Action -->
+<div class="flex items-center justify-between gap-3 pt-1 border-t border-surface-container">
+<div class="flex-1">
+<div class="flex justify-between text-xs mb-1">
+<span class="text-on-surface-variant font-medium">Capacidad libre de caja:</span>
+<span class="font-bold text-tertiary">70% libre</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 30%;"></div>
+</div>
+</div>
+<button class="min-h-[44px] px-3 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-semibold text-xs flex items-center gap-1 shrink-0 active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[16px]">navigation</span>
+<span>Mi Cabina</span>
+</button>
+</div>
+</div>
+<!-- 2. David Chen -->
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-3.5 shadow-sm space-y-2.5">
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative shrink-0">
+<div class="w-10 h-10 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-headline font-bold text-sm ring-2 ring-blue-300">DC</div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h4 class="font-headline font-bold text-sm text-on-surface truncate">David Chen</h4>
+<span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-surface-container-highest text-on-surface-variant">TX-02</span>
+</div>
+<p class="text-xs text-on-surface-variant truncate">Volvo VNL 760 • Ruta San Antonio</p>
+</div>
+</div>
+<span class="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">En Tránsito</span>
+</div>
+<div class="flex items-center justify-between gap-3 pt-1 border-t border-surface-container">
+<div class="flex-1">
+<div class="flex justify-between text-xs mb-1">
+<span class="text-on-surface-variant font-medium">Capacidad libre de caja:</span>
+<span class="font-bold text-primary">45% libre</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 55%;"></div>
+</div>
+</div>
+<button class="min-h-[44px] px-3 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-semibold text-xs flex items-center gap-1 shrink-0 active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[16px]">call</span>
+<span>Llamar</span>
+</button>
+</div>
+</div>
+<!-- 3. Marcus Vance -->
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-3.5 shadow-sm space-y-2.5">
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative shrink-0">
+<div class="w-10 h-10 rounded-full bg-amber-100 text-amber-900 flex items-center justify-center font-headline font-bold text-sm ring-2 ring-amber-300">MV</div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-white"></span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h4 class="font-headline font-bold text-sm text-on-surface truncate">Marcus Vance</h4>
+<span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-surface-container-highest text-on-surface-variant">TX-03</span>
+</div>
+<p class="text-xs text-on-surface-variant truncate">Kenworth T680 • Muelle 4 Laredo</p>
+</div>
+</div>
+<span class="text-[11px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">En Rampa UPS</span>
+</div>
+<div class="flex items-center justify-between gap-3 pt-1 border-t border-surface-container">
+<div class="flex-1">
+<div class="flex justify-between text-xs mb-1">
+<span class="text-on-surface-variant font-medium">Capacidad libre de caja:</span>
+<span class="font-bold text-amber-700">15% libre (Casi lleno)</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container overflow-hidden">
+<div class="bg-secondary-container h-full rounded-full" style="width: 85%;"></div>
+</div>
+</div>
+<button class="min-h-[44px] px-3 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-semibold text-xs flex items-center gap-1 shrink-0 active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[16px]">chat</span>
+<span>Mensaje</span>
+</button>
+</div>
+</div>
+<!-- 4. Sarah Jenkins -->
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-3.5 shadow-sm space-y-2.5">
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative shrink-0">
+<img alt="Sarah Jenkins" class="w-10 h-10 rounded-full object-cover ring-2 ring-emerald-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDl8HPPAqXntBWz6zLI2-psHIGaCBXHCHkeNvlz0cq_JzfphOvr8m7rh1hfK7iwCDwoeN9XSJtqdweQF__xfAkfLJQz1mjC0Ia1vkMBNcFo0NL3jlG4sADhaGFHl_a0oQ6jiEplv2QRkolotzbqZg3VuVlGVr2d1AiNtrdmBSDNY6-Qv8upFPVqPriA9Sc2GVY2u4wDcOetfMNGAgkiMdRWh406zx5Mu0IQyP1A5QVh5JmqOOiMsds"/>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h4 class="font-headline font-bold text-sm text-on-surface truncate">Sarah Jenkins</h4>
+<span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-surface-container-highest text-on-surface-variant">TX-04</span>
+</div>
+<p class="text-xs text-on-surface-variant truncate">Freightliner Cascadia • Target Hub</p>
+</div>
+</div>
+<span class="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">En Tiempo</span>
+</div>
+<div class="flex items-center justify-between gap-3 pt-1 border-t border-surface-container">
+<div class="flex-1">
+<div class="flex justify-between text-xs mb-1">
+<span class="text-on-surface-variant font-medium">Capacidad libre de caja:</span>
+<span class="font-bold text-tertiary">80% libre</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 20%;"></div>
+</div>
+</div>
+<button class="min-h-[44px] px-3 rounded-xl bg-primary text-on-primary font-semibold text-xs flex items-center gap-1 shrink-0 shadow-sm active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[16px]">add_task</span>
+<span>Asignar Extra</span>
+</button>
+</div>
+</div>
+<!-- 5. Elena Rostova -->
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-3.5 shadow-sm space-y-2.5">
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative shrink-0">
+<div class="w-10 h-10 rounded-full bg-purple-100 text-purple-900 flex items-center justify-center font-headline font-bold text-sm ring-2 ring-purple-300">ER</div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h4 class="font-headline font-bold text-sm text-on-surface truncate">Elena Rostova</h4>
+<span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-surface-container-highest text-on-surface-variant">TX-05</span>
+</div>
+<p class="text-xs text-on-surface-variant truncate">Peterbilt 579 • I-35 Norte</p>
+</div>
+</div>
+<span class="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">En Ruta</span>
+</div>
+<div class="flex items-center justify-between gap-3 pt-1 border-t border-surface-container">
+<div class="flex-1">
+<div class="flex justify-between text-xs mb-1">
+<span class="text-on-surface-variant font-medium">Capacidad libre de caja:</span>
+<span class="font-bold text-tertiary">60% libre</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 40%;"></div>
+</div>
+</div>
+<button class="min-h-[44px] px-3 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-semibold text-xs flex items-center gap-1 shrink-0 active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[16px]">call</span>
+<span>Llamar</span>
+</button>
+</div>
+</div>
+<!-- 6. Mateo Álvarez -->
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-3.5 shadow-sm space-y-2.5">
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative shrink-0">
+<div class="w-10 h-10 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center font-headline font-bold text-sm ring-2 ring-gray-300">MA</div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-gray-400 ring-2 ring-white"></span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h4 class="font-headline font-bold text-sm text-on-surface truncate">Mateo Álvarez</h4>
+<span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-surface-container-highest text-on-surface-variant">TX-06</span>
+</div>
+<p class="text-xs text-on-surface-variant truncate">Kenworth T680 • Taller Mecánico Laredo</p>
+</div>
+</div>
+<span class="text-[11px] font-bold text-on-surface-variant bg-surface-container-highest px-2 py-0.5 rounded-full">Taller Preventivo</span>
+</div>
+<div class="flex items-center justify-between gap-3 pt-1 border-t border-surface-container">
+<div class="flex-1">
+<span class="text-xs text-on-surface-variant font-medium">Revisión de frenos DOT • Listo a las 16:00</span>
+</div>
+<button class="min-h-[44px] px-3 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-semibold text-xs flex items-center gap-1 shrink-0 active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[16px]">build</span>
+<span>Estatus</span>
+</button>
+</div>
+</div>
+<!-- 7. Carlos V. -->
+<div class="bg-surface-container-lowest border border-surface-container-high rounded-2xl p-3.5 shadow-sm space-y-2.5">
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative shrink-0">
+<div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-900 flex items-center justify-center font-headline font-bold text-sm ring-2 ring-emerald-300">CV</div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h4 class="font-headline font-bold text-sm text-on-surface truncate">Carlos V.</h4>
+<span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-surface-container-highest text-on-surface-variant">TX-07</span>
+</div>
+<p class="text-xs text-on-surface-variant truncate">Volvo VNL 860 • All Freight Express</p>
+</div>
+</div>
+<span class="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">En Ruta</span>
+</div>
+<div class="flex items-center justify-between gap-3 pt-1 border-t border-surface-container">
+<div class="flex-1">
+<div class="flex justify-between text-xs mb-1">
+<span class="text-on-surface-variant font-medium">Capacidad libre de caja:</span>
+<span class="font-bold text-tertiary">50% libre</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 50%;"></div>
+</div>
+</div>
+<button class="min-h-[44px] px-3 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-semibold text-xs flex items-center gap-1 shrink-0 active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[16px]">call</span>
+<span>Llamar</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- 6. Accesos Rápidos Tácticos -->
+<section class="space-y-2.5">
+<h3 class="font-headline font-bold text-base text-on-surface px-1">Accesos Tácticos</h3>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+<!-- Acceso 1 -->
+<button class="min-h-[52px] bg-surface-container-lowest border border-surface-container-high hover:border-primary/40 rounded-2xl p-3 flex items-center gap-3 text-left shadow-sm active:scale-95 transition-all" type="button">
+<div class="w-10 h-10 rounded-xl bg-primary-fixed text-on-primary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">map</span>
+</div>
+<div class="min-w-0">
+<p class="font-headline font-bold text-xs text-on-surface truncate">Mapa GPS en Vivo</p>
+<p class="text-[11px] text-on-surface-variant truncate">7 unidades con geocerca</p>
+</div>
+</button>
+<!-- Acceso 2 -->
+<button class="min-h-[52px] bg-surface-container-lowest border border-surface-container-high hover:border-secondary/40 rounded-2xl p-3 flex items-center gap-3 text-left shadow-sm active:scale-95 transition-all" type="button">
+<div class="w-10 h-10 rounded-xl bg-secondary-fixed text-on-secondary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">receipt_long</span>
+</div>
+<div class="min-w-0">
+<p class="font-headline font-bold text-xs text-on-surface truncate">Liquidación 1099</p>
+<p class="text-[11px] text-secondary font-bold truncate">$2,450 USD Pendiente</p>
+</div>
+</button>
+<!-- Acceso 3 -->
+<button class="min-h-[52px] bg-surface-container-lowest border border-surface-container-high hover:border-tertiary/40 rounded-2xl p-3 flex items-center gap-3 text-left shadow-sm active:scale-95 transition-all" type="button">
+<div class="w-10 h-10 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">document_scanner</span>
+</div>
+<div class="min-w-0">
+<p class="font-headline font-bold text-xs text-on-surface truncate">Auditoría PODs</p>
+<p class="text-[11px] text-on-surface-variant truncate">Cartas de porte / OCR</p>
+</div>
+</button>
+</div>
+</section>
+</main>
+<!-- 7. Bottom Navigation Bar Flutter M3 (80dp height) -->
+<nav class="fixed bottom-0 inset-x-0 z-40 bg-surface/95 backdrop-blur-xl border-t border-surface-container-high pb-safe">
+<div class="max-w-xl mx-auto h-[80px] px-3 flex items-center justify-around">
+<!-- Tab 1: Dashboard (Activo) -->
+<a class="flex flex-col items-center justify-center min-w-[64px] min-h-[52px] text-primary group" href="#">
+<div class="w-16 h-8 rounded-full bg-primary-fixed flex items-center justify-center mb-1 group-active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[24px] fill text-on-primary-fixed">dashboard</span>
+</div>
+<span class="font-headline text-[11px] font-bold text-primary tracking-tight">Dashboard</span>
+</a>
+<!-- Tab 2: GPS Flota -->
+<a class="flex flex-col items-center justify-center min-w-[64px] min-h-[52px] text-on-surface-variant hover:text-on-surface group" href="#">
+<div class="w-16 h-8 rounded-full flex items-center justify-center mb-1 group-hover:bg-surface-container group-active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[24px]">share_location</span>
+</div>
+<span class="font-headline text-[11px] font-medium text-on-surface-variant group-hover:text-on-surface tracking-tight">GPS Flota</span>
+</a>
+<!-- Tab 3: Pickups Extras -->
+<a class="flex flex-col items-center justify-center min-w-[64px] min-h-[52px] text-on-surface-variant hover:text-on-surface group relative" href="#">
+<div class="w-16 h-8 rounded-full flex items-center justify-center mb-1 group-hover:bg-surface-container group-active:scale-95 transition-transform relative">
+<span class="material-symbols-outlined text-[24px]">add_box</span>
+<span class="absolute top-1 right-3 w-2 h-2 rounded-full bg-secondary"></span>
+</div>
+<span class="font-headline text-[11px] font-medium text-on-surface-variant group-hover:text-on-surface tracking-tight">Pickups Extras</span>
+</a>
+<!-- Tab 4: Admin Flota -->
+<a class="flex flex-col items-center justify-center min-w-[64px] min-h-[52px] text-on-surface-variant hover:text-on-surface group" href="#">
+<div class="w-16 h-8 rounded-full flex items-center justify-center mb-1 group-hover:bg-surface-container group-active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[24px]">manage_accounts</span>
+</div>
+<span class="font-headline text-[11px] font-medium text-on-surface-variant group-hover:text-on-surface tracking-tight">Admin Flota</span>
+</a>
+</div>
+</nav>
+<!-- Interactive Dual-mode script -->
+<script>
+    function switchMode(mode) {
+      const adminBtn = document.getElementById('mode-admin-btn');
+      const driverBtn = document.getElementById('mode-driver-btn');
+
+      if (mode === 'admin') {
+        adminBtn.className = 'flex-1 py-2.5 px-3 rounded-xl bg-surface-container-lowest text-primary font-headline font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-1.5 transition-all';
+        driverBtn.className = 'flex-1 py-2.5 px-3 rounded-xl text-on-surface-variant font-headline font-medium text-xs sm:text-sm hover:text-on-surface flex items-center justify-center gap-1.5 transition-all';
+      } else {
+        driverBtn.className = 'flex-1 py-2.5 px-3 rounded-xl bg-surface-container-lowest text-primary font-headline font-bold text-xs sm:text-sm shadow-sm flex items-center justify-center gap-1.5 transition-all';
+        adminBtn.className = 'flex-1 py-2.5 px-3 rounded-xl text-on-surface-variant font-headline font-medium text-xs sm:text-sm hover:text-on-surface flex items-center justify-center gap-1.5 transition-all';
+      }
+    }
+  </script>
+</body></html>

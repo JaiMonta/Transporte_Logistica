@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<meta content="mobile_tab" name="shell-type"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-low": "#f4f3f9",
+            "inverse-surface": "#2f3035",
+            "secondary-fixed-dim": "#fdb880",
+            "on-surface": "#1a1b20",
+            "surface-variant": "#e3e2e8",
+            "on-error": "#ffffff",
+            "on-secondary": "#ffffff",
+            "primary-fixed": "#dae2ff",
+            "surface-tint": "#3e5ca2",
+            "tertiary": "#00694f",
+            "surface-bright": "#faf8ff",
+            "surface-dim": "#dad9e0",
+            "secondary": "#865223",
+            "on-tertiary-fixed-variant": "#00513c",
+            "secondary-fixed": "#ffdcc3",
+            "surface-container-highest": "#e3e2e8",
+            "error": "#ba1a1a",
+            "tertiary-container": "#008565",
+            "on-primary-fixed": "#001847",
+            "surface-container-high": "#e8e7ee",
+            "inverse-primary": "#b1c5ff",
+            "on-secondary-fixed": "#2f1500",
+            "on-tertiary-container": "#f8fff9",
+            "outline": "#747782",
+            "primary-container": "#5673bb",
+            "inverse-on-surface": "#f1f0f7",
+            "on-background": "#1a1b20",
+            "error-container": "#ffdad6",
+            "on-error-container": "#93000a",
+            "outline-variant": "#c4c6d2",
+            "on-primary-fixed-variant": "#234489",
+            "surface": "#faf8ff",
+            "tertiary-fixed": "#7df9cc",
+            "primary": "#3c5aa0",
+            "on-tertiary": "#ffffff",
+            "primary-fixed-dim": "#b1c5ff",
+            "tertiary-fixed-dim": "#5fdcb1",
+            "on-secondary-fixed-variant": "#6a3b0d",
+            "on-primary-container": "#fffdff",
+            "on-primary": "#ffffff",
+            "surface-container": "#eeedf4",
+            "surface-container-lowest": "#ffffff",
+            "on-tertiary-fixed": "#002116",
+            "on-secondary-container": "#784619",
+            "secondary-container": "#fdb880",
+            "on-surface-variant": "#444651",
+            "background": "#faf8ff"
+          },
+          borderRadius: {
+            "DEFAULT": "0.375rem",
+            "lg": "0.75rem",
+            "xl": "1rem",
+            "2xl": "1.25rem",
+            "3xl": "1.75rem",
+            "full": "9999px"
+          },
+          fontFamily: {
+            "headline": ["Space Grotesk", "sans-serif"],
+            "body": ["Inter", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    @layer base {
+      html, body {
+        width: 100vw;
+        margin: 0;
+        padding: 0;
+        background-color: #faf8ff;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+      .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom, 20px);
+      }
+      .pt-safe {
+        padding-top: env(safe-area-inset-top, 24px);
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body flex flex-col min-h-screen select-none antialiased">
+<!-- Flutter M3 Top App Bar -->
+<header class="fixed top-0 inset-x-0 z-50 bg-surface/95 backdrop-blur-md pt-safe border-b border-outline-variant/30">
+<div class="h-16 px-4 flex items-center justify-between gap-3">
+<!-- Brand & Owner Identity -->
+<div class="flex items-center gap-2.5">
+<div class="w-10 h-10 rounded-2xl bg-primary text-on-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[24px]">local_shipping</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<h1 class="font-headline font-bold text-[16px] text-on-surface leading-tight">Maldonado Fleet</h1>
+<span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-tertiary/15 text-tertiary font-headline uppercase">7 Activas</span>
+</div>
+<span class="text-[12px] text-on-surface-variant font-medium">Texas Hub • UPS &amp; All Freight 1099</span>
+</div>
+</div>
+<!-- Action: Mode Toggle & Profile Avatar -->
+<div class="flex items-center gap-2">
+<!-- Dual Mode Pill Toggle -->
+<div class="flex items-center bg-surface-container-high rounded-full p-0.5 border border-outline-variant/40">
+<button class="px-2.5 py-1 rounded-full text-[11px] font-headline font-bold bg-primary text-on-primary shadow-xs transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">admin_panel_settings</span>
+<span>Admin</span>
+</button>
+<button class="px-2.5 py-1 rounded-full text-[11px] font-headline font-medium text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">airline_seat_recline_normal</span>
+<span>Cabina</span>
+</button>
+</div>
+<!-- Avatar Armando Maldonado -->
+<div class="relative">
+<img alt="Armando Maldonado" class="w-9 h-9 rounded-full object-cover ring-2 ring-primary/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2tQHI8lPaOgdyxwxazV_OBOzj9_6whxaLizpM3pCYyiyMvoAo8xC-Z2gCVnqceorJEUV7vasMyZ628a8rsdIIVFQTUwQXCVKfs30LvnJkyAopgk16kTiLNamhy_rt1QYiYdb5QmG3ckIOpcPFmMOzqRQqNH3Bl8LFTW7YkcnpSYN0VCQBtQp7n1NWoYRcz_1ZldzBZCtYWLtEkfPNyGV_E6MjIHnTpg0d7175fqMFKE2GNsj3UFo"/>
+<span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-tertiary rounded-full ring-2 ring-surface"></span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Scrollable Body Viewport -->
+<main class="flex-1 w-full pt-[calc(4rem+env(safe-area-inset-top,24px))] pb-28 flex flex-col">
+<!-- Subtitle Banner -->
+<div class="px-4 pt-3 pb-2 flex items-center justify-between bg-surface">
+<div>
+<h2 class="font-headline font-bold text-[20px] text-on-surface tracking-tight">Monitoreo GPS Flota Móvil</h2>
+<p class="text-[12px] text-on-surface-variant">Operaciones en tiempo real • Corredor I-35 / Texas Triangle</p>
+</div>
+<button class="flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-high text-primary font-headline text-[12px] font-semibold active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[16px] text-tertiary animate-pulse">sensors</span>
+<span>En Vivo</span>
+</button>
+</div>
+<!-- M3 Filter Chips Bar (Horizontal Scrollable) -->
+<div class="px-4 py-2 overflow-x-auto scrollbar-none flex items-center gap-2 sticky top-[calc(4rem+env(safe-area-inset-top,24px))] z-30 bg-surface/95 backdrop-blur-sm">
+<button class="filter-chip px-3.5 py-1.5 rounded-full bg-primary text-on-primary font-headline text-[12px] font-bold flex items-center gap-1.5 shadow-xs whitespace-nowrap">
+<span class="material-symbols-outlined text-[16px]">apps</span>
+<span>Todas (7)</span>
+</button>
+<button class="filter-chip px-3.5 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant font-headline text-[12px] font-semibold flex items-center gap-1.5 whitespace-nowrap hover:bg-surface-container-highest transition-colors">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span>En Ruta (5)</span>
+</button>
+<button class="filter-chip px-3.5 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant font-headline text-[12px] font-semibold flex items-center gap-1.5 whitespace-nowrap hover:bg-surface-container-highest transition-colors">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span>En Muelle/Carga (1)</span>
+</button>
+<button class="filter-chip px-3.5 py-1.5 rounded-full bg-error-container text-on-error-container font-headline text-[12px] font-bold flex items-center gap-1.5 whitespace-nowrap">
+<span class="material-symbols-outlined text-[16px] text-error">warning</span>
+<span>Alerta (1)</span>
+</button>
+</div>
+<!-- Tactical GPS Simulated Map Container -->
+<div class="px-4 pt-2">
+<div class="relative w-full h-[320px] rounded-3xl overflow-hidden bg-[#e6edf5] shadow-sm border border-outline-variant/40">
+<!-- Stylized Vector Map Canvas -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+<!-- Background Grid & Roads Pattern -->
+<defs>
+<pattern height="36" id="grid" patternunits="userSpaceOnUse" width="36">
+<path d="M 36 0 L 0 0 0 36" fill="none" stroke="#d5e0ee" stroke-width="0.7"></path>
+</pattern>
+</defs>
+<rect fill="#e9eff7" height="100%" width="100%"></rect>
+<rect fill="url(#grid)" height="100%" width="100%"></rect>
+<!-- Interstate Corridors (I-35, I-30, I-20) -->
+<path d="M 60 290 Q 140 180 200 130 T 320 40" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-width="8"></path>
+<path d="M 60 290 Q 140 180 200 130 T 320 40" fill="none" stroke="#3c5aa0" stroke-dasharray="6 4" stroke-opacity="0.8" stroke-width="3"></path>
+<path d="M 40 130 L 340 120" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-width="7"></path>
+<path d="M 40 130 L 340 120" fill="none" stroke="#cbd5e1" stroke-width="3"></path>
+<path d="M 200 130 L 290 260" fill="none" stroke="#ffffff" stroke-width="6"></path>
+<path d="M 200 130 L 290 260" fill="none" stroke="#cbd5e1" stroke-width="2.5"></path>
+<!-- Geofence Zones (UPS Freight / All Freight) -->
+<circle cx="210" cy="115" fill="#00694f" fill-opacity="0.08" r="42" stroke="#00694f" stroke-dasharray="4 3" stroke-width="1.5"></circle>
+<text fill="#00694f" font-family="Space Grotesk" font-size="9" font-weight="700" x="215" y="80">UPS HUB DALLAS</text>
+<circle cx="90" cy="135" fill="#865223" fill-opacity="0.08" r="32" stroke="#865223" stroke-dasharray="4 3" stroke-width="1.5"></circle>
+<text fill="#865223" font-family="Space Grotesk" font-size="9" font-weight="700" x="60" y="165">ALL FREIGHT FTW</text>
+</svg>
+<!-- City Markers -->
+<div class="absolute top-[82px] left-[175px] pointer-events-none">
+<span class="text-[10px] font-headline font-bold text-on-surface-variant bg-surface/80 px-1.5 py-0.5 rounded shadow-xs">Dallas</span>
+</div>
+<div class="absolute top-[118px] left-[45px] pointer-events-none">
+<span class="text-[10px] font-headline font-bold text-on-surface-variant bg-surface/80 px-1.5 py-0.5 rounded shadow-xs">Fort Worth</span>
+</div>
+<div class="absolute bottom-[28px] left-[45px] pointer-events-none">
+<span class="text-[10px] font-headline font-bold text-on-surface-variant bg-surface/80 px-1.5 py-0.5 rounded shadow-xs">Laredo / Border</span>
+</div>
+<!-- Interactive Truck Markers on Map -->
+<!-- #TX-01 Armando Maldonado (Selected Active) -->
+<div class="absolute top-[96px] left-[175px] -translate-x-1/2 -translate-y-1/2 z-20 cursor-pointer">
+<div class="flex flex-col items-center">
+<div class="px-2 py-0.5 rounded-full bg-primary text-on-primary font-headline text-[10px] font-bold shadow-md flex items-center gap-1 border-2 border-surface animate-bounce">
+<span class="material-symbols-outlined text-[12px]">local_shipping</span>
+<span>#TX-01 Armando</span>
+</div>
+<div class="w-3 h-3 bg-primary rotate-45 -mt-1 shadow-xs"></div>
+<div class="w-5 h-5 rounded-full bg-primary/25 -mt-1 flex items-center justify-center">
+<div class="w-2.5 h-2.5 rounded-full bg-primary"></div>
+</div>
+</div>
+</div>
+<!-- #TX-02 Marcus Vance (Delayed at Dock Alert) -->
+<div class="absolute top-[140px] left-[78px] -translate-x-1/2 -translate-y-1/2 z-10 cursor-pointer">
+<div class="flex flex-col items-center">
+<div class="px-2 py-0.5 rounded-full bg-error text-on-error font-headline text-[10px] font-bold shadow-md flex items-center gap-1 border border-surface">
+<span class="material-symbols-outlined text-[11px]">alarm</span>
+<span>#TX-02 Marcus (+15m)</span>
+</div>
+<div class="w-2.5 h-2.5 bg-error rotate-45 -mt-1"></div>
+</div>
+</div>
+<!-- #TX-03 Sarah Jenkins -->
+<div class="absolute top-[180px] left-[130px] -translate-x-1/2 -translate-y-1/2 z-10 cursor-pointer">
+<div class="flex flex-col items-center opacity-90 hover:opacity-100">
+<div class="px-1.5 py-0.5 rounded-full bg-surface-container-lowest text-on-surface font-headline text-[9px] font-bold shadow-sm flex items-center gap-1 border border-outline-variant/60">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+<span>#TX-03 Sarah</span>
+</div>
+<div class="w-2 h-2 bg-surface-container-lowest rotate-45 -mt-1 border-r border-b border-outline-variant/60"></div>
+</div>
+</div>
+<!-- #TX-04 David Chen -->
+<div class="absolute bottom-[60px] left-[90px] -translate-x-1/2 -translate-y-1/2 z-10 cursor-pointer">
+<div class="flex flex-col items-center opacity-90 hover:opacity-100">
+<div class="px-1.5 py-0.5 rounded-full bg-surface-container-lowest text-on-surface font-headline text-[9px] font-bold shadow-sm flex items-center gap-1 border border-outline-variant/60">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+<span>#TX-04 David</span>
+</div>
+<div class="w-2 h-2 bg-surface-container-lowest rotate-45 -mt-1 border-r border-b border-outline-variant/60"></div>
+</div>
+</div>
+<!-- Floating Tactical Map HUD Controls -->
+<div class="absolute top-2.5 right-2.5 flex flex-col gap-1.5 z-20">
+<button class="w-9 h-9 rounded-xl bg-surface/90 backdrop-blur-md text-primary flex items-center justify-center shadow-md active:scale-90 transition-transform" title="Mi Ubicación">
+<span class="material-symbols-outlined text-[19px]">my_location</span>
+</button>
+<button class="w-9 h-9 rounded-xl bg-surface/90 backdrop-blur-md text-on-surface-variant flex items-center justify-center shadow-md active:scale-90 transition-transform" title="Tráfico On">
+<span class="material-symbols-outlined text-[19px] text-tertiary">traffic</span>
+</button>
+<button class="w-9 h-9 rounded-xl bg-surface/90 backdrop-blur-md text-on-surface-variant flex items-center justify-center shadow-md active:scale-90 transition-transform" title="Geocercas UPS/All Freight">
+<span class="material-symbols-outlined text-[19px] text-secondary">share_location</span>
+</button>
+</div>
+<div class="absolute top-2.5 left-2.5 z-20">
+<div class="px-2.5 py-1 rounded-full bg-surface/90 backdrop-blur-md text-[11px] font-headline font-semibold text-on-surface shadow-xs flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-ping"></span>
+<span>GPS Satelital Activo (3s)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Tactical Alert Banner (Prompt requirement #3) -->
+<div class="px-4 mt-3">
+<div class="rounded-2xl bg-error-container/80 border border-error/20 p-3 flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-error text-on-error flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">warning</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<h4 class="font-headline font-bold text-[12px] text-on-error-container">Alerta en Rampa • #TX-02</h4>
+<span class="text-[10px] font-headline font-bold text-error">+15 min mora</span>
+</div>
+<p class="text-[11px] text-on-error-container/80 truncate">Marcus Vance: Retraso en muelle All Freight Fort Worth</p>
+</div>
+<button class="px-2 py-1 bg-surface rounded-lg text-error text-[11px] font-headline font-bold shadow-xs active:scale-95 transition-transform flex-shrink-0">
+          Ver Muelle
+        </button>
+</div>
+</div>
+<!-- Active Unit Detailed Bottom Sheet / Ficha Detallada (Unidad #01 Armando Maldonado) -->
+<div class="px-4 mt-3">
+<div class="bg-surface-container-lowest rounded-3xl p-4 shadow-sm border border-outline-variant/30 flex flex-col gap-3.5">
+<!-- Sheet Header: Unit ID, Driver & Status -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-2xl bg-primary-container text-on-primary-container flex items-center justify-center font-headline font-bold text-[18px]">
+              01
+            </div>
+<div>
+<div class="flex items-center gap-1.5">
+<h3 class="font-headline font-bold text-[15px] text-on-surface">Unidad #TX-01 • Peterbilt 579</h3>
+<span class="px-2 py-0.5 rounded-full text-[10px] font-headline font-bold bg-primary/10 text-primary">Tú</span>
+</div>
+<p class="text-[12px] text-on-surface-variant font-medium">Armando Maldonado • Subcontratista Principal</p>
+</div>
+</div>
+<span class="px-2.5 py-1 rounded-full text-[11px] font-headline font-bold bg-tertiary-fixed/40 text-on-tertiary-fixed-variant">
+            En Ruta
+          </span>
+</div>
+<!-- Telemetry 4-Pill Grid -->
+<div class="grid grid-cols-2 gap-2.5">
+<!-- Velocidad -->
+<div class="bg-surface-container-low rounded-2xl p-3 border border-outline-variant/20 flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="text-[11px] font-headline font-semibold uppercase tracking-wider">Velocidad</span>
+<span class="material-symbols-outlined text-[17px] text-primary">speed</span>
+</div>
+<div class="mt-1 flex items-baseline gap-1">
+<span class="font-headline font-bold text-[22px] text-on-surface">62</span>
+<span class="text-[11px] font-headline text-on-surface-variant font-medium">mph (99 km/h)</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full mt-2 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 78%"></div>
+</div>
+</div>
+<!-- Nivel Diésel -->
+<div class="bg-surface-container-low rounded-2xl p-3 border border-outline-variant/20 flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="text-[11px] font-headline font-semibold uppercase tracking-wider">Diésel</span>
+<span class="material-symbols-outlined text-[17px] text-secondary">local_gas_station</span>
+</div>
+<div class="mt-1 flex items-baseline gap-1">
+<span class="font-headline font-bold text-[22px] text-on-surface">78</span>
+<span class="text-[11px] font-headline text-on-surface-variant font-medium">% tanque</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1 rounded-full mt-2 overflow-hidden">
+<div class="bg-secondary-container h-full rounded-full" style="width: 78%"></div>
+</div>
+</div>
+<!-- Termo / Reefer -->
+<div class="bg-surface-container-low rounded-2xl p-3 border border-outline-variant/20 flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="text-[11px] font-headline font-semibold uppercase tracking-wider">Termo Reefer</span>
+<span class="material-symbols-outlined text-[17px] text-tertiary">ac_unit</span>
+</div>
+<div class="mt-1 flex items-baseline gap-1">
+<span class="font-headline font-bold text-[22px] text-tertiary">-4.0</span>
+<span class="text-[11px] font-headline text-on-surface-variant font-medium">°C Óptimo</span>
+</div>
+<span class="text-[10px] text-tertiary font-medium mt-2 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Cadena de frío OK
+            </span>
+</div>
+<!-- HOS Restante -->
+<div class="bg-surface-container-low rounded-2xl p-3 border border-outline-variant/20 flex flex-col justify-between">
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="text-[11px] font-headline font-semibold uppercase tracking-wider">HOS Restante</span>
+<span class="material-symbols-outlined text-[17px] text-primary">timer</span>
+</div>
+<div class="mt-1 flex items-baseline gap-1">
+<span class="font-headline font-bold text-[22px] text-on-surface">05h 40m</span>
+</div>
+<span class="text-[10px] text-on-surface-variant font-medium mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-tertiary">verified</span> Cumplimiento FMCSA
+            </span>
+</div>
+</div>
+<!-- Next Waypoint Card -->
+<div class="bg-surface-container-low rounded-2xl p-3 border border-outline-variant/20 flex items-center justify-between">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="w-9 h-9 rounded-xl bg-tertiary/15 text-tertiary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">warehouse</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-[10px] font-headline font-bold text-tertiary uppercase tracking-wider">Próxima Parada</span>
+<h4 class="font-headline font-bold text-[13px] text-on-surface truncate">UPS Freight Distribution Hub Dallas</h4>
+<span class="text-[11px] text-on-surface-variant">Puerta Cross-Dock #18 • ETA 14:15 CST</span>
+</div>
+</div>
+<div class="text-right flex-shrink-0 pl-2">
+<span class="font-headline font-bold text-[14px] text-primary">18.4</span>
+<span class="text-[10px] text-on-surface-variant block">millas</span>
+</div>
+</div>
+<!-- Big Touch Action Buttons (>=48dp) -->
+<div class="grid grid-cols-3 gap-2 pt-0.5">
+<button class="min-h-[48px] rounded-2xl bg-primary text-on-primary font-headline text-[11px] font-bold flex flex-col items-center justify-center gap-1 shadow-sm active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px]">call</span>
+<span>Llamar a Cabina</span>
+</button>
+<button class="min-h-[48px] rounded-2xl bg-surface-container-high text-on-surface font-headline text-[11px] font-bold flex flex-col items-center justify-center gap-1 hover:bg-surface-container-highest active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px] text-primary">assignment</span>
+<span>Ver Hoja de Ruta</span>
+</button>
+<button class="min-h-[48px] rounded-2xl bg-surface-container-high text-on-surface font-headline text-[11px] font-bold flex flex-col items-center justify-center gap-1 hover:bg-surface-container-highest active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px] text-secondary">add_location_alt</span>
+<span>Asignar Parada Spot</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Lista de Unidades Rápidas (Otros operadores 1099) -->
+<div class="px-4 mt-4 flex flex-col gap-2.5">
+<div class="flex items-center justify-between">
+<h3 class="font-headline font-bold text-[15px] text-on-surface">Otras Unidades Activas 1099</h3>
+<span class="text-[12px] font-headline text-primary font-semibold">Ver Flota Completa (7)</span>
+</div>
+<!-- Unit Card #02 Marcus Vance -->
+<div class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant/30 flex items-center justify-between gap-3 shadow-xs">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="w-10 h-10 rounded-xl bg-error-container text-on-error-container flex items-center justify-center font-headline font-bold text-[14px]">
+            02
+          </div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h4 class="font-headline font-bold text-[13px] text-on-surface truncate">Marcus Vance (#TX-02)</h4>
+<span class="px-1.5 py-0.2 rounded text-[9px] font-headline font-bold bg-error text-on-error">Alerta</span>
+</div>
+<p class="text-[11px] text-on-surface-variant truncate">All Freight Fort Worth • Espera Muelle 3</p>
+</div>
+</div>
+<div class="flex flex-col items-end flex-shrink-0">
+<span class="text-[11px] font-headline font-bold text-error">Demora +15m</span>
+<span class="text-[10px] text-on-surface-variant">HOS: 06h 10m</span>
+</div>
+</div>
+<!-- Unit Card #03 Sarah Jenkins -->
+<div class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant/30 flex items-center justify-between gap-3 shadow-xs">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="w-10 h-10 rounded-xl bg-surface-container-high text-on-surface flex items-center justify-center font-headline font-bold text-[14px]">
+            03
+          </div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h4 class="font-headline font-bold text-[13px] text-on-surface truncate">Sarah Jenkins (#TX-03)</h4>
+<span class="px-1.5 py-0.2 rounded text-[9px] font-headline font-bold bg-tertiary/15 text-tertiary">En Ruta</span>
+</div>
+<p class="text-[11px] text-on-surface-variant truncate">Arlington Hub ➔ Waco Depot (I-35 S)</p>
+</div>
+</div>
+<div class="flex flex-col items-end flex-shrink-0">
+<span class="text-[11px] font-headline font-bold text-on-surface">58 mph</span>
+<div class="w-14 bg-surface-container-highest h-1 rounded-full mt-1">
+<div class="bg-tertiary h-full rounded-full" style="width: 65%"></div>
+</div>
+</div>
+</div>
+<!-- Unit Card #04 David Chen -->
+<div class="bg-surface-container-lowest rounded-2xl p-3 border border-outline-variant/30 flex items-center justify-between gap-3 shadow-xs">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="w-10 h-10 rounded-xl bg-surface-container-high text-on-surface flex items-center justify-center font-headline font-bold text-[14px]">
+            04
+          </div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h4 class="font-headline font-bold text-[13px] text-on-surface truncate">David Chen (#TX-04)</h4>
+<span class="px-1.5 py-0.2 rounded text-[9px] font-headline font-bold bg-tertiary/15 text-tertiary">En Ruta</span>
+</div>
+<p class="text-[11px] text-on-surface-variant truncate">Laredo Border Crossing ➔ San Antonio</p>
+</div>
+</div>
+<div class="flex flex-col items-end flex-shrink-0">
+<span class="text-[11px] font-headline font-bold text-on-surface">65 mph</span>
+<div class="w-14 bg-surface-container-highest h-1 rounded-full mt-1">
+<div class="bg-tertiary h-full rounded-full" style="width: 88%"></div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Flutter M3 Bottom Navigation Bar (80dp height) -->
+<nav class="fixed bottom-0 inset-x-0 z-50 bg-surface-container-lowest/95 backdrop-blur-md border-t border-outline-variant/30 pb-safe">
+<div class="h-20 px-2 flex items-center justify-around">
+<!-- 1. Rutas / Despacho -->
+<a class="flex flex-col items-center justify-center min-w-[64px] py-1 text-on-surface-variant hover:text-on-surface transition-colors gap-1 group" href="#">
+<div class="px-4 py-1 rounded-full group-hover:bg-surface-container-high transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">alt_route</span>
+</div>
+<span class="font-headline text-[11px] font-medium text-on-surface-variant">Despacho</span>
+</a>
+<!-- 2. GPS Flota (Activo) -->
+<a class="flex flex-col items-center justify-center min-w-[64px] py-1 text-primary transition-colors gap-1" href="#">
+<div class="px-4 py-1 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center shadow-xs">
+<span class="material-symbols-outlined text-[24px]">location_on</span>
+</div>
+<span class="font-headline text-[11px] font-bold text-primary">GPS Flota</span>
+</a>
+<!-- 3. Pickups Extras -->
+<a class="flex flex-col items-center justify-center min-w-[64px] py-1 text-on-surface-variant hover:text-on-surface transition-colors gap-1 group" href="#">
+<div class="px-4 py-1 rounded-full group-hover:bg-surface-container-high transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">add_box</span>
+</div>
+<span class="font-headline text-[11px] font-medium text-on-surface-variant">Pickups</span>
+</a>
+<!-- 4. Admin Dual -->
+<a class="flex flex-col items-center justify-center min-w-[64px] py-1 text-on-surface-variant hover:text-on-surface transition-colors gap-1 group" href="#">
+<div class="px-4 py-1 rounded-full group-hover:bg-surface-container-high transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">tune</span>
+</div>
+<span class="font-headline text-[11px] font-medium text-on-surface-variant">Admin Dual</span>
+</a>
+</div>
+</nav>
+<!-- Simple Interaction Script for Filter Chips -->
+<script>
+    document.querySelectorAll('.filter-chip').forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.filter-chip').forEach(b => {
+          if (!b.classList.contains('bg-error-container')) {
+            b.classList.remove('bg-primary', 'text-on-primary');
+            b.classList.add('bg-surface-container-high', 'text-on-surface-variant');
+          }
+        });
+        if (!button.classList.contains('bg-error-container')) {
+          button.classList.remove('bg-surface-container-high', 'text-on-surface-variant');
+          button.classList.add('bg-primary', 'text-on-primary');
+        }
+      });
+    });
+  </script>
+</body></html>

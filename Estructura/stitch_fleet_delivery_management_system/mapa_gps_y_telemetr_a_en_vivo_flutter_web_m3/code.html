@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&amp;family=Space+Grotesk:wght@300..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"inverse-primary":"#b1c5ff","error-container":"#ffdad6","surface-container-high":"#e8e7ee","primary-fixed":"#dae2ff","secondary-fixed":"#ffdcc3","surface-container":"#eeedf4","surface-tint":"#3e5ca2","surface-dim":"#dad9e0","error":"#ba1a1a","surface-container-highest":"#e3e2e8","on-secondary-fixed":"#2f1500","surface":"#faf8ff","on-error-container":"#93000a","on-secondary":"#ffffff","secondary-container":"#fdb880","on-tertiary":"#ffffff","outline":"#747782","tertiary-fixed-dim":"#5fdcb1","background":"#faf8ff","outline-variant":"#c4c6d2","surface-bright":"#faf8ff","on-primary-fixed":"#001847","on-tertiary-container":"#f8fff9","on-primary-fixed-variant":"#234489","on-tertiary-fixed":"#002116","on-primary":"#ffffff","on-secondary-container":"#784619","inverse-on-surface":"#f1f0f7","primary":"#3c5aa0","primary-container":"#5673bb","on-primary-container":"#fffdff","on-surface-variant":"#444651","on-error":"#ffffff","surface-variant":"#e3e2e8","secondary-fixed-dim":"#fdb880","on-background":"#1a1b20","tertiary":"#00694f","on-secondary-fixed-variant":"#6a3b0d","inverse-surface":"#2f3035","on-tertiary-fixed-variant":"#00513c","on-surface":"#1a1b20","primary-fixed-dim":"#b1c5ff","surface-container-lowest":"#ffffff","tertiary-container":"#008565","tertiary-fixed":"#7df9cc","secondary":"#865223","surface-container-low":"#f4f3f9"},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px"},spacing:{"space-lg":"1.5rem","space-sm":"0.75rem",gutter:"1rem","space-md":"1rem","space-xs":"0.375rem","space-xl":"2rem","margin-tablet":"1.5rem",margin:"1rem","gutter-sm":"0.75rem"},fontFamily:{"headline-md":["Space Grotesk"],"display-lg":["Space Grotesk"],"body-md":["Hanken Grotesk"],"title-lg":["Hanken Grotesk"],"headline-lg-mobile":["Space Grotesk"],"label-md":["Space Grotesk"],"body-lg":["Hanken Grotesk"],"headline-lg":["Space Grotesk"],"label-sm":["Space Grotesk"],"label-lg":["Space Grotesk"]},fontSize:{"headline-md":["20px",{lineHeight:"26px",letterSpacing:"-0.01em",fontWeight:"600"}],"display-lg":["36px",{lineHeight:"44px",letterSpacing:"-0.03em",fontWeight:"700"}],"body-md":["14px",{lineHeight:"20px",fontWeight:"500"}],"title-lg":["18px",{lineHeight:"24px",fontWeight:"600"}],"headline-lg-mobile":["24px",{lineHeight:"30px",letterSpacing:"-0.02em",fontWeight:"700"}],"label-md":["13px",{lineHeight:"18px",letterSpacing:"0.04em",fontWeight:"600"}],"body-lg":["16px",{lineHeight:"24px",fontWeight:"500"}],"headline-lg":["28px",{lineHeight:"34px",letterSpacing:"-0.02em",fontWeight:"700"}],"label-sm":["11px",{lineHeight:"14px",letterSpacing:"0.06em",fontWeight:"700"}],"label-lg":["15px",{lineHeight:"20px",letterSpacing:"0.02em",fontWeight:"700"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-screen w-72 bg-surface-container-low z-50 flex flex-col shadow-[0_1px_8px_rgba(0,0,0,0.04)] select-none"><div class="h-16 px-space-md flex items-center gap-space-sm bg-surface-container-low"><img alt="Minimalist modern logistics fleet logo icon, dynamic stylized arrow and delivery truck or freight geometric symbol, clean lines, high contrast bold emblem. Design context: - Primary color: #0d52ff
+- Font: spaceGrotesk
+- Mode: light
+- Roundness: rounded-md
+. The logo should be visually consistent with these brand tokens." class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoJ-uSbetgzOoubE9J43Pqvt_9jLIQ95TNaNDNi0Oe1huRwMY2pmxv-swG2oVQG_rxkUFAtaTDmc5wTt6HBupXpxqcXKmK8x4mSdGC8TqPnUJKoQUsgYdWyg0lZRuecDwlmnT0w0aEI9L8Zf_dyakIyt75QbDls5nONcbzzh-FAPv5OJPbG9iQAPLJlS9Y_jlsvm2HvoQMkcA72Y2dmkrfarTWFGldnZodXB5kAtyUuom1Ng7yiKc"/><div class="flex flex-col"><span class="font-headline-md text-headline-md tracking-tight text-primary leading-none">FLEETIQ</span><span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold mt-1">Control Central</span></div></div><div class="flex-1 overflow-y-auto px-space-sm py-space-sm space-y-space-md"><div class="space-y-1"><div class="px-space-md py-space-xs font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Operaciones</div><nav class="space-y-1" data-active-classes="bg-primary-container text-on-primary-container font-bold rounded-full shadow-sm"><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="dashboard-general" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span class="font-body-md text-body-md">Dashboard General</span></a><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="despacho-rutas" href="#"><span class="material-symbols-outlined text-[20px]">alt_route</span><span class="font-body-md text-body-md">Despacho de Rutas</span></a><a aria-current="page" class="group flex items-center gap-space-sm px-space-md py-2.5 transition-all bg-primary-container text-on-primary-container font-bold rounded-full shadow-sm" data-path="mapa-gps-en-vivo" href="#"><span class="material-symbols-outlined text-[20px]">near_me</span><span class="font-body-md text-body-md">Mapa GPS en Vivo</span></a></nav></div><div class="space-y-1"><div class="px-space-md py-space-xs font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Documentación</div><nav class="space-y-1" data-active-classes="bg-primary-container text-on-primary-container font-bold rounded-full shadow-sm"><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="manifiestos-ocr" href="#"><span class="material-symbols-outlined text-[20px]">document_scanner</span><span class="font-body-md text-body-md">Manifiestos y OCR</span></a><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="bitacora-del-dia" href="#"><span class="material-symbols-outlined text-[20px]">assignment</span><span class="font-body-md text-body-md">Bitácora del Día</span></a></nav></div><div class="space-y-1"><div class="px-space-md py-space-xs font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Administración</div><nav class="space-y-1" data-active-classes="bg-primary-container text-on-primary-container font-bold rounded-full shadow-sm"><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="gestion-pagos-1099" href="#"><span class="material-symbols-outlined text-[20px]">payments</span><span class="font-body-md text-body-md">Gestión Pagos 1099</span></a><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="reportes-facturacion" href="#"><span class="material-symbols-outlined text-[20px]">receipt_long</span><span class="font-body-md text-body-md">Reportes de Facturación</span></a><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="flota-choferes" href="#"><span class="material-symbols-outlined text-[20px]">local_shipping</span><span class="font-body-md text-body-md">Flota y Choferes</span></a></nav></div><div class="space-y-1"><div class="px-space-md py-space-xs font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Configuración</div><nav class="space-y-1" data-active-classes="bg-primary-container text-on-primary-container font-bold rounded-full shadow-sm"><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="ajustes-empresa" href="#"><span class="material-symbols-outlined text-[20px]">tune</span><span class="font-body-md text-body-md">Ajustes de Empresa</span></a><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="soporte-control" href="#"><span class="material-symbols-outlined text-[20px]">help</span><span class="font-body-md text-body-md">Soporte</span></a></nav></div></div><div class="p-space-sm bg-surface-container"><div class="flex items-center gap-space-sm p-space-xs rounded-xl bg-surface-container-lowest"><span class="material-symbols-outlined text-tertiary text-2xl">speed</span><div><div class="font-label-sm text-label-sm uppercase text-on-surface-variant font-bold">Sistema GPS</div><div class="font-body-md text-body-md font-semibold text-tertiary flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-tertiary"></span>En Línea 99.98%</div></div></div></div></aside><div class="pl-72"><header class="fixed top-0 left-72 right-0 h-16 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 px-space-md flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md flex-1 max-w-xl"><div class="flex items-center gap-2 bg-surface-container-high rounded-full px-space-md py-2 w-full"><span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span><input class="bg-transparent border-0 outline-none w-full text-on-surface placeholder:text-on-surface-variant font-body-md text-body-md" placeholder="Buscar chofer, unidad, remolque o manifiesto..." type="text"/></div></div><div class="flex items-center gap-space-sm"><div class="hidden xl:flex items-center gap-2"><div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm uppercase"><span class="w-2 h-2 rounded-full bg-tertiary"></span>14 Unidades en Ruta</div><div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm uppercase"><span class="material-symbols-outlined text-[14px]">warning</span>3 Alertas Críticas</div></div><div class="h-6 w-px bg-outline-variant mx-1 hidden lg:block"></div><button aria-label="Notificaciones" class="relative p-2 rounded-full hover:bg-surface-container-high text-on-surface-variant transition-colors"><span class="material-symbols-outlined text-2xl">notifications</span><span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-error rounded-full ring-2 ring-surface"></span></button><button aria-label="Actualizaciones de flota" class="p-2 rounded-full hover:bg-surface-container-high text-on-surface-variant transition-colors"><span class="material-symbols-outlined text-2xl">sync</span></button><div class="flex items-center gap-2.5 pl-2 py-1 pr-3 rounded-full bg-surface-container-low hover:bg-surface-container-high cursor-pointer transition-colors"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeki8ePOVmDAtVuYRCNzme6S5r0e4CnLZGLaYeEImTTI6Cj0f2pwkHTI06n3E8LvEH-SttySTpO6t6xe3XHYxo1MryXeHfjSKzlevMXKDJlMXnbrtG-iRDhKiN2HCOQm5hUL0NV3nhF3yrm9LA617KGJalv5PsIv2VLtZlfvJQy6dOFsEEIJP9f_ALTfU2W1pcK4GuuXhLl3iksFn_Myba6IoB6_jhefnR8OVSu9U5zcrN-Y1kOMA"/><div class="flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface leading-tight">Armando Garza</span><span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Admin Despacho</span></div><span class="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span></div></div></header><main class="w-full pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full relative min-h-[calc(100vh-4rem)] overflow-hidden select-none">
+<!-- Map Canvas Simulation (Laredo - Monterrey - San Antonio Logistics Corridor) -->
+<div class="absolute inset-0 bg-surface-container-highest overflow-hidden z-0">
+<div class="w-full h-full bg-cover bg-center filter saturate-125 contrast-105" data-location="Laredo, Texas logistics hub freight corridor to Monterrey Mexico" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD31FHWpWZ0LIO4mGOeBA_vmOS5ZuGT-9eLjs57fxv1dTa-UiJvfy-rE2IAEStP_P3boDMX3Sy8ovTzUcveuXacToE_Sm4_IEgXqZtvKaPkeZdtJK5_H-WdXBwydKQ6WAsMNT1jqNuXJePnZLYZmK3O9rmdGf1LjrUgX5dF8xM2I-2HVzIWcwuxw1PiUA6Cyy0SvIOWmnLyAGZYUTdV4dC6of35rg40L8sL_kh1hpz63sELs5_IcqI')"></div>
+<!-- Vector Cartography Overlay Grid & Highway Arteries -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none opacity-85" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<pattern height="64" id="grid-pattern" patternunits="userSpaceOnUse" width="64">
+<path class="text-outline-variant/30" d="M 64 0 L 0 0 0 64" fill="none" stroke="currentColor" stroke-width="0.75"></path>
+</pattern>
+<!-- Gradients for dynamic trails -->
+<lineargradient id="routeGradientTX402" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#3c5aa0" stop-opacity="0.2"></stop>
+<stop offset="70%" stop-color="#3c5aa0" stop-opacity="0.9"></stop>
+<stop offset="100%" stop-color="#5673bb" stop-opacity="1"></stop>
+</lineargradient>
+<lineargradient id="routeGradientTX108" x1="0%" x2="100%" y1="100%" y2="0%">
+<stop offset="0%" stop-color="#00694f" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#008565" stop-opacity="0.9"></stop>
+</lineargradient>
+<filter height="140%" id="glow" width="140%" x="-20%" y="-20%">
+<fegaussianblur result="blur" stddeviation="3"></fegaussianblur>
+<fecomposite in="SourceGraphic" in2="blur" operator="over"></fecomposite>
+</filter>
+</defs>
+<rect fill="url(#grid-pattern)" height="100%" width="100%"></rect>
+<!-- Major Interstate / Carr. 57 arteries -->
+<path class="text-surface-container/60" d="M 320 40 Q 560 220 720 430 T 960 780" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="14"></path>
+<path class="text-outline-variant/70" d="M 320 40 Q 560 220 720 430 T 960 780" fill="none" stroke="currentColor" stroke-dasharray="8 6" stroke-linecap="round" stroke-width="6"></path>
+<!-- Active Highway Corridor Line for TX-402 (Active Route) -->
+<path d="M 520 180 Q 640 310 710 420" fill="none" filter="url(#glow)" id="path-tx402" stroke="url(#routeGradientTX402)" stroke-linecap="round" stroke-width="5"></path>
+<!-- Geofence Polygonal Zone: Parque Industrial Norte -->
+<polygon class="text-primary" fill="currentColor" points="670,370 760,390 750,470 650,440" stroke="currentColor" stroke-dasharray="4 3" stroke-width="2"></polygon>
+<text class="fill-primary font-label-sm text-[10px] tracking-wider uppercase font-bold" x="670" y="362">Geocerca: Parque Ind. Norte</text>
+<!-- Geofence Zone 2: Terminal Frontera Laredo -->
+<polygon class="text-tertiary" fill="currentColor" points="480,130 570,140 550,210 460,190" stroke="currentColor" stroke-dasharray="4 3" stroke-width="2"></polygon>
+<text class="fill-tertiary font-label-sm text-[10px] tracking-wider uppercase font-bold" x="475" y="122">Geocerca: Aduana Laredo World Trade</text>
+<!-- Unit Pin TX-108 -->
+<g class="cursor-pointer" transform="translate(540, 210)">
+<circle class="text-tertiary/20" fill="currentColor" r="16"></circle>
+<circle class="text-tertiary ring-2 ring-surface" fill="currentColor" r="7"></circle>
+<rect class="text-inverse-surface shadow-md" fill="currentColor" height="22" rx="11" width="70" x="12" y="-12"></rect>
+<text class="fill-inverse-on-surface font-label-sm text-[11px] font-bold" text-anchor="middle" x="47" y="3">TX-108</text>
+</g>
+<!-- Unit Pin TX-210 (Critical Delay Alert) -->
+<g class="cursor-pointer" transform="translate(610, 290)">
+<circle class="text-error/25 animate-ping" fill="currentColor" r="18"></circle>
+<circle class="text-error ring-2 ring-surface" fill="currentColor" r="8"></circle>
+<rect class="text-error shadow-lg" fill="currentColor" height="24" rx="12" width="90" x="-45" y="-32"></rect>
+<text class="fill-on-error font-label-sm text-[10px] font-bold uppercase tracking-tight" text-anchor="middle" x="0" y="-16">! TX-210 +28m</text>
+</g>
+<!-- Unit Pin TX-305 -->
+<g class="cursor-pointer" transform="translate(740, 440)">
+<circle class="text-secondary ring-2 ring-surface" fill="currentColor" r="7"></circle>
+<rect class="text-inverse-surface shadow-md" fill="currentColor" height="22" rx="11" width="68" x="12" y="-12"></rect>
+<text class="fill-inverse-on-surface font-label-sm text-[11px] font-bold" text-anchor="middle" x="46" y="3">TX-305</text>
+</g>
+<!-- Active Selected Unit Pin: TX-402 (With animated pulse) -->
+<g class="cursor-pointer" transform="translate(710, 420)">
+<circle class="text-primary/20 animate-pulse" fill="currentColor" r="26"></circle>
+<circle class="text-primary ring-4 ring-surface shadow-xl" fill="currentColor" r="14"></circle>
+<polygon fill="#ffffff" points="706,415 714,415 710,425"></polygon>
+<!-- Target Destination Line -->
+<line class="text-primary" stroke="currentColor" stroke-dasharray="3 3" stroke-width="2" x1="0" x2="35" y1="0" y2="28"></line>
+<circle class="text-tertiary-container" cx="35" cy="28" fill="currentColor" r="4"></circle>
+</g>
+</svg>
+<!-- Top Left Floating Scale and Compass Widget -->
+<div class="absolute top-20 right-6 flex flex-col items-center gap-2 pointer-events-auto">
+<div class="bg-surface-container-lowest/90 backdrop-blur-md rounded-full shadow-lg p-2.5 flex flex-col items-center gap-3 text-on-surface-variant">
+<button aria-label="Centrar Mapa" class="w-9 h-9 rounded-full flex items-center justify-center hover:bg-surface-container-high transition-colors" title="Centrar Mapa">
+<span class="material-symbols-outlined text-[20px] text-primary">my_location</span>
+</button>
+<button aria-label="Acercar" class="w-9 h-9 rounded-full flex items-center justify-center hover:bg-surface-container-high transition-colors" title="Acercar (+)">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+<div class="w-5 h-px bg-outline-variant/50"></div>
+<button aria-label="Alejar" class="w-9 h-9 rounded-full flex items-center justify-center hover:bg-surface-container-high transition-colors" title="Alejar (-)">
+<span class="material-symbols-outlined text-[20px]">remove</span>
+</button>
+<button aria-label="Modo 3D" class="w-9 h-9 rounded-full flex items-center justify-center hover:bg-surface-container-high transition-colors" title="Modo 3D / Perspectiva">
+<span class="material-symbols-outlined text-[20px]">layers</span>
+</button>
+</div>
+<div class="bg-surface-container-lowest/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-sm text-center">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Escala 1:25k</span>
+</div>
+</div>
+</div>
+<!-- FLOATING TOP BAR: Search & Material 3 Filter Chips -->
+<header class="relative z-20 px-6 pt-4 pb-2 w-full flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 pointer-events-none">
+<!-- Filter Chips Cluster (Floating M3 Filter Segment) -->
+<div class="flex flex-wrap items-center gap-2 pointer-events-auto">
+<button class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary-container text-on-primary-container font-label-md text-label-md shadow-md hover:shadow-lg transition-all scale-[1.02]">
+<span class="material-symbols-outlined text-[18px]">view_in_ar</span>
+<span>Todas las Unidades</span>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-lowest/25 font-bold text-xs">14</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-lowest/90 backdrop-blur-md text-on-surface hover:bg-surface-container-high font-label-md text-label-md shadow-sm transition-all">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span>En Tránsito</span>
+<span class="text-on-surface-variant font-bold text-xs ml-0.5">9</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-container-lowest/90 backdrop-blur-md text-on-surface hover:bg-surface-container-high font-label-md text-label-md shadow-sm transition-all">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span>En Espera</span>
+<span class="text-on-surface-variant font-bold text-xs ml-0.5">3</span>
+</button>
+<div class="h-6 w-px bg-outline-variant/40 mx-1 hidden sm:block"></div>
+<!-- Toggle Chip: Tráfico ON -->
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-lowest/95 backdrop-blur-md text-tertiary font-label-md text-label-md shadow-sm hover:bg-tertiary/10 transition-colors">
+<span class="material-symbols-outlined text-[16px] text-tertiary">traffic</span>
+<span>Tráfico ON</span>
+</button>
+<!-- Toggle Chip: Geocercas ON -->
+<button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-md text-label-md shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">polyline</span>
+<span>Geocercas ON</span>
+</button>
+<!-- Critical Alert Pill Chip -->
+<button class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-error-container text-on-error-container font-label-md text-label-md shadow-md animate-pulse">
+<span class="material-symbols-outlined text-[16px]">emergency_home</span>
+<span>Alertas Críticas</span>
+<span class="px-1.5 py-0.5 rounded-full bg-error text-on-error font-bold text-[10px]">3</span>
+</button>
+</div>
+<!-- Quick Live Refresh Indicator -->
+<div class="pointer-events-auto hidden md:flex items-center gap-2 bg-surface-container-lowest/90 backdrop-blur-md px-3.5 py-1.5 rounded-full shadow-sm text-on-surface">
+<span class="inline-block w-2.5 h-2.5 rounded-full bg-tertiary animate-ping"></span>
+<span class="font-label-sm text-label-sm font-semibold tracking-wide uppercase text-on-surface-variant">GPS Sync • Hace 3s</span>
+</div>
+</header>
+<!-- MAIN INTERACTIVE WORKSPACE (Split floating deck: Roster Drawer Left, Detail Card Right) -->
+<div class="relative z-10 flex-1 px-6 pb-24 pt-2 flex flex-col lg:flex-row gap-5 pointer-events-none items-start">
+<!-- LEFT PANEL: Real-time Unit Telemetry Drawer (Floating M3 Roster) -->
+<aside class="w-full lg:w-96 max-h-[calc(100vh-14rem)] flex flex-col bg-surface-container-lowest/95 backdrop-blur-xl rounded-2xl shadow-xl pointer-events-auto overflow-hidden">
+<!-- Drawer Header & Search Field -->
+<div class="p-4 pb-3 space-y-3 bg-surface-container-low/70">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-2xl">local_shipping</span>
+<h2 class="font-headline-md text-headline-md tracking-tight text-on-surface">Flota en Operación</h2>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant">Corredor TX-NL</span>
+</div>
+<!-- Quick filter in drawer -->
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full pl-9 pr-8 py-2 rounded-xl bg-surface-container-high/80 text-on-surface placeholder:text-on-surface-variant font-body-md text-body-md outline-none focus:ring-2 focus:ring-primary transition-all" placeholder="Filtrar por unidad, chofer o caja..." type="text"/>
+<span class="material-symbols-outlined absolute right-2.5 text-on-surface-variant text-[18px] cursor-pointer">tune</span>
+</div>
+</div>
+<!-- Unit Telemetry Cards Scroll Area -->
+<div class="flex-1 overflow-y-auto p-3 space-y-2.5 divide-y-0">
+<!-- CARD 1: TX-402 (Active Selected Unit) -->
+<div class="p-3.5 rounded-xl bg-primary/5 shadow-sm cursor-pointer relative transition-all">
+<div class="absolute left-0 top-3 bottom-3 w-1.5 bg-primary rounded-r-full"></div>
+<div class="flex items-start justify-between gap-2 pl-2">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md text-primary font-bold tracking-tight">TX-402</span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-[10px] uppercase font-bold">
+                  En Ruta
+                </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface font-semibold mt-0.5">Sarah Jenkins</p>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Freightliner Cascadia '24 • Caja 53' Reefer</span>
+</div>
+<div class="text-right">
+<span class="font-headline-md text-headline-md text-primary font-bold">64</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant block -mt-1">km/h</span>
+</div>
+</div>
+<!-- Micro Telemetry Grid -->
+<div class="grid grid-cols-3 gap-2 mt-3 pt-2.5 bg-surface-container-lowest/80 rounded-lg p-2 pl-3">
+<div class="flex flex-col">
+<span class="font-label-sm text-[10px] text-on-surface-variant uppercase font-bold">Termo Frío</span>
+<span class="font-label-md text-label-md font-bold text-tertiary flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">ac_unit</span> 3.8°C
+              </span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-[10px] text-on-surface-variant uppercase font-bold">Diésel</span>
+<span class="font-label-md text-label-md font-bold text-on-surface flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px] text-secondary">local_gas_station</span> 82%
+              </span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-[10px] text-on-surface-variant uppercase font-bold">HOS Conducción</span>
+<span class="font-label-md text-label-md font-bold text-on-surface flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px]">schedule</span> 05h 12m
+              </span>
+</div>
+</div>
+<!-- Waypoint destination snippet -->
+<div class="mt-2.5 flex items-center gap-1.5 pl-2 text-on-surface-variant font-label-sm text-[11px]">
+<span class="material-symbols-outlined text-primary text-[15px]">flag</span>
+<span class="truncate font-medium">Almacenes del Norte S.A. • Rampa 12</span>
+</div>
+</div>
+<!-- CARD 2: TX-108 -->
+<div class="p-3.5 rounded-xl bg-surface-container-lowest hover:bg-surface-container-high/60 shadow-sm cursor-pointer transition-all">
+<div class="flex items-start justify-between gap-2">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight">TX-108</span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-[10px] uppercase font-bold">
+                  En Ruta
+                </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface font-semibold mt-0.5">Mario Lozano</p>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Kenworth T680 • Carga Congelada</span>
+</div>
+<div class="text-right">
+<span class="font-headline-md text-headline-md text-on-surface font-bold">58</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant block -mt-1">km/h</span>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-2.5 pt-2 bg-surface-container-low/50 rounded-lg p-2">
+<div class="flex flex-col">
+<span class="font-label-sm text-[10px] text-on-surface-variant uppercase font-bold">Termo</span>
+<span class="font-label-md text-label-md font-bold text-tertiary">-18.2°C</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-[10px] text-on-surface-variant uppercase font-bold">Diésel</span>
+<span class="font-label-md text-label-md font-bold text-on-surface">64%</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-[10px] text-on-surface-variant uppercase font-bold">ETA</span>
+<span class="font-label-md text-label-md font-bold text-primary">11:20 AM</span>
+</div>
+</div>
+</div>
+<!-- CARD 3: TX-210 (Retraso Alerta) -->
+<div class="p-3.5 rounded-xl bg-error-container/40 hover:bg-error-container/60 shadow-sm cursor-pointer transition-all">
+<div class="flex items-start justify-between gap-2">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md text-error font-bold tracking-tight">TX-210</span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-error text-on-error font-label-sm text-[10px] uppercase font-bold">
+                  Retraso +28 min
+                </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface font-semibold mt-0.5">Roberto Escobedo</p>
+<span class="font-label-sm text-label-sm text-on-surface-variant">International LT • Detenido en Carr. 57</span>
+</div>
+<div class="text-right">
+<span class="material-symbols-outlined text-error text-2xl">warning</span>
+</div>
+</div>
+<div class="mt-2.5 bg-error-container/80 text-on-error-container p-2 rounded-lg flex items-center justify-between text-xs font-semibold">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">timer_off</span>
+              Velocidad: 0 km/h (14 min)
+            </span>
+<button class="underline hover:opacity-80">Verificar Incidencia</button>
+</div>
+</div>
+<!-- CARD 4: TX-305 (En Descarga) -->
+<div class="p-3.5 rounded-xl bg-surface-container-lowest hover:bg-surface-container-high/60 shadow-sm cursor-pointer transition-all">
+<div class="flex items-start justify-between gap-2">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight">TX-305</span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-[10px] uppercase font-bold">
+                  En Descarga
+                </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface font-semibold mt-0.5">David Valdés</p>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Volvo VNL 860 • Centro CEDIS San Nicolás</span>
+</div>
+<div class="text-right">
+<span class="material-symbols-outlined text-secondary text-2xl">forklift</span>
+</div>
+</div>
+<div class="mt-2.5 flex items-center justify-between text-xs text-on-surface-variant pt-1">
+<span class="font-medium">Muelle 04 • En proceso</span>
+<span class="font-bold text-on-surface">Salida est. 11:00 AM</span>
+</div>
+</div>
+</div>
+<!-- Drawer Footer Telemetry Summary -->
+<div class="p-3 bg-surface-container-low flex items-center justify-between text-xs text-on-surface-variant">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-tertiary">sensors</span>
+          Telemetría CAN-Bus activa
+        </span>
+<button class="font-label-sm text-primary font-bold uppercase tracking-wider hover:underline">Ver todas (14)</button>
+</div>
+</aside>
+<!-- RIGHT/CENTER FLOATING DETAIL CARD: Unidad Seleccionada (TX-402) -->
+<div class="w-full lg:max-w-md ml-auto bg-surface-container-lowest/95 backdrop-blur-xl rounded-2xl shadow-2xl pointer-events-auto overflow-hidden transition-all duration-300">
+<!-- Card Hero / Unit Identity -->
+<div class="relative bg-gradient-to-br from-primary via-primary-container to-primary-container p-5 text-on-primary">
+<div class="flex items-start justify-between">
+<div>
+<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container-lowest/20 backdrop-blur-md text-on-primary font-label-sm text-[10px] uppercase font-bold mb-2">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed"></span> Monitoreo en Vivo
+            </div>
+<div class="flex items-baseline gap-2">
+<h1 class="font-display-lg text-display-lg font-bold tracking-tight">TX-402</h1>
+<span class="font-title-lg text-title-lg text-on-primary/90 font-medium">Cascadia '24</span>
+</div>
+<p class="font-body-md text-body-md text-on-primary/80 mt-0.5">Operador asignado: Sarah Jenkins (Lic. Federal #TX-90412)</p>
+</div>
+<button aria-label="Cerrar detalle" class="w-8 h-8 rounded-full bg-surface-container-lowest/20 hover:bg-surface-container-lowest/30 flex items-center justify-center transition-colors" title="Cerrar detalle">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<!-- Telemetry Gauges Pill Row -->
+<div class="grid grid-cols-3 gap-2.5 mt-5">
+<div class="bg-surface-container-lowest/15 backdrop-blur-sm rounded-xl p-2.5 flex flex-col items-center justify-center text-center">
+<span class="material-symbols-outlined text-[20px] text-tertiary-fixed mb-0.5">speed</span>
+<span class="font-headline-md text-headline-md leading-none font-bold">64</span>
+<span class="font-label-sm text-[10px] text-on-primary/75 uppercase tracking-wider mt-1">km/h GPS</span>
+</div>
+<div class="bg-surface-container-lowest/15 backdrop-blur-sm rounded-xl p-2.5 flex flex-col items-center justify-center text-center">
+<span class="material-symbols-outlined text-[20px] text-tertiary-fixed mb-0.5">severe_cold</span>
+<span class="font-headline-md text-headline-md leading-none font-bold">3.8°C</span>
+<span class="font-label-sm text-[10px] text-on-primary/75 uppercase tracking-wider mt-1">Termo Reefer</span>
+</div>
+<div class="bg-surface-container-lowest/15 backdrop-blur-sm rounded-xl p-2.5 flex flex-col items-center justify-center text-center">
+<span class="material-symbols-outlined text-[20px] text-secondary-container mb-0.5">local_gas_station</span>
+<span class="font-headline-md text-headline-md leading-none font-bold">82%</span>
+<span class="font-label-sm text-[10px] text-on-primary/75 uppercase tracking-wider mt-1">Diésel (480L)</span>
+</div>
+</div>
+</div>
+<!-- Current Waypoint & Mission Context -->
+<div class="p-5 space-y-4">
+<!-- Live Route Progress Graphic -->
+<div class="space-y-1.5">
+<div class="flex items-center justify-between text-xs">
+<span class="font-label-md text-label-md font-semibold text-on-surface">Ruta Laredo TX → Apodaca NL</span>
+<span class="font-label-sm text-label-sm text-tertiary font-bold">92% Completado</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-tertiary rounded-full" style="width: 92%;"></div>
+</div>
+<div class="flex items-center justify-between text-[11px] text-on-surface-variant">
+<span>Salida 05:40 AM (Aduana)</span>
+<span class="font-bold text-primary">ETA: 10:48 AM (4.2 km restantes)</span>
+</div>
+</div>
+<!-- Next Stop Destination Card -->
+<div class="p-3.5 rounded-xl bg-surface-container-low flex items-start gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">warehouse</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-1">
+<span class="font-label-sm text-[10px] uppercase font-bold tracking-wider text-primary">Parada Inmediata</span>
+<span class="font-label-sm text-[10px] px-2 py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant font-mono">#MNF-9921-TX</span>
+</div>
+<h4 class="font-title-lg text-title-lg font-bold text-on-surface truncate mt-0.5">Almacenes del Norte S.A.</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Rampa de Descarga #12 • Geocerca Norte</p>
+<div class="mt-2 flex items-center gap-3 text-xs font-semibold text-on-surface">
+<span class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined text-[15px]">check_circle</span>
+                Cita Confirmada
+              </span>
+<span>•</span>
+<span>24 Pallets (Refrigerado)</span>
+</div>
+</div>
+</div>
+<!-- Vehicle Telemetry Quick Metrics Bar -->
+<div class="p-3 rounded-xl bg-surface-container-highest/60 flex items-center justify-between text-xs">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">lock</span>
+<span class="text-on-surface font-medium">Sello Electrónico:</span>
+<span class="font-mono font-bold text-tertiary">VERIFICADO #8990-B</span>
+</div>
+<span class="material-symbols-outlined text-tertiary text-[18px]">verified_user</span>
+</div>
+<!-- Material 3 Action Buttons Stack -->
+<div class="pt-2 space-y-2">
+<!-- Primary CTA (Chat con Cabina) - gloved touch height 56px minimum guideline compliant -->
+<button class="w-full h-14 rounded-xl bg-primary-container text-on-primary-container font-label-lg text-label-lg shadow-md hover:shadow-lg hover:brightness-105 active:scale-[0.98] transition-all flex items-center justify-center gap-2 font-bold">
+<span class="material-symbols-outlined text-[22px]">forum</span>
+<span>Chat con Cabina / Sarah J.</span>
+</button>
+<!-- Secondary Actions Pair -->
+<div class="grid grid-cols-2 gap-2">
+<button class="h-12 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors flex items-center justify-center gap-1.5 font-semibold">
+<span class="material-symbols-outlined text-[18px]">assignment</span>
+<span>Hoja de Ruta</span>
+</button>
+<button class="h-12 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors flex items-center justify-center gap-1.5 font-semibold">
+<span class="material-symbols-outlined text-[18px]">support_agent</span>
+<span>Contactar Muelle</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- BOTTOM FLOATING M3 BANNER / STATUS DECK -->
+<footer class="absolute bottom-3 left-6 right-6 z-30 pointer-events-none">
+<div class="bg-inverse-surface text-inverse-on-surface rounded-2xl p-4 shadow-2xl pointer-events-auto flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4">
+<!-- Key Telemetry Telemetry Indicators -->
+<div class="flex flex-wrap items-center gap-6 divide-x-0 sm:divide-x divide-outline-variant/30">
+<!-- Indicator 1: GPS Satellites -->
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-tertiary/20 text-tertiary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">satellite_alt</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md font-bold leading-none text-tertiary-fixed">18 Satélites</span>
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed animate-ping"></span>
+</div>
+<span class="font-label-sm text-[11px] text-inverse-on-surface/70 mt-1 block">Precisión RTK ± 1.5 metros</span>
+</div>
+</div>
+<!-- Indicator 2: Reefer Cold Chain Compliance -->
+<div class="flex items-center gap-3 sm:pl-6">
+<div class="w-10 h-10 rounded-xl bg-primary-fixed/20 text-primary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">nest_thermostat_gen_3</span>
+</div>
+<div>
+<span class="font-headline-md text-headline-md font-bold leading-none text-on-primary-container">100% Rango Seguro</span>
+<span class="font-label-sm text-[11px] text-inverse-on-surface/70 mt-1 block">Flota Refrigerada &lt; 4.0°C</span>
+</div>
+</div>
+<!-- Indicator 3: Operational On-Time SLA -->
+<div class="flex items-center gap-3 sm:pl-6">
+<div class="w-10 h-10 rounded-xl bg-secondary-fixed/20 text-secondary-fixed-dim flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[22px]">insights</span>
+</div>
+<div>
+<span class="font-headline-md text-headline-md font-bold leading-none text-secondary-fixed">94.8% SLA</span>
+<span class="font-label-sm text-[11px] text-inverse-on-surface/70 mt-1 block">Rutas Internacionales a Tiempo</span>
+</div>
+</div>
+</div>
+<!-- Real-Time Event Dispatch Log Ticker -->
+<div class="flex items-center gap-3 bg-inverse-surface/80 bg-surface-container-highest/10 px-4 py-2.5 rounded-xl max-w-xl">
+<span class="material-symbols-outlined text-tertiary-fixed text-[20px] shrink-0 animate-bounce">notifications_active</span>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-[10px] uppercase font-bold tracking-wider text-inverse-on-surface/60">Último Evento en Vivo (10:44:12)</span>
+<p class="font-body-md text-body-md text-inverse-on-surface truncate font-semibold">
+            Unidad <span class="text-primary-fixed font-bold">TX-402</span> ingresó a Geocerca <span class="text-tertiary-fixed">"Parque Industrial Norte"</span>.
+          </p>
+</div>
+<button aria-label="Ver Bitácora" class="ml-auto shrink-0 text-inverse-on-surface/70 hover:text-inverse-on-surface transition-colors" title="Ver Bitácora de Eventos">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</footer>
+</div>
+<script>
+  // Material 3 Interactive Micro-behaviors
+  document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      // Gentle kinetic ripple feedback without altering global shell
+      this.classList.add('scale-95');
+      setTimeout(() => {
+        this.classList.remove('scale-95');
+      }, 150);
+    });
+  });
+</script></main></div></body></html>

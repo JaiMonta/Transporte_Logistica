@@ -1,0 +1,143 @@
+
+<div id="erd" style="padding: 1rem 0"></div>
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const themeMode = document.documentElement.dataset.mode;
+const dark = themeMode ? themeMode === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"anthropic-sans", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '12px',
+    fontFamily: '"anthropic-sans", sans-serif',
+    lineColor: dark ? '#9c9a92' : '#73726c',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+  },
+});
+const diagram = `erDiagram
+  USUARIOS {
+    uuid id PK
+    string nombre
+    string email
+    string rol
+    string telefono
+    boolean activo
+    timestamp created_at
+  }
+  CAMIONES {
+    uuid id PK
+    string placa
+    string marca_modelo
+    string numero_unidad
+    boolean activo
+    timestamp created_at
+  }
+  MANIFIESTOS {
+    uuid id PK
+    uuid chofer_id FK
+    uuid camion_id FK
+    uuid ruta_id FK
+    string numero_manifiesto
+    string empresa_cliente
+    string estado
+    date fecha_servicio
+    string pdf_url
+    timestamp created_at
+  }
+  ENTREGAS {
+    uuid id PK
+    uuid manifiesto_id FK
+    string numero_entrega
+    string cliente_nombre
+    string direccion
+    decimal kilos
+    string estado
+    string foto_evidencia_url
+    string firma_url
+    decimal lat_entrega
+    decimal lng_entrega
+    timestamp entregado_at
+  }
+  RUTAS {
+    uuid id PK
+    uuid chofer_id FK
+    uuid camion_id FK
+    date fecha
+    string origen
+    string destino
+    string estado
+    string notas
+    timestamp created_at
+  }
+  UBICACIONES_GPS {
+    uuid id PK
+    uuid chofer_id FK
+    uuid ruta_id FK
+    decimal latitud
+    decimal longitud
+    decimal velocidad
+    timestamp registrado_at
+  }
+  PAGOS_CHOFERES {
+    uuid id PK
+    uuid chofer_id FK
+    date periodo_inicio
+    date periodo_fin
+    decimal monto_base
+    decimal extras
+    decimal total
+    string estado
+    string comprobante_url
+    timestamp created_at
+  }
+  EXTRAS_SERVICIO {
+    uuid id PK
+    uuid chofer_id FK
+    uuid ruta_id FK
+    string tipo
+    decimal monto
+    string descripcion
+    timestamp created_at
+  }
+
+  USUARIOS ||--o{ MANIFIESTOS : "es_chofer"
+  USUARIOS ||--o{ RUTAS : "asignado_a"
+  USUARIOS ||--o{ UBICACIONES_GPS : "genera"
+  USUARIOS ||--o{ PAGOS_CHOFERES : "recibe"
+  USUARIOS ||--o{ EXTRAS_SERVICIO : "genera"
+  CAMIONES ||--o{ MANIFIESTOS : "usado_en"
+  CAMIONES ||--o{ RUTAS : "asignado_a"
+  MANIFIESTOS ||--o{ ENTREGAS : "contiene"
+  MANIFIESTOS }o--|| RUTAS : "pertenece_a"
+  RUTAS ||--o{ UBICACIONES_GPS : "genera"
+  RUTAS ||--o{ EXTRAS_SERVICIO : "tiene"
+`;
+const { svg } = await mermaid.render('erd-svg', diagram);
+document.getElementById('erd').innerHTML = svg;
+
+document.querySelectorAll('#erd svg .node').forEach(node => {
+  const firstPath = node.querySelector('path[d]');
+  if (!firstPath) return;
+  const d = firstPath.getAttribute('d');
+  const nums = d.match(/-?[\d.]+/g)?.map(Number);
+  if (!nums || nums.length < 8) return;
+  const xs = [nums[0], nums[2], nums[4], nums[6]];
+  const ys = [nums[1], nums[3], nums[5], nums[7]];
+  const x = Math.min(...xs), y = Math.min(...ys);
+  const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x); rect.setAttribute('y', y);
+  rect.setAttribute('width', w); rect.setAttribute('height', h);
+  rect.setAttribute('rx', '8');
+  for (const a of ['fill', 'stroke', 'stroke-width', 'class', 'style']) {
+    if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+  }
+  firstPath.replaceWith(rect);
+});
+document.querySelectorAll('#erd svg .row-rect-odd path, #erd svg .row-rect-even path').forEach(p => {
+  p.setAttribute('stroke', 'none');
+});
+</script>

@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+
+<html lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&amp;family=Space+Grotesk:wght@300..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"inverse-primary":"#b1c5ff","error-container":"#ffdad6","surface-container-high":"#e8e7ee","primary-fixed":"#dae2ff","secondary-fixed":"#ffdcc3","surface-container":"#eeedf4","surface-tint":"#3e5ca2","surface-dim":"#dad9e0","error":"#ba1a1a","surface-container-highest":"#e3e2e8","on-secondary-fixed":"#2f1500","surface":"#faf8ff","on-error-container":"#93000a","on-secondary":"#ffffff","secondary-container":"#fdb880","on-tertiary":"#ffffff","outline":"#747782","tertiary-fixed-dim":"#5fdcb1","background":"#faf8ff","outline-variant":"#c4c6d2","surface-bright":"#faf8ff","on-primary-fixed":"#001847","on-tertiary-container":"#f8fff9","on-primary-fixed-variant":"#234489","on-tertiary-fixed":"#002116","on-primary":"#ffffff","on-secondary-container":"#784619","inverse-on-surface":"#f1f0f7","primary":"#3c5aa0","primary-container":"#5673bb","on-primary-container":"#fffdff","on-surface-variant":"#444651","on-error":"#ffffff","surface-variant":"#e3e2e8","secondary-fixed-dim":"#fdb880","on-background":"#1a1b20","tertiary":"#00694f","on-secondary-fixed-variant":"#6a3b0d","inverse-surface":"#2f3035","on-tertiary-fixed-variant":"#00513c","on-surface":"#1a1b20","primary-fixed-dim":"#b1c5ff","surface-container-lowest":"#ffffff","tertiary-container":"#008565","tertiary-fixed":"#7df9cc","secondary":"#865223","surface-container-low":"#f4f3f9"},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px"},spacing:{"space-lg":"1.5rem","space-sm":"0.75rem",gutter:"1rem","space-md":"1rem","space-xs":"0.375rem","space-xl":"2rem","margin-tablet":"1.5rem",margin:"1rem","gutter-sm":"0.75rem"},fontFamily:{"headline-md":["Space Grotesk"],"display-lg":["Space Grotesk"],"body-md":["Hanken Grotesk"],"title-lg":["Hanken Grotesk"],"headline-lg-mobile":["Space Grotesk"],"label-md":["Space Grotesk"],"body-lg":["Hanken Grotesk"],"headline-lg":["Space Grotesk"],"label-sm":["Space Grotesk"],"label-lg":["Space Grotesk"]},fontSize:{"headline-md":["20px",{lineHeight:"26px",letterSpacing:"-0.01em",fontWeight:"600"}],"display-lg":["36px",{lineHeight:"44px",letterSpacing:"-0.03em",fontWeight:"700"}],"body-md":["14px",{lineHeight:"20px",fontWeight:"500"}],"title-lg":["18px",{lineHeight:"24px",fontWeight:"600"}],"headline-lg-mobile":["24px",{lineHeight:"30px",letterSpacing:"-0.02em",fontWeight:"700"}],"label-md":["13px",{lineHeight:"18px",letterSpacing:"0.04em",fontWeight:"600"}],"body-lg":["16px",{lineHeight:"24px",fontWeight:"500"}],"headline-lg":["28px",{lineHeight:"34px",letterSpacing:"-0.02em",fontWeight:"700"}],"label-sm":["11px",{lineHeight:"14px",letterSpacing:"0.06em",fontWeight:"700"}],"label-lg":["15px",{lineHeight:"20px",letterSpacing:"0.02em",fontWeight:"700"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-screen w-72 bg-surface-container-low z-50 flex flex-col shadow-[0_1px_8px_rgba(0,0,0,0.04)] select-none"><div class="h-16 px-space-md flex items-center gap-space-sm bg-surface-container-low"><img alt="Minimalist modern logistics fleet logo icon, dynamic stylized arrow and delivery truck or freight geometric symbol, clean lines, high contrast bold emblem. Design context: - Primary color: #0d52ff
+- Font: spaceGrotesk
+- Mode: light
+- Roundness: rounded-md
+. The logo should be visually consistent with these brand tokens." class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCssOg0VNVzzAuvYkA67dLob1ryi3ZdtvDts2fy92szyJUU0-K_74_lgcZplYA3VQhB25ZE53jbaSErMGBpI9-fFaoCuVkbKcpS6goh3kXoXLwsjxVwPDXViGpbyqeFm8JOU1fPQBV8fHKmvYAgtdC3f9PeJMKIL5nRbLVIY7tiyJRA1r03AkfimUl7Krhp1Wq560kszNbjO84RpOBtx_U_0XsUBLRu2camJLBhf7sdsI3WdYaDm6g"/><div class="flex flex-col"><span class="font-headline-md text-headline-md tracking-tight text-primary leading-none">FLEETIQ</span><span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold mt-1">Control Central</span></div></div><div class="flex-1 overflow-y-auto px-space-sm py-space-sm space-y-space-md"><div class="space-y-1"><div class="px-space-md py-space-xs font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Operaciones</div><nav class="space-y-1" data-active-classes="bg-primary-container text-on-primary-container font-bold rounded-full shadow-sm"><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="dashboard-general" href="#"><span class="material-symbols-outlined text-[20px]">dashboard</span><span class="font-body-md text-body-md">Dashboard General</span></a><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="despacho-rutas" href="#"><span class="material-symbols-outlined text-[20px]">alt_route</span><span class="font-body-md text-body-md">Despacho de Rutas</span></a><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="mapa-gps-en-vivo" href="#"><span class="material-symbols-outlined text-[20px]">near_me</span><span class="font-body-md text-body-md">Mapa GPS en Vivo</span></a></nav></div><div class="space-y-1"><div class="px-space-md py-space-xs font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Documentación</div><nav class="space-y-1" data-active-classes="bg-primary-container text-on-primary-container font-bold rounded-full shadow-sm"><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="manifiestos-ocr" href="#"><span class="material-symbols-outlined text-[20px]">document_scanner</span><span class="font-body-md text-body-md">Manifiestos y OCR</span></a><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="bitacora-del-dia" href="#"><span class="material-symbols-outlined text-[20px]">assignment</span><span class="font-body-md text-body-md">Bitácora del Día</span></a></nav></div><div class="space-y-1"><div class="px-space-md py-space-xs font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Administración</div><nav class="space-y-1" data-active-classes="bg-primary-container text-on-primary-container font-bold rounded-full shadow-sm"><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="gestion-pagos-1099" href="#"><span class="material-symbols-outlined text-[20px]">payments</span><span class="font-body-md text-body-md">Gestión Pagos 1099</span></a><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="reportes-facturacion" href="#"><span class="material-symbols-outlined text-[20px]">receipt_long</span><span class="font-body-md text-body-md">Reportes de Facturación</span></a><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="flota-choferes" href="#"><span class="material-symbols-outlined text-[20px]">local_shipping</span><span class="font-body-md text-body-md">Flota y Choferes</span></a></nav></div><div class="space-y-1"><div class="px-space-md py-space-xs font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-bold">Configuración</div><nav class="space-y-1" data-active-classes="bg-primary-container text-on-primary-container font-bold rounded-full shadow-sm"><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="ajustes-empresa" href="#"><span class="material-symbols-outlined text-[20px]">tune</span><span class="font-body-md text-body-md">Ajustes de Empresa</span></a><a class="group flex items-center gap-space-sm px-space-md py-2.5 rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="soporte-control" href="#"><span class="material-symbols-outlined text-[20px]">help</span><span class="font-body-md text-body-md">Soporte</span></a></nav></div></div><div class="p-space-sm bg-surface-container"><div class="flex items-center gap-space-sm p-space-xs rounded-xl bg-surface-container-lowest"><span class="material-symbols-outlined text-tertiary text-2xl">speed</span><div><div class="font-label-sm text-label-sm uppercase text-on-surface-variant font-bold">Sistema GPS</div><div class="font-body-md text-body-md font-semibold text-tertiary flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-tertiary"></span>En Línea 99.98%</div></div></div></div></aside><div class="pl-72"><header class="fixed top-0 left-72 right-0 h-16 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 px-space-md flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md flex-1 max-w-xl"><div class="flex items-center gap-2 bg-surface-container-high rounded-full px-space-md py-2 w-full"><span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span><input class="bg-transparent border-0 outline-none w-full text-on-surface placeholder:text-on-surface-variant font-body-md text-body-md" placeholder="Buscar chofer, unidad, remolque o manifiesto..." type="text"/></div></div><div class="flex items-center gap-space-sm"><div class="hidden xl:flex items-center gap-2"><div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm uppercase"><span class="w-2 h-2 rounded-full bg-tertiary"></span>14 Unidades en Ruta</div><div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm uppercase"><span class="material-symbols-outlined text-[14px]">warning</span>3 Alertas Críticas</div></div><div class="h-6 w-px bg-outline-variant mx-1 hidden lg:block"></div><button aria-label="Notificaciones" class="relative p-2 rounded-full hover:bg-surface-container-high text-on-surface-variant transition-colors"><span class="material-symbols-outlined text-2xl">notifications</span><span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-error rounded-full ring-2 ring-surface"></span></button><button aria-label="Actualizaciones de flota" class="p-2 rounded-full hover:bg-surface-container-high text-on-surface-variant transition-colors"><span class="material-symbols-outlined text-2xl">sync</span></button><div class="flex items-center gap-2.5 pl-2 py-1 pr-3 rounded-full bg-surface-container-low hover:bg-surface-container-high cursor-pointer transition-colors"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaUccKzncI9KJyUZZttvL2RLifmOC1wYEy7O12OvFcQzu9Hczzf4dtdFafjQGOX2W8oLtxsxHFUfRniYlVEQjDZ9_dBJq1ZxqubNHm9M1f_FPxxgws9dNY8IFb6ImYBUyf-yf6Bc4-ClTwFCkyRpWMVsD6lb17KtvtKyhvPW94S_VYCFr-MT307rSK7yGLFNhZxjodNQVoJHb9rIOMofn2bpS9taGw8y3ecCScGYAkQE2Ykm3CbQE"/><div class="flex flex-col text-left"><span class="font-label-md text-label-md text-on-surface leading-tight">Armando Garza</span><span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Admin Despacho</span></div><span class="material-symbols-outlined text-on-surface-variant text-[18px]">expand_more</span></div></div></header><main class="w-full pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<div class="p-space-lg max-w-[1720px] mx-auto w-full space-y-space-lg">
+<!-- Top Action Surface: Material 3 Navigation & Command Deck -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md flex flex-col xl:flex-row items-start xl:items-center justify-between gap-space-md">
+<div class="flex flex-col sm:flex-row sm:items-center gap-space-md">
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
+<span>Operaciones</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>Despacho de Rutas</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-bold">Nueva Asignación</span>
+</div>
+<div class="flex items-center gap-space-sm mt-1">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Folio #DSP-2024-8841</h1>
+<span class="px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm uppercase tracking-wide">Borrador Operativo</span>
+</div>
+</div>
+<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container font-label-md text-label-md text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-[18px]">warehouse</span>
+<span>Terminal Activa: <strong class="text-on-surface">Laredo Hub Norte (TX-20)</strong></span>
+</div>
+</div>
+<div class="flex flex-wrap items-center gap-space-sm w-full xl:w-auto justify-end">
+<button class="h-11 px-4 rounded-full text-primary hover:bg-surface-container-high transition-colors font-label-lg text-label-lg flex items-center gap-2" type="button">
+<span class="material-symbols-outlined text-[18px]">save</span>
+          Guardar Borrador
+        </button>
+<button class="h-11 px-5 rounded-full bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors font-label-lg text-label-lg flex items-center gap-2" type="button">
+<span class="material-symbols-outlined text-[18px]">upload_file</span>
+          Importar Excel / ERP
+        </button>
+<button class="h-11 px-6 rounded-full bg-primary text-on-primary hover:bg-primary-container shadow-md transition-all font-label-lg text-label-lg flex items-center gap-2" id="dispatchMasterBtn" type="button">
+<span class="material-symbols-outlined text-[20px]">send_time_extension</span>
+          Publicar y Despachar Ruta
+        </button>
+</div>
+</section>
+<!-- Master-Detail 2-Column Desktop Grid -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-space-lg items-start">
+<!-- LEFT COLUMN: Dispatch Configuration & Route Sequence (Flex 6 / Col 7) -->
+<div class="xl:col-span-7 space-y-space-lg min-w-0">
+<!-- Card: Dotación de Operador y Unidad -->
+<article class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+<header class="px-space-lg py-space-md bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-primary text-2xl">badge</span>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Dotación de Operador y Unidad</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Asignación nominal de tractor, caja reefer y chofer certificado</p>
+</div>
+</div>
+<button class="px-3.5 py-1.5 rounded-full bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md flex items-center gap-1.5 transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">swap_horiz</span>
+              Cambiar Chofer
+            </button>
+</header>
+<div class="p-space-lg space-y-space-md">
+<!-- Chofer Strip -->
+<div class="p-space-md rounded-xl bg-surface-container-low flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md">
+<div class="relative">
+<img class="w-14 h-14 rounded-full object-cover shadow-sm" data-alt="Professional logistics female truck driver Sarah Jenkins wearing uniform polo and safety cap with clear sky behind truck yard in warm daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5gQfxYJdKh-ngGuXWnleHOC3HWuChpOPZ10lHgl6_zetZytrAlY2GXZW1B3hzw-N49UbW3Xsv-xHv6eV6WRNWzsKXm0XkrkGXePfz52DncpKmHvFCkW9jszsF63woIiSGWgfRBC_uKZSF1o56GaD4Hzxff29pNQZym1OTo6KpqPyDmRMEjGr-XFuPYWTUngKdeiJRZCA_99zKPlTkk5EjKlCA7HkAKbwSexGadFljDGqtktAgC5M"/>
+<span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-tertiary-container rounded-full ring-2 ring-surface-container-lowest"></span>
+</div>
+<div class="space-y-0.5">
+<div class="flex items-center gap-2">
+<span class="font-title-lg text-title-lg text-on-surface font-bold">Sarah Jenkins</span>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm uppercase">Disponible</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Lic. Federal Cat. A #TX-998241 • Laredo Base</p>
+<div class="flex items-center gap-3 pt-1">
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-secondary font-bold">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                      4.96 (184 viajes)
+                    </span>
+<span class="text-outline-variant">•</span>
+<span class="flex items-center gap-1 font-label-sm text-label-sm text-on-surface font-semibold">
+<span class="material-symbols-outlined text-[16px] text-tertiary">timer</span>
+                      HOS Disponible: 9h 20m
+                    </span>
+</div>
+</div>
+</div>
+<div class="p-3 rounded-lg bg-surface-container-lowest flex items-center gap-3 shadow-sm md:min-w-[190px] justify-between">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">ELD Status</span>
+<div class="font-label-md text-label-md text-tertiary font-bold flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span> Conectado VDO
+                  </div>
+</div>
+<span class="material-symbols-outlined text-outline text-[24px]">contactless</span>
+</div>
+</div>
+<!-- Tractor & Remolque Strip -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<div class="p-space-md rounded-xl bg-surface-container flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">local_shipping</span>
+<span class="font-label-md text-label-md text-on-surface font-bold">Tractor #TR-402</span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm font-semibold">ELD OK</span>
+</div>
+<div class="mt-3">
+<p class="font-title-lg text-title-lg text-on-surface font-bold leading-tight">Freightliner Cascadia 2024</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Placas 44-AD-9R • Odómetro 114,230 km</p>
+</div>
+<div class="mt-4 pt-3 flex items-center justify-between border-t-0 bg-surface-container-lowest/80 rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Nivel Diésel</span>
+<div class="flex items-center gap-2">
+<div class="w-24 h-2 rounded-full bg-surface-container-high overflow-hidden">
+<div class="h-full bg-tertiary" style="width: 82%;"></div>
+</div>
+<span class="font-label-md text-label-md text-on-surface font-bold">82%</span>
+</div>
+</div>
+</div>
+<div class="p-space-md rounded-xl bg-surface-container flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-[22px]">ac_unit</span>
+<span class="font-label-md text-label-md text-on-surface font-bold">Caja #RF-5311</span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm font-semibold">ThermoKing OK</span>
+</div>
+<div class="mt-3">
+<p class="font-title-lg text-title-lg text-on-surface font-bold leading-tight">Utility 53ft Refrigerada</p>
+<p class="font-body-md text-body-md text-on-surface-variant">ThermoKing SB-300 Smart Reefer</p>
+</div>
+<div class="mt-4 pt-3 flex items-center justify-between bg-surface-container-lowest/80 rounded-lg p-2.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Setpoint Actual</span>
+<div class="flex items-center gap-1.5 font-label-md text-label-md text-primary font-bold">
+<span class="material-symbols-outlined text-[18px]">thermostat</span>
+                    -4.0 °C Estable
+                  </div>
+</div>
+</div>
+</div>
+<!-- Tarifa y Compensación -->
+<div class="p-space-sm rounded-lg bg-surface-container-high flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">payments</span>
+<span class="font-label-md text-label-md text-on-surface">Tarifa Base Pactada: <strong class="text-on-surface">$850.00 USD</strong></span>
+<span class="text-outline-variant">•</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Extras autorizados: Paradas adicionales y espera fría</span>
+</div>
+<button class="font-label-sm text-label-sm text-primary font-bold hover:underline" type="button">Modificar Tabulador</button>
+</div>
+</div>
+</article>
+<!-- Card: Secuencia y Hoja de Paradas (Reorderable List) -->
+<article class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+<header class="px-space-lg py-space-md bg-surface-container-low flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-primary text-2xl">format_list_numbered</span>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Secuencia y Hoja de Paradas</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Reordena arrastrando el control o ajusta tiempos límite</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-3 py-1 rounded-full bg-surface-container font-label-sm text-label-sm font-bold text-on-surface">4 Paradas Planificadas</span>
+</div>
+</header>
+<div class="p-space-lg space-y-space-md" id="stopsContainer">
+<!-- Stop 01 -->
+<div class="stop-card group p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors relative flex items-start gap-space-md">
+<div class="cursor-grab active:cursor-grabbing text-outline hover:text-on-surface pt-1 select-none" title="Arrastrar para reordenar">
+<span class="material-symbols-outlined text-2xl">drag_indicator</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary font-headline-md text-headline-md flex items-center justify-center shrink-0 shadow-sm">
+                01
+              </div>
+<div class="flex-1 space-y-2 min-w-0">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm uppercase font-bold">Origen / Recolección</span>
+<span class="font-label-md text-label-md text-on-surface-variant font-bold">08:30 AM (Check-in)</span>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary font-bold bg-tertiary-fixed px-2 py-0.5 rounded-full">Sello Verificado</span>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface font-bold">CEDIS Central Laredo - Muelle Frío 04</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Av. de las Américas 4920, Parque Logístico Industrial, Laredo TX</p>
+</div>
+<div class="flex flex-wrap items-center gap-2 pt-1">
+<span class="px-2.5 py-1 rounded-lg bg-surface-container-lowest text-on-surface font-label-sm text-label-sm flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary">inventory_2</span>
+                    8 Pallets Carga Fría
+                  </span>
+<span class="px-2.5 py-1 rounded-lg bg-surface-container-lowest text-on-surface font-label-sm text-label-sm flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">verified_user</span>
+                    Sello Fiscal #A-9921
+                  </span>
+<span class="px-2.5 py-1 rounded-lg bg-surface-container-lowest text-on-surface font-label-sm text-label-sm flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-error">device_thermostat</span>
+                    Temp. Requerida: -4°C
+                  </span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 rounded-full hover:bg-surface-container-highest text-on-surface-variant" title="Ver Manifiesto Detallado" type="button">
+<span class="material-symbols-outlined text-[20px]">description</span>
+</button>
+</div>
+</div>
+<!-- Stop 02 -->
+<div class="stop-card group p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors relative flex items-start gap-space-md">
+<div class="cursor-grab active:cursor-grabbing text-outline hover:text-on-surface pt-1 select-none" title="Arrastrar para reordenar">
+<span class="material-symbols-outlined text-2xl">drag_indicator</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface font-headline-md text-headline-md flex items-center justify-center shrink-0">
+                02
+              </div>
+<div class="flex-1 space-y-2 min-w-0">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm uppercase font-bold">Entrega Parcial</span>
+<span class="font-label-md text-label-md text-on-surface-variant font-bold">09:40 AM - 10:10 AM</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-bold">Firma &amp; Sello Requerido</span>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface font-bold">Súper Fresco Express Sucursal Anáhuac</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Carretera Anáhuac KM 12.5, Zona Comercial Poniente</p>
+</div>
+<div class="flex flex-wrap items-center gap-2 pt-1">
+<span class="px-2.5 py-1 rounded-lg bg-surface-container-lowest text-on-surface font-label-sm text-label-sm flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary">inventory_2</span>
+                    Descarga: 4 Cajas Frías
+                  </span>
+<span class="px-2.5 py-1 rounded-lg bg-surface-container-lowest text-on-surface font-label-sm text-label-sm flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-secondary">draw</span>
+                    Firma de Recibido Digital
+                  </span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 rounded-full hover:bg-surface-container-highest text-on-surface-variant" title="Ver Contacto de Sucursal" type="button">
+<span class="material-symbols-outlined text-[20px]">phone_in_talk</span>
+</button>
+</div>
+</div>
+<!-- Stop 03 -->
+<div class="stop-card group p-space-md rounded-xl bg-error-container/30 hover:bg-error-container/40 transition-colors relative flex items-start gap-space-md shadow-sm">
+<div class="cursor-grab active:cursor-grabbing text-outline hover:text-on-surface pt-1 select-none" title="Arrastrar para reordenar">
+<span class="material-symbols-outlined text-2xl">drag_indicator</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-error text-on-error font-headline-md text-headline-md flex items-center justify-center shrink-0 shadow-sm">
+                03
+              </div>
+<div class="flex-1 space-y-2 min-w-0">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full bg-error text-on-error font-label-sm text-label-sm uppercase font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">timer</span>
+                      Ventana Estricta / Alta Prioridad
+                    </span>
+<span class="font-label-md text-label-md text-error font-bold">10:45 AM En Punto</span>
+</div>
+<span class="font-label-sm text-label-sm text-error font-bold">Penalización por Retraso</span>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface font-bold">Almacenes del Norte - Planta Maquiladora 2</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Parque Industrial Río Bravo, Acceso Proveedores Puerta 7</p>
+</div>
+<div class="flex flex-wrap items-center gap-2 pt-1">
+<span class="px-2.5 py-1 rounded-lg bg-surface-container-lowest text-on-surface font-label-sm text-label-sm flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary">vaccines</span>
+                    4 Pallets Farmacéuticos
+                  </span>
+<span class="px-2.5 py-1 rounded-lg bg-surface-container-lowest text-error font-label-sm text-label-sm flex items-center gap-1 shadow-sm font-bold">
+<span class="material-symbols-outlined text-[16px]">device_thermostat</span>
+                    Cadena Fría Crítica -4°C
+                  </span>
+<span class="px-2.5 py-1 rounded-lg bg-surface-container-lowest text-on-surface font-label-sm text-label-sm flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">badge</span>
+                    Inspección Sanitaria In-situ
+                  </span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 rounded-full hover:bg-surface-container-highest text-error" title="Alerta de Protocolo" type="button">
+<span class="material-symbols-outlined text-[20px]">notification_important</span>
+</button>
+</div>
+</div>
+<!-- Stop 04 -->
+<div class="stop-card group p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors relative flex items-start gap-space-md">
+<div class="cursor-grab active:cursor-grabbing text-outline hover:text-on-surface pt-1 select-none" title="Arrastrar para reordenar">
+<span class="material-symbols-outlined text-2xl">drag_indicator</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface font-headline-md text-headline-md flex items-center justify-center shrink-0">
+                04
+              </div>
+<div class="flex-1 space-y-2 min-w-0">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm uppercase font-bold">Entrega Final</span>
+<span class="font-label-md text-label-md text-on-surface-variant font-bold">11:50 AM - 12:30 PM</span>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary font-bold">Cierre de Manifiesto</span>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface font-bold">Logística Bajío Centro de Consolidación</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Libramiento Sur Monterrey-Nuevo Laredo Km 28</p>
+</div>
+<div class="flex flex-wrap items-center gap-2 pt-1">
+<span class="px-2.5 py-1 rounded-lg bg-surface-container-lowest text-on-surface font-label-sm text-label-sm flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">local_convenience_store</span>
+                    8 Bultos Secos / Retorno de Tarimas
+                  </span>
+<span class="px-2.5 py-1 rounded-lg bg-surface-container-lowest text-on-surface font-label-sm text-label-sm flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
+                    Libre de Devolución
+                  </span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 rounded-full hover:bg-surface-container-highest text-on-surface-variant" title="Detalles" type="button">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Add Stop Action -->
+<div class="px-space-lg pb-space-lg pt-2">
+<button class="w-full h-14 rounded-xl bg-surface-container hover:bg-surface-container-high text-primary font-label-lg text-label-lg flex items-center justify-center gap-2 transition-all" id="addStopBtn" type="button">
+<span class="material-symbols-outlined text-[22px]">add_circle</span>
+              + Agregar Parada o Recolección Adicional
+            </button>
+</div>
+</article>
+<!-- Card: Instrucciones Especiales para el Chofer -->
+<article class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg space-y-space-md">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-primary text-2xl">speaker_notes</span>
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Instrucciones Especiales para el Chofer</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Aparecerán resaltadas en la app móvil del operador antes de abrir puertas</p>
+</div>
+</div>
+<!-- M3 Chips Verification Filter Style -->
+<div class="flex flex-wrap gap-2 pt-1">
+<label class="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-sm transition-colors select-none">
+<input checked="" class="hidden" type="checkbox"/>
+<span class="material-symbols-outlined text-[18px]">check</span>
+              Gafete y EPP Obligatorio
+            </label>
+<label class="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-sm transition-colors select-none">
+<input checked="" class="hidden" type="checkbox"/>
+<span class="material-symbols-outlined text-[18px]">check</span>
+              Evidencia Fotográfica de Sellos
+            </label>
+<label class="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-sm transition-colors select-none">
+<input checked="" class="hidden" type="checkbox"/>
+<span class="material-symbols-outlined text-[18px]">check</span>
+              Registro Termógrafo Impreso
+            </label>
+<label class="cursor-pointer inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-surface-container text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors select-none">
+<input class="hidden" type="checkbox"/>
+<span class="material-symbols-outlined text-[18px]">add</span>
+              Checklist HazMat
+            </label>
+</div>
+<!-- Multiline TextField Flutter Equivalent -->
+<div class="space-y-1">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase font-bold" for="driverNotes">Mensaje Directo al Tablero de la Unidad</label>
+<textarea class="w-full p-space-md rounded-xl bg-surface-container-low text-on-surface font-body-lg text-body-lg placeholder:text-on-surface-variant outline-none focus:bg-surface-container-lowest transition-colors shadow-inner resize-none" id="driverNotes" placeholder="Escribe instrucciones operativas claras (e.g. Muelle de reversa estrecho en Parada 03, reportar temperatura cada 45 minutos al despachador central)..." rows="4">Atención Sarah: En Parada 03 (Almacenes del Norte) es indispensable ingresar por el carril exclusivo de Farmacéuticos. No abrir cortina trasera hasta que el inspector de calidad valide el precinto térmico #A-9921.</textarea>
+</div>
+</article>
+</div>
+<!-- RIGHT COLUMN: Telemetry, Map Preview & Billing Metrics (Flex 4 / Col 5) -->
+<div class="xl:col-span-5 space-y-space-lg min-w-0">
+<!-- Card: Trazo Vectorial de Ruta & Mapa -->
+<article class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+<header class="px-space-lg py-space-md bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-2xl">route</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Trazo Vectorial de Ruta</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm font-bold">Ruta Eficiente Optimizada</span>
+</header>
+<div class="relative w-full h-72">
+<!-- Static Map Container via data-location specification -->
+<div class="w-full h-full bg-cover bg-center" data-location="Laredo, Texas Logistics Hub" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD31FHWpWZ0LIO4mGOeBA_vmOS5ZuGT-9eLjs57fxv1dTa-UiJvfy-rE2IAEStP_P3boDMX3Sy8ovTzUcveuXacToE_Sm4_IEgXqZtvKaPkeZdtJK5_H-WdXBwydKQ6WAsMNT1jqNuXJePnZLYZmK3O9rmdGf1LjrUgX5dF8xM2I-2HVzIWcwuxw1PiUA6Cyy0SvIOWmnLyAGZYUTdV4dC6of35rg40L8sL_kh1hpz63sELs5_IcqI');"></div>
+<!-- Map Telemetry HUD Overlay -->
+<div class="absolute bottom-3 left-3 right-3 p-space-md rounded-xl bg-surface/95 backdrop-blur-md shadow-lg flex items-center justify-between">
+<div class="text-center">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Distancia Total</span>
+<p class="font-headline-md text-headline-md text-primary font-bold">84.5 km</p>
+</div>
+<div class="h-8 w-px bg-surface-variant"></div>
+<div class="text-center">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Tiempo Est.</span>
+<p class="font-headline-md text-headline-md text-on-surface font-bold">4h 15m</p>
+</div>
+<div class="h-8 w-px bg-surface-variant"></div>
+<div class="text-center">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Diésel Est.</span>
+<p class="font-headline-md text-headline-md text-secondary font-bold">32.8 L</p>
+</div>
+<div class="h-8 w-px bg-surface-variant"></div>
+<div class="text-center">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase">ETA Global</span>
+<p class="font-headline-md text-headline-md text-tertiary font-bold">12:45 PM</p>
+</div>
+</div>
+</div>
+<!-- Secondary route summary chips -->
+<div class="p-space-md bg-surface-container-low flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-tertiary">traffic</span>
+              Tráfico Moderado en Autopista 35
+            </span>
+<span class="flex items-center gap-1 font-bold text-primary">
+<span class="material-symbols-outlined text-[16px]">toll</span>
+              2 Casetas ($24.00 USD)
+            </span>
+</div>
+</article>
+<!-- Card: Balance y Capacidad Técnica -->
+<article class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg space-y-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-2xl">scale</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Balance y Capacidad Técnica</h2>
+</div>
+<span class="px-2.5 py-0.5 rounded-full bg-surface-container font-label-sm text-label-sm font-bold text-on-surface">DOT Legal</span>
+</div>
+<!-- Masa y Volumen Progress Visualizer -->
+<div class="space-y-3">
+<div class="flex items-center justify-between font-body-md text-body-md">
+<span class="text-on-surface-variant">Masa Bruta Cargada</span>
+<span class="font-bold text-on-surface">1,200 kg <span class="text-outline-variant font-normal">/ 18,000 kg Máx</span></span>
+</div>
+<div class="w-full h-3 rounded-full bg-surface-container-high overflow-hidden">
+<div class="h-full bg-primary-container rounded-full transition-all duration-500" style="width: 35%;"></div>
+</div>
+<div class="flex items-center justify-between font-label-sm text-label-sm text-on-surface-variant">
+<span>Ocupación de Volumen: <strong>35%</strong> (Espacio disponible para retorno)</span>
+<span class="text-tertiary font-bold">Subcargado Óptimo</span>
+</div>
+</div>
+<!-- Inline Technical SVG Distribution Graph -->
+<div class="p-space-md rounded-xl bg-surface-container-low space-y-2">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase font-bold">Distribución por Ejes (Bridge Law)</span>
+<span class="font-label-md text-label-md text-tertiary font-bold">52% Frontal / 48% Trasero</span>
+</div>
+<div class="py-1">
+<svg class="w-full h-12 text-outline-variant" fill="none" viewbox="0 0 380 40">
+<!-- Trailer Chassis schematic line -->
+<line stroke="currentColor" stroke-linecap="round" stroke-width="3" x1="20" x2="360" y1="20" y2="20"></line>
+<!-- Front Steer Axle -->
+<circle class="fill-surface-container-highest stroke-primary" cx="50" cy="20" r="10" stroke-width="3"></circle>
+<text class="fill-primary text-[10px] font-bold" text-anchor="middle" x="50" y="24">E1</text>
+<!-- Drive Axle Tandem -->
+<circle class="fill-surface-container-highest stroke-primary" cx="150" cy="20" r="10" stroke-width="3"></circle>
+<circle class="fill-surface-container-highest stroke-primary" cx="175" cy="20" r="10" stroke-width="3"></circle>
+<!-- Trailer Tandem Axle -->
+<circle class="fill-surface-container-highest stroke-tertiary" cx="310" cy="20" r="10" stroke-width="3"></circle>
+<circle class="fill-surface-container-highest stroke-tertiary" cx="335" cy="20" r="10" stroke-width="3"></circle>
+<!-- Load indicator box -->
+<rect class="fill-primary-container opacity-80" height="12" rx="3" width="105" x="190" y="7"></rect>
+<text class="fill-on-primary-container text-[8px] font-bold" text-anchor="middle" x="242" y="16">CARGA DISTRIBUIDA</text>
+</svg>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Presión neumática monitoreada en tiempo real vía TPMS de la unidad.</p>
+</div>
+<!-- M3 Regulatory Compliance Badges -->
+<div class="grid grid-cols-2 gap-space-sm pt-1">
+<div class="p-3 rounded-lg bg-tertiary-fixed/40 flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-[20px]">verified</span>
+<div>
+<p class="font-label-sm text-label-sm uppercase text-on-tertiary-fixed font-bold leading-tight">Carta Porte SAT</p>
+<p class="font-label-sm text-label-sm text-tertiary font-semibold">Validada con CFDI 4.0</p>
+</div>
+</div>
+<div class="p-3 rounded-lg bg-primary-fixed/40 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">policy</span>
+<div>
+<p class="font-label-sm text-label-sm uppercase text-on-primary-fixed font-bold leading-tight">Permiso SCT</p>
+<p class="font-label-sm text-label-sm text-primary font-semibold">Carga Federal Vigente</p>
+</div>
+</div>
+</div>
+</article>
+<!-- Card: Resumen Económico del Despacho -->
+<article class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg space-y-space-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-2xl">account_balance_wallet</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Resumen Económico</h2>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between pb-2 border-b-0 bg-surface-container-low p-space-sm rounded-lg">
+<span class="font-body-md text-body-md text-on-surface-variant">Facturación Acordada Cliente</span>
+<span class="font-title-lg text-title-lg text-on-surface font-bold">$1,150.00 USD</span>
+</div>
+<div class="flex items-center justify-between pb-2 bg-surface-container-low p-space-sm rounded-lg">
+<div>
+<span class="font-body-md text-body-md text-on-surface-variant block">Pago Estimado Chofer 1099</span>
+<span class="font-label-sm text-label-sm text-outline">Calculado: $4.50/milla + parada extra</span>
+</div>
+<span class="font-title-lg text-title-lg text-secondary font-bold">$380.00 USD</span>
+</div>
+<div class="p-space-md rounded-xl bg-tertiary-fixed flex items-center justify-between text-on-tertiary-fixed shadow-sm">
+<div class="space-y-0.5">
+<span class="font-label-sm text-label-sm uppercase tracking-wider font-bold">Margen Bruto de Operación</span>
+<p class="font-display-lg text-display-lg font-bold leading-none">$770.00 <span class="text-label-lg font-normal">USD</span></p>
+</div>
+<div class="text-right">
+<span class="px-3 py-1 rounded-full bg-surface-container-lowest text-tertiary font-headline-md text-headline-md font-bold shadow-sm inline-block">
+                  67.0%
+                </span>
+<p class="font-label-sm text-label-sm font-semibold mt-1">Margen Objetivo Superado</p>
+</div>
+</div>
+</div>
+<!-- Large Action Dispatch Button (Material 3 Master CTA) -->
+<div class="pt-2">
+<button class="w-full h-16 rounded-xl bg-tertiary-container hover:bg-tertiary text-on-tertiary shadow-lg hover:shadow-xl transition-all font-label-lg text-label-lg flex items-center justify-center gap-3" id="dispatchMobileBtn" type="button">
+<span class="material-symbols-outlined text-[24px]">phonelink_ring</span>
+              Despachar Ruta al Teléfono del Chofer
+            </button>
+<p class="font-label-sm text-label-sm text-center text-on-surface-variant mt-2">
+              Se enviará una notificación push a la terminal móvil Honeywell de Sarah Jenkins.
+            </p>
+</div>
+</article>
+</div>
+</div>
+</div>
+<!-- Notification Toast Container for UI micro-interactions -->
+<div class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none bg-inverse-surface text-inverse-on-surface px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3" id="toastNotification">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[22px]">check_circle</span>
+<span class="font-label-md text-label-md" id="toastMessage">Ruta despachada exitosamente a la unidad TR-402</span>
+</div>
+</div>
+<script>
+  // Interactive micro-interactions simulating Flutter reactive behavior
+  const dispatchMasterBtn = document.getElementById('dispatchMasterBtn');
+  const dispatchMobileBtn = document.getElementById('dispatchMobileBtn');
+  const addStopBtn = document.getElementById('addStopBtn');
+  const toastNotification = document.getElementById('toastNotification');
+  const toastMessage = document.getElementById('toastMessage');
+  const stopsContainer = document.getElementById('stopsContainer');
+
+  function showToast(message) {
+    if (!toastNotification) return;
+    toastMessage.textContent = message;
+    toastNotification.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
+    toastNotification.classList.add('translate-y-0', 'opacity-100');
+    
+    setTimeout(() => {
+      toastNotification.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
+      toastNotification.classList.remove('translate-y-0', 'opacity-100');
+    }, 3800);
+  }
+
+  if (dispatchMasterBtn) {
+    dispatchMasterBtn.addEventListener('click', () => {
+      showToast('Hoja de Despacho #DSP-2024-8841 Publicada y sincronizada con el ERP Central.');
+    });
+  }
+
+  if (dispatchMobileBtn) {
+    dispatchMobileBtn.addEventListener('click', () => {
+      showToast('Push de navegación enviado al celular de Sarah Jenkins (App Driver v3.4).');
+    });
+  }
+
+  if (addStopBtn && stopsContainer) {
+    addStopBtn.addEventListener('click', () => {
+      const currentStops = stopsContainer.querySelectorAll('.stop-card').length;
+      const newStopNumber = String(currentStops + 1).padStart(2, '0');
+      
+      const newStopElement = document.createElement('div');
+      newStopElement.className = 'stop-card group p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors relative flex items-start gap-space-md animate-pulse';
+      newStopElement.innerHTML = `
+        <div class="cursor-grab text-outline hover:text-on-surface pt-1 select-none">
+          <span class="material-symbols-outlined text-2xl">drag_indicator</span>
+        </div>
+        <div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container font-headline-md text-headline-md flex items-center justify-center shrink-0">
+          ${newStopNumber}
+        </div>
+        <div class="flex-1 space-y-2 min-w-0">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm uppercase font-bold">Nueva Parada Dinámica</span>
+            <span class="font-label-md text-label-md text-primary font-bold">Por Confirmar</span>
+          </div>
+          <div>
+            <h3 class="font-title-lg text-title-lg text-on-surface font-bold">Punto Intermedio de Descarga</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant">Dirección pendiente de geocodificación automática...</p>
+          </div>
+        </div>
+        <button type="button" class="p-2 rounded-full hover:bg-surface-container-highest text-error" onclick="this.closest('.stop-card').remove();">
+          <span class="material-symbols-outlined text-[20px]">delete</span>
+        </button>
+      `;
+
+      stopsContainer.appendChild(newStopElement);
+      setTimeout(() => {
+        newStopElement.classList.remove('animate-pulse');
+      }, 600);
+      showToast('Nueva parada agregada a la secuencia.');
+    });
+  }
+</script></main></div></body></html>
