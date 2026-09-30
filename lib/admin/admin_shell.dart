@@ -41,6 +41,8 @@ class AdminShell extends ConsumerWidget {
 
   bool get _enListaClientes => ubicacion == Rutas.adminClientes;
 
+  bool get _enListaManifiestos => ubicacion == Rutas.adminManifiestos;
+
   Future<void> _salir(BuildContext context, WidgetRef ref) =>
       ref.read(authControllerProvider.notifier).cerrarSesion();
 
@@ -62,6 +64,12 @@ class AdminShell extends ConsumerWidget {
               tooltip: 'Nuevo cliente',
               icon: const Icon(Icons.add_business),
               onPressed: () => context.go(Rutas.adminClienteNuevo),
+            ),
+          if (_enListaManifiestos)
+            IconButton(
+              tooltip: 'Subir manifiesto',
+              icon: const Icon(Icons.upload_file),
+              onPressed: () => context.go(Rutas.adminManifiestoNuevo),
             ),
           IconButton(
             tooltip: 'Cerrar sesión',

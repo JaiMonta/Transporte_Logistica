@@ -39,6 +39,7 @@ class Rutas {
   static String adminClienteEditar(String id) => '/admin/clientes/$id';
 
   static const String adminManifiestos = '/admin/manifiestos';
+  static const String adminManifiestoNuevo = '/admin/manifiestos/nuevo';
   static String adminManifiestoDetalle(String id) => '/admin/manifiestos/$id';
 
   static const String choferHome = '/chofer/home';
@@ -125,6 +126,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: Rutas.adminManifiestos,
             builder: (context, state) => const ManifiestosScreen(),
             routes: [
+              GoRoute(
+                path: 'nuevo',
+                builder: (context, state) => const CapturaManifiestoScreen(),
+              ),
               GoRoute(
                 path: ':id',
                 builder: (context, state) => ManifiestoDetalleScreen(

@@ -16,6 +16,8 @@ import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/offline_banner.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/validators/validador.dart';
+import '../../auth/models/profile.dart';
+import '../../auth/providers/auth_providers.dart';
 import '../../clientes/presentation/widgets/cliente_selector.dart';
 import '../data/ocr_repository.dart';
 import '../models/manifiesto.dart';
@@ -249,7 +251,9 @@ class _CapturaManifiestoScreenState
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Manifiesto guardado.')),
       );
-      context.go(Rutas.choferManifiestos);
+      final esAdmin =
+          ref.read(currentProfileProvider).value?.rol == Rol.admin;
+      context.go(esAdmin ? Rutas.adminManifiestos : Rutas.choferManifiestos);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
