@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../core/router.dart';
 import '../../../core/theme.dart';
@@ -20,8 +21,10 @@ import '../data/ocr_repository.dart';
 import '../models/manifiesto.dart';
 import '../providers/manifiestos_providers.dart';
 
-/// Captura de un manifiesto con la cámara en vivo (solo móvil).
+/// Captura de un manifiesto.
 ///
+/// En móvil usa la cámara en vivo; en Web/escritorio permite **seleccionar
+/// un archivo de imagen** (útil para pruebas desde la web móvil).
 /// Flujo: foto del BOL -> compresión + subida al bucket `manifiestos`
 /// -> OCR (Edge Function) -> revisión humana de los campos -> guardar.
 class CapturaManifiestoScreen extends ConsumerStatefulWidget {
@@ -117,55 +120,82 @@ class _CapturaManifiestoScreenState
     try {
       final archivo = await camara.takePicture();
       final bytes = await archivo.readAsBytes();
-      final almacen = ref.read(almacenamientoRepositoryProvider);
-
-      // Comprime y sube al bucket privado `manifiestos`.
-      final comprimida = almacen.comprimirImagen(bytes);
-      final path = almacen.rutaDe(
-        carpeta: 'bol',
-        archivo: 'bol_${DateTime.now().millisecondsSinceEpoch}.jpg',
-      );
-      final evidencia = await almacen.subir(
-        bucket: BucketEvidencia.manifiestos,
-        path: path,
-        bytes: comprimida,
-        tipo: TipoEvidencia.bol,
-      );
-
-      // OCR (Edge Function; si falla, se permite continuar manualmente).
-      ResultadoOcr? ocr;
-      try {
-        ocr = await ref.read(ocrRepositoryProvider).extraer(
-              comprimida,
-              contentType: 'image/jpeg',
-            );
-      } catch (_) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'No se pudo reconocer el documento. Completa los datos manualmente.',
-              ),
-            ),
-          );
-        }
-      }
-
-      if (!mounted) return;
-      setState(() {
-        _foto = comprimida;
-        _evidencia = evidencia;
-        _ocr = ocr;
-        _procesando = false;
-        _numeroPro.text = ocr?.numeroPro ?? '';
-        _fecha.text = _fechaTexto(ocr?.fecha ?? DateTime.now());
-      });
+      await _procesarBytes(bytes);
     } catch (e) {
       if (!mounted) return;
       setState(() => _procesando = false);
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(mensajeError(e))));
     }
+  }
+
+  /// Selecciona una imagen desde el almacenamiento (Web/escritorio).
+  ///
+  /// Permite probar el flujo completo (subida + OCR + guardado) desde la web
+  /// móvil, donde no hay acceso a la cámara en vivo.
+  Future<void> _seleccionarArchivo() async {
+    if (_procesando) return;
+    try {
+      final archivo = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+      );
+      if (archivo == null) return;
+      setState(() => _procesando = true);
+      final bytes = await archivo.readAsBytes();
+      await _procesarBytes(bytes);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _procesando = false);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(mensajeError(e))));
+    }
+  }
+
+  /// Sube la imagen al bucket, ejecuta el OCR y pasa a la revisión.
+  Future<void> _procesarBytes(Uint8List bytes) async {
+    final almacen = ref.read(almacenamientoRepositoryProvider);
+
+    // Comprime y sube al bucket privado `manifiestos`.
+    final comprimida = almacen.comprimirImagen(bytes);
+    final path = almacen.rutaDe(
+      carpeta: 'bol',
+      archivo: 'bol_${DateTime.now().millisecondsSinceEpoch}.jpg',
+    );
+    final evidencia = await almacen.subir(
+      bucket: BucketEvidencia.manifiestos,
+      path: path,
+      bytes: comprimida,
+      tipo: TipoEvidencia.bol,
+    );
+
+    // OCR (Edge Function; si falla, se permite continuar manualmente).
+    ResultadoOcr? ocr;
+    try {
+      ocr = await ref.read(ocrRepositoryProvider).extraer(
+            comprimida,
+            contentType: 'image/jpeg',
+          );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'No se pudo reconocer el documento. Completa los datos manualmente.',
+            ),
+          ),
+        );
+      }
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _foto = comprimida;
+      _evidencia = evidencia;
+      _ocr = ocr;
+      _procesando = false;
+      _numeroPro.text = ocr?.numeroPro ?? '';
+      _fecha.text = _fechaTexto(ocr?.fecha ?? DateTime.now());
+    });
   }
 
   Future<void> _repetirFoto() async {
@@ -239,30 +269,58 @@ class _CapturaManifiestoScreenState
           const OfflineBanner(),
           Expanded(
             child: kIsWeb
-                ? _avisoWeb(context)
-                : (_foto == null ? _vistaCamara(context) : _vistaRevision(context)),
+                ? (_foto == null
+                    ? _vistaSeleccionWeb(context)
+                    : _vistaRevision(context))
+                : (_foto == null
+                    ? _vistaCamara(context)
+                    : _vistaRevision(context)),
           ),
         ],
       ),
     );
   }
 
-  Widget _avisoWeb(BuildContext context) {
+  Widget _vistaSeleccionWeb(BuildContext context) {
+    final tema = Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.photo_camera_outlined,
-                size: 56, color: AppColors.onSurfaceVariant),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              'La captura del manifiesto está disponible en la app móvil.',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ],
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.document_scanner_outlined,
+                  size: 64, color: AppColors.primary),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'Subir foto del manifiesto',
+                textAlign: TextAlign.center,
+                style: tema.textTheme.titleLarge,
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                'Selecciona una imagen del BOL. Se subirá, se leerá con OCR '
+                'y podrás revisar los datos antes de guardar.',
+                textAlign: TextAlign.center,
+                style: tema.textTheme.bodyMedium,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              PrimaryButton(
+                texto: 'Seleccionar imagen',
+                icono: Icons.upload_file,
+                cargando: _procesando,
+                onPressed: _seleccionarArchivo,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                'En la app móvil la captura se hace con la cámara en vivo.',
+                textAlign: TextAlign.center,
+                style: tema.textTheme.bodySmall,
+              ),
+            ],
+          ),
         ),
       ),
     );
