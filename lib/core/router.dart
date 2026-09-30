@@ -14,6 +14,10 @@ import '../features/auth/presentation/usuarios_screen.dart';
 import '../features/auth/providers/auth_providers.dart';
 import '../features/clientes/presentation/cliente_form_screen.dart';
 import '../features/clientes/presentation/clientes_screen.dart';
+import '../features/manifiesto/presentation/captura_manifiesto_screen.dart';
+import '../features/manifiesto/presentation/manifiesto_detalle_screen.dart';
+import '../features/manifiesto/presentation/manifiestos_screen.dart';
+import '../features/manifiesto/presentation/mis_manifiestos_screen.dart';
 import 'supabase_client.dart';
 
 /// Rutas de la aplicación.
@@ -34,7 +38,13 @@ class Rutas {
   static const String adminClienteNuevo = '/admin/clientes/nuevo';
   static String adminClienteEditar(String id) => '/admin/clientes/$id';
 
+  static const String adminManifiestos = '/admin/manifiestos';
+  static String adminManifiestoDetalle(String id) => '/admin/manifiestos/$id';
+
   static const String choferHome = '/chofer/home';
+  static const String choferManifiestos = '/chofer/manifiestos';
+  static const String choferCapturaManifiesto = '/chofer/manifiestos/capturar';
+  static String choferManifiestoDetalle(String id) => '/chofer/manifiestos/$id';
 
   static const Set<String> publicas = {login, recuperar, restablecer};
 }
@@ -111,11 +121,39 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
+          GoRoute(
+            path: Rutas.adminManifiestos,
+            builder: (context, state) => const ManifiestosScreen(),
+            routes: [
+              GoRoute(
+                path: ':id',
+                builder: (context, state) => ManifiestoDetalleScreen(
+                  manifiestoId: state.pathParameters['id']!,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
       GoRoute(
         path: Rutas.choferHome,
         builder: (context, state) => const _ChoferHomeScreen(),
+      ),
+      GoRoute(
+        path: Rutas.choferManifiestos,
+        builder: (context, state) => const MisManifiestosScreen(),
+        routes: [
+          GoRoute(
+            path: 'capturar',
+            builder: (context, state) => const CapturaManifiestoScreen(),
+          ),
+          GoRoute(
+            path: ':id',
+            builder: (context, state) => ManifiestoDetalleScreen(
+              manifiestoId: state.pathParameters['id']!,
+            ),
+          ),
+        ],
       ),
     ],
     errorBuilder: (context, state) => _PantallaError(
@@ -177,24 +215,35 @@ class _ChoferHomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.local_shipping_outlined, size: 64),
-              const SizedBox(height: 16),
-              Text(
-                'Bienvenido, ${perfil?.nombreVisible ?? ''}',
-                style: Theme.of(context).textTheme.headlineMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              const Text('Aquí verás tus manifestos y entregas del día.'),
-            ],
+      body: ListView(
+        padding: const EdgeInsets.all(24),
+        children: [
+          Text(
+            'Bienvenido, ${perfil?.nombreVisible ?? ''}',
+            style: Theme.of(context).textTheme.headlineMedium,
           ),
-        ),
+          const SizedBox(height: 8),
+          const Text('Gestiona tus manifiestos y entregas del día.'),
+          const SizedBox(height: 24),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.add_a_photo_outlined),
+              title: const Text('Capturar manifiesto'),
+              subtitle: const Text('Foto del BOL y reconocimiento de datos'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.go(Rutas.choferCapturaManifiesto),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.description_outlined),
+              title: const Text('Mis manifiestos'),
+              subtitle: const Text('Consulta los manifiestos capturados'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.go(Rutas.choferManifiestos),
+            ),
+          ),
+        ],
       ),
     );
   }

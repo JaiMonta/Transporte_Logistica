@@ -164,11 +164,77 @@ online-only y todo el servicio local queda como no-op.
 
 ---
 
+## Módulo 4 — Manifiestos  ✅ COMPLETADO
+
+Alta de manifiestos con nº PRO y foto del BOL. El chofer captura desde móvil
+(cámara en vivo); el OCR propone PRO, fecha y cliente; el chofer los revisa y
+corrige antes de guardar. El administrador lista, busca y audita.
+
+### Reconciliación de esquema (importante)
+
+El proyecto remoto tenía un **esquema previo** (`usuarios`, `rutas`,
+`manifiestos`, `entregas`, `camiones`, `extras_servicio`, `pagos_choferes`,
+`ubicaciones_gps`) del diseño original, vacío y **no enlazado a `auth.users`**.
+Se acordó: (1) alinear al plan, (2) eliminar lo no usado, (3) añadir políticas.
+Migración `20260930145000_reconciliacion_esquema.sql` elimina esas tablas.
+La fuente de verdad de usuarios es `public.profiles` (Módulo 1).
+
+### Esquema (Supabase)
+
+- Migración `20260930150000_module4_manifiestos.sql`: enum `cotejo_estado`
+  (`pendiente`, `ok`, `revision`) y tabla `public.manifiestos` (id, numero_pro,
+  cliente_id→clientes, fecha, capturado_por→profiles, bucket, path, hash_sha256,
+  ocr_pro, ocr_confianza, cotejo, timestamps). Índice único
+  `(lower(numero_pro), cliente_id, fecha)`; índices por fecha/cliente/capturista;
+  trigger `updated_at`.
+- Migración `20260930150200_module4_pro_unique_nulls.sql`: refuerza el índice
+  con `NULLS NOT DISTINCT` (PRO único aunque el cliente sea nulo, Postgres 17).
+- RLS: el chofer ve y crea solo los suyos (`capturado_por = auth.uid()`);
+  el admin ve y gestiona todo; update/delete solo admin.
+
+### Edge Function
+
+- `ocr-manifiesto` desplegada: valida JWT y usuario activo; llama a OpenAI
+  `gpt-4o-mini` con Structured Outputs y devuelve `{numero_pro, fecha, cliente,
+  confianza}`. La clave vive en el secreto `OPENAI_API_KEY` (aún no configurado;
+  sin ella la función responde 503 "OCR no configurado").
+
+### Flutter (feature `manifiesto`)
+
+- `models/manifiesto.dart` (Manifiesto, enum `CotejoEstado`, join de cliente).
+- `data/manifiestos_repository.dart` (listar con búsqueda PRO + rango de fechas,
+  obtener, `existePro`, crear) y `data/ocr_repository.dart`.
+- `providers/manifiestos_providers.dart` (`FiltroManifiestos`, `manifiestosProvider`,
+  `manifiestoProvider`).
+- `presentation/captura_manifiesto_screen.dart` (**solo móvil**; en Web avisa):
+  cámara en vivo con marco guía y linterna, subida al bucket `manifiestos`
+  (reutiliza `AlmacenamientoRepository`), OCR y formulario de revisión humana.
+- `presentation/manifiestos_screen.dart` (admin: tarjetas/tabla, búsqueda y rango
+  de fechas), `presentation/mis_manifiestos_screen.dart` (chofer) y
+  `presentation/manifiesto_detalle_screen.dart` (foto BOL por URL firmada +
+  metadatos).
+- Rutas nuevas en `router.dart` (admin y chofer) y entrada "Manifiestos" en
+  `AdminShell`; el home del chofer pasa a menú.
+- Permiso de cámara: `AndroidManifest.xml` (`CAMERA`) e iOS `Info.plist`
+  (`NSCameraUsageDescription`).
+
+### Pruebas
+
+- Unitarias: `test/modulo4_test.dart`; total del proyecto **40 en verde**.
+- RLS/E2E remoto (todas en verde): el chofer solo ve/crea los suyos y no puede
+  editar; el admin ve y gestiona todos; PRO duplicado → 409; `ocr-manifiesto`
+  sin token → 401 y sin clave → 503. Datos de prueba eliminados.
+- `flutter analyze` limpio; `flutter test` 40/40.
+
+### Pendiente para cerrar el OCR
+
+- Configurar el secreto `OPENAI_API_KEY`:
+  `supabase secrets set OPENAI_API_KEY=... --project-ref fmwwablhluztdvspujwj`.
+
+---
+
 ## Módulos pendientes
 
-- **Módulo 4 — Manifiestos**: nº PRO, cliente, fecha, foto BOL, quién capturó;
-  PRO único por cliente y fecha; captura ~30s; búsqueda por PRO/fecha (admin);
-  RLS: el chofer ve los suyos.
 - **Módulo 5 — Entregas**: ligada a manifiesto, estado y secuencia, foto del
   recibo firmado, hora del servidor (`now()`), lista del día, alerta de trabajo
   programado si falta foto, estado visible en admin.

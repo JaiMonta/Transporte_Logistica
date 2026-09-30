@@ -20,6 +20,7 @@ class AdminShell extends ConsumerWidget {
     Rutas.adminDashboard,
     Rutas.adminUsuarios,
     Rutas.adminClientes,
+    Rutas.adminManifiestos,
   ];
 
   int get _indice {
@@ -32,6 +33,7 @@ class AdminShell extends ConsumerWidget {
   String get _titulo => switch (_indice) {
         1 => 'Usuarios y accesos',
         2 => 'Clientes',
+        3 => 'Manifiestos',
         _ => 'Panel',
       };
 
@@ -95,6 +97,11 @@ class AdminShell extends ConsumerWidget {
                             selectedIcon: Icon(Icons.business),
                             label: Text('Clientes'),
                           ),
+                          NavigationRailDestination(
+                            icon: Icon(Icons.description_outlined),
+                            selectedIcon: Icon(Icons.description),
+                            label: Text('Manifiestos'),
+                          ),
                         ],
                       ),
                       const VerticalDivider(width: 1),
@@ -125,6 +132,11 @@ class AdminShell extends ConsumerWidget {
                   icon: Icon(Icons.business_outlined),
                   selectedIcon: Icon(Icons.business),
                   label: 'Clientes',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.description_outlined),
+                  selectedIcon: Icon(Icons.description),
+                  label: 'Manifiestos',
                 ),
               ],
             ),
