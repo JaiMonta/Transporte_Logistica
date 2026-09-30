@@ -95,6 +95,28 @@ comentarios, carpetas ni textos de la interfaz. El sistema debe ser genérico.
 
 ---
 
+## Plan del día — Vista inicial (Bienvenida + Login)  ✅ COMPLETADO
+
+Objetivo: pantalla inicial con la imagen de bienvenida a mitad de pantalla,
+el lema "LOGÍSTICA DE TRANSPORTE" en letras grandes, un logotipo generado y,
+en la otra mitad, el inicio de sesión.
+
+- [x] Declarar `assets/` en `pubspec.yaml` y mover la imagen a
+  `assets/bienvenida_transporte.jfif`.
+- [x] Generar `assets/logo.png` (camión + barras de ruta, PNG transparente con
+  azul `#3C5AA0` y ámbar `#865223`). Script reproducible en
+  `tool/generar_logo.dart` (dependencia `image`).
+- [x] Extrar el formulario a `widgets/formulario_login.dart` (reutilizable).
+- [x] Nueva `features/auth/presentation/bienvenida_screen.dart`:
+  - Ancho (≥900px): `Row` mitad imagen (overlay + logo + lema en `displayLarge`
+    60px) / mitad login.
+  - Estrecho: apilado (imagen ~45% arriba, login abajo).
+- [x] Ruta `/login` ahora apunta a `PantallaBienvenida` (se eliminó
+  `login_screen.dart`); redirección por rol intacta.
+- [x] `flutter analyze` limpio y `flutter test` (12 pruebas) en verde.
+
+---
+
 ## Comandos de desarrollo
 
 ```
