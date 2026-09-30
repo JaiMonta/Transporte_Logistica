@@ -2,6 +2,9 @@
 env.json
 .supabase_token
 
+# Firebase / Hosting (caché local de despliegue)
+.firebase/
+
 # Miscellaneous
 *.class
 *.log

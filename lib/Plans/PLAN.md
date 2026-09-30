@@ -281,6 +281,83 @@ en la otra mitad, el inicio de sesión.
 
 ---
 
+## Registro del día  ✅ COMPLETADO
+
+Resumen de lo trabajado en la jornada (además del Módulo 4, detallado arriba):
+
+### Reglas de contexto del agente (DCP)
+
+- Se configuraron las reglas de poda de contexto (plugin DCP) en
+  `~/.config/opencode`: `dcp.jsonc` (perfil equilibrado: `protectUserMessages`,
+  `protectTags`, límites 50%–78%, `turnProtection` 5, patrones de archivo
+  protegidos) y los prompts en español en `dcp-prompts/overrides/`.
+
+### Reconciliación de esquema Supabase (hallazgo clave)
+
+- El proyecto remoto tenía un **esquema previo** (`usuarios`, `rutas`,
+  `manifiestos`, `entregas`, `camiones`, `extras_servicio`, `pagos_choferes`,
+  `ubicaciones_gps`) vacío y **no enlazado a `auth.users`**. Se acordó alinear al
+  plan, eliminar lo no usado y añadir políticas.
+- Migración `20260930145000_reconciliacion_esquema.sql`: elimina esas tablas.
+- **Decisión:** `public.profiles` es la única fuente de verdad de usuarios.
+- Estado final del remoto: `profiles`, `clientes`, `evidencias`, `sync_events`,
+  `manifiestos`.
+
+### Módulo 4 — Manifiestos (ver sección propia)
+
+- Captura con cámara en vivo en móvil y **por archivo en Web** (para pruebas
+  desde la web móvil), OCR con OpenAI `gpt-4o-mini` (Edge Function
+  `ocr-manifiesto`) y revisión humana antes de guardar.
+- Secreto `OPENAI_API_KEY` configurado. La función alcanza OpenAI; para operar
+  falta saldo en la cuenta de OpenAI (respondió 429 "no credits remaining").
+- **Recomendación:** rotar la API key (quedó expuesta al pegarla en el chat).
+
+### Datos de desarrollo
+
+- Chofer de prueba: `chofer.test@example.com` / `Test1234*` (contraseña
+  actualizada). Admin: `jaimemonta@gmail.com` / `Jaime5221`.
+
+### Limpieza
+
+- Se eliminó `lib/dataconnect_generated/` (andamio de ejemplo de Firebase Data
+  Connect, "movies/reviews", no referenciado y que rompía `flutter analyze`).
+
+### Despliegue web en Firebase Hosting
+
+- Proyecto Firebase: `transporte-logistica-fabab` (cuenta `jaimemonta@gmail.com`).
+- `firebase.json` sirve `build/web` con rewrite SPA (`**` → `/index.html`).
+- URL en vivo: **https://transporte-logistica-fabab.web.app** (HTTP 200; rewrite
+  SPA verificado en `/admin/manifiestos`).
+- Se eliminaron andamios de ejemplo de `firebase init` no usados (`dataconnect/`,
+  `functions/`, `firestore.rules`, `firestore.indexes.json`, `"same as default/"`).
+- `.firebase/` (caché de despliegue) añadido a `.gitignore`.
+
+---
+
+## Despliegue
+
+### Web (Firebase Hosting)
+
+```
+flutter build web --dart-define-from-file=env.json
+firebase deploy --only hosting --project transporte-logistica-fabab
+```
+
+### Backend (Supabase)
+
+```
+# Aplicar migraciones (vía Management API con el PAT de .supabase_token).
+# Desplegar Edge Functions:
+supabase functions deploy admin-users --project-ref fmwwablhluztdvspujwj
+supabase functions deploy firmar-url   --project-ref fmwwablhluztdvspujwj
+supabase functions deploy ocr-manifiesto --project-ref fmwwablhluztdvspujwj
+
+# Secretos:
+supabase secrets set OPENAI_API_KEY=<clave> --project-ref fmwwablhluztdvspujwj
+```
+
+---
+
 ## Comandos de desarrollo
 
 ```
