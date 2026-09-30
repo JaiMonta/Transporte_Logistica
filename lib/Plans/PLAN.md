@@ -109,12 +109,63 @@ secreto `NOMINATIM_USER_AGENT`; la tabla `geocodificaciones` fue eliminada.
 
 ---
 
+## Módulo 3 — Almacenamiento y modo offline  ✅ COMPLETADO
+
+Infraestructura **reutilizable** de evidencias y cola offline (sin pantallas de
+operación). La cola funciona **solo en móvil** (Android/iOS); en Web la app es
+online-only y todo el servicio local queda como no-op.
+
+### Esquema (Supabase)
+
+- Migración `20260930140000_module3_storage.sql` aplicada:
+  - Enums `evidencia_tipo` (bol, firma, recibo, extra, otro), `sync_estado`
+    (pendiente, subiendo, fallido, completado), `sync_accion` (crear, actualizar,
+    eliminar).
+  - `public.evidencias` (id, usuario_id→profiles, tipo, bucket, path, hash_sha256,
+    tamano_bytes, subido_en, created_at; único `(bucket, path)`).
+  - `public.sync_events` (id, usuario_id, entidad, entidad_id, accion, payload
+    jsonb, estado, intentos, ultimo_error, timestamps; único
+    `(usuario_id, entidad, entidad_id, accion)` para idempotencia).
+  - RLS: el chofer solo ve/sube lo suyo (sin borrar); el admin gestiona todo.
+- Migración `20260930140100_module3_storage_buckets.sql` aplicada: tres buckets
+  **privados** (`manifiestos`, `firmas`, `extras`) y políticas sobre
+  `storage.objects` — el chofer opera solo dentro de su carpeta `{uid}/…`; el
+  admin en todas.
+
+### Edge Function
+
+- `firmar-url` desplegada: valida el JWT, exige usuario activo, restringe al dueño
+  del `path` (o admin), valida bucket/path (`..`, rutas absolutas) y firma URLs de
+  corta vida (60 s, máx 300). Acciones `sign`, `upload`, `remove`.
+
+### Flutter (`lib/shared/services/`)
+
+- `offline_manager.dart`: base local `sqflite` (`offline_queue`, `gps_buffer`) que
+  **solo se inicializa fuera de Web**; `encolar` idempotente, pendientes, contador.
+- `sync_engine.dart`: escucha `connectivity_plus`, vacía la cola a Supabase con
+  **espera creciente** (`esperaReintento`, tope 5 min), espeja en `sync_events` y
+  marca estados pendiente→subiendo→completado/fallido. Providers `syncEngineProvider`
+  y `pendientesProvider`.
+- `almacenamiento_repository.dart`: comprime con `image` (JPEG q70, máx 1600 px),
+  calcula SHA-256 (`crypto`), sube con `storage.uploadBinary` y registra en
+  `evidencias`; obtiene URL firmada vía Edge Function.
+- `gps_tracker.dart`: buffer local de posiciones (base para el módulo GPS).
+- `offline_banner.dart`: ahora muestra también "N pendiente(s) de sincronizar".
+
+### Pruebas
+
+- Unitarias: `test/modulo3_test.dart` (backoff, `hayConexion`, serialización de
+  `ElementoCola`/`PuntoGps`); total del proyecto **30 en verde**.
+- RLS/E2E remoto (todas en verde): el chofer sube/lee solo su carpeta, no puede
+  escribir ni borrar lo ajeno; el admin gestiona todo; `firmar-url` 403 para carpeta
+  ajena, 400 para path/bucket inválidos, 401 sin token; evidencias/sync_events con
+  RLS propia. Datos de prueba eliminados.
+- `flutter analyze` limpio; `flutter test` 30/30.
+
+---
+
 ## Módulos pendientes
 
-- **Módulo 3 — Almacenamiento y modo offline**: buckets privados (BOL/recibos),
-  URLs firmadas cortas, compresión de fotos, cola `sqflite` con estados
-  pendiente/subiendo/fallido/completado, `connectivity_plus`, reintento con espera
-  creciente, indicador de pendientes.
 - **Módulo 4 — Manifiestos**: nº PRO, cliente, fecha, foto BOL, quién capturó;
   PRO único por cliente y fecha; captura ~30s; búsqueda por PRO/fecha (admin);
   RLS: el chofer ve los suyos.
