@@ -12,7 +12,7 @@ class PantallaBienvenida extends StatelessWidget {
   const PantallaBienvenida({super.key});
 
   static const _imagen = AssetImage('assets/bienvenida_transporte.jfif');
-  static const _logo = AssetImage('assets/logo.png');
+  static const _logo = AssetImage('assets/Logo.png');
 
   @override
   Widget build(BuildContext context) {
@@ -90,51 +90,74 @@ class _PanelImagen extends StatelessWidget {
             ),
           ),
         ),
-        Padding(
-          padding: EdgeInsets.all(expandido ? AppSpacing.xl : AppSpacing.lg),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: expandido
-                ? CrossAxisAlignment.start
-                : CrossAxisAlignment.center,
-            children: [
-              Image(
-                image: PantallaBienvenida._logo,
-                width: expandido ? 96 : 72,
-                height: expandido ? 96 : 72,
-                errorBuilder: (_, _, _) =>
-                    const Icon(Icons.local_shipping, size: 72, color: Colors.white),
-              ),
-              SizedBox(height: expandido ? AppSpacing.lg : AppSpacing.md),
-              Text(
-                'LOGÍSTICA\nDE TRANSPORTE',
-                textAlign: expandido ? TextAlign.start : TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'SpaceGrotesk',
-                  fontSize: expandido ? 60 : 34,
-                  height: 1.05,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1,
-                  color: Colors.white,
-                  shadows: const [
-                    Shadow(
-                      color: Color(0x99000000),
-                      blurRadius: 12,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
+        LayoutBuilder(
+          builder: (context, restricciones) {
+            final alto = restricciones.maxHeight;
+            return Padding(
+              padding: EdgeInsets.all(expandido ? AppSpacing.xl : AppSpacing.md),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: SingleChildScrollView(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image(
+                        image: PantallaBienvenida._logo,
+                        width: 160,
+                        height: 160,
+                        errorBuilder: (_, _, _) => const Icon(
+                          Icons.local_shipping,
+                          size: 120,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Flexible(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'LOGÍSTICA\nDE TRANSPORTE',
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                fontFamily: 'SpaceGrotesk',
+                                fontSize:
+                                    expandido ? (alto < 420 ? 28 : 36) : 26,
+                                height: 1.05,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1,
+                                color: Colors.white,
+                                shadows: const [
+                                  Shadow(
+                                    color: Color(0x99000000),
+                                    blurRadius: 12,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            Text(
+                              'Control de flota, manifiestos y entregas en un solo lugar.',
+                              textAlign: TextAlign.start,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.92),
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              SizedBox(height: AppSpacing.sm),
-              Text(
-                'Control de flota, manifiestos y entregas en un solo lugar.',
-                textAlign: expandido ? TextAlign.start : TextAlign.center,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.92),
-                    ),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ],
     );

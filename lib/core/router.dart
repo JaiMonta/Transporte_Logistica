@@ -12,6 +12,8 @@ import '../features/auth/presentation/restablecer_password_screen.dart';
 import '../features/auth/presentation/usuario_form_screen.dart';
 import '../features/auth/presentation/usuarios_screen.dart';
 import '../features/auth/providers/auth_providers.dart';
+import '../features/clientes/presentation/cliente_form_screen.dart';
+import '../features/clientes/presentation/clientes_screen.dart';
 import 'supabase_client.dart';
 
 /// Rutas de la aplicación.
@@ -27,6 +29,10 @@ class Rutas {
   static const String adminUsuarios = '/admin/usuarios';
   static const String adminUsuarioNuevo = '/admin/usuarios/nuevo';
   static String adminUsuarioEditar(String id) => '/admin/usuarios/$id';
+
+  static const String adminClientes = '/admin/clientes';
+  static const String adminClienteNuevo = '/admin/clientes/nuevo';
+  static String adminClienteEditar(String id) => '/admin/clientes/$id';
 
   static const String choferHome = '/chofer/home';
 
@@ -85,6 +91,22 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: ':id',
                 builder: (context, state) => UsuarioFormScreen(
                   usuarioId: state.pathParameters['id'],
+                ),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: Rutas.adminClientes,
+            builder: (context, state) => const ClientesScreen(),
+            routes: [
+              GoRoute(
+                path: 'nuevo',
+                builder: (context, state) => const ClienteFormScreen(),
+              ),
+              GoRoute(
+                path: ':id',
+                builder: (context, state) => ClienteFormScreen(
+                  clienteId: state.pathParameters['id'],
                 ),
               ),
             ],

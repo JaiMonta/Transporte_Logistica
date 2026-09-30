@@ -60,10 +60,57 @@ comentarios, carpetas ni textos de la interfaz. El sistema debe ser genérico.
 
 ---
 
+## Módulo 2 — Clientes  ✅ COMPLETADO
+
+Catálogo de clientes con baja lógica y selector reutilizable. El administrador
+crea/edita/desactiva; el chofer solo ve los clientes activos.
+
+### Esquema (Supabase)
+
+- Migración `supabase/migrations/20260930130000_module2_clientes.sql` aplicada:
+  `public.clientes` (id, nombre, nombre_contacto, telefono, email, direccion,
+  lat, lng, activo, created_at, updated_at), índice único `lower(email)` con
+  correo no nulo, índice por nombre, trigger `updated_at` reutilizando
+  `public.set_updated_at()`.
+- RLS: `clientes_select_active_or_admin` (chofer solo activos, admin todo);
+  insert/update/delete solo `public.is_admin()`. Grants a `authenticated`
+  (select/insert/update/delete) y `service_role` (all).
+
+### Flutter (feature `clientes`)
+
+- `models/cliente.dart` (lat/lng, `tieneUbicacion`, `nombreVisible`, `iniciales`).
+- `data/clientes_repository.dart`: listar (búsqueda + filtro activo), obtener,
+  `existeCorreo`, crear, actualizar, cambiarActivo — todo por PostgREST (RLS).
+- `providers/clientes_providers.dart`: `FiltroClientes`, `clientesProvider`,
+  `clienteProvider(id)` y `clientesActivosProvider` (reutilizable en Módulos 4/5/6).
+- `presentation/clientes_screen.dart` (búsqueda + filtro activos/inactivos,
+  tarjetas en móvil / tabla en pantalla ancha, activar/desactivar) y
+  `presentation/cliente_form_screen.dart` (alta/edición con validaciones).
+- Widgets: `cliente_card.dart`, `cliente_tabla.dart`, `cliente_selector.dart`.
+- Rutas: `adminClientes`, `adminClienteNuevo`, `adminClienteEditar(id)`; entrada
+  "Clientes" en `AdminShell`.
+
+### Ubicación en el mapa (decisión del usuario)
+
+En vez de geocodificación por servicio externo (Nominatim bloqueaba las IPs
+compartidas de Supabase Edge), se implementó un **selector de mapa modal**:
+`lib/shared/widgets/selector_mapa.dart` abre un diálogo con `flutter_map` y
+OpenStreetMap; el administrador toca el punto exacto y la app toma latitud y
+longitud. Se eliminó la Edge Function `geocodificar`, su migración de caché y el
+secreto `NOMINATIM_USER_AGENT`; la tabla `geocodificaciones` fue eliminada.
+
+### Pruebas
+
+- Unitarias: `test/modulo2_test.dart` (Cliente.fromMap, coordenadas fuera de
+  rango, `FiltroClientes.copyWith`), total del proyecto 21 en verde.
+- RLS en remoto (todas en verde): el chofer solo ve activos y no puede
+  crear/editar; el administrador gestiona todo.
+- `flutter analyze` limpio; `flutter test` 21/21.
+
+---
+
 ## Módulos pendientes
 
-- **Módulo 2 — Clientes**: catálogo; admin escribe, chofer solo lee activos; baja
-  lógica; selector reutilizable.
 - **Módulo 3 — Almacenamiento y modo offline**: buckets privados (BOL/recibos),
   URLs firmadas cortas, compresión de fotos, cola `sqflite` con estados
   pendiente/subiendo/fallido/completado, `connectivity_plus`, reintento con espera

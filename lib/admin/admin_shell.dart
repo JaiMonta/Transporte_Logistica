@@ -16,11 +16,28 @@ class AdminShell extends ConsumerWidget {
 
   static const double _breakpointAncho = 900;
 
-  int get _indice => ubicacion.startsWith(Rutas.adminUsuarios) ? 1 : 0;
+  static const List<String> _rutas = [
+    Rutas.adminDashboard,
+    Rutas.adminUsuarios,
+    Rutas.adminClientes,
+  ];
 
-  String get _titulo => _indice == 1 ? 'Usuarios y accesos' : 'Panel';
+  int get _indice {
+    for (var i = _rutas.length - 1; i >= 0; i--) {
+      if (ubicacion.startsWith(_rutas[i])) return i;
+    }
+    return 0;
+  }
+
+  String get _titulo => switch (_indice) {
+        1 => 'Usuarios y accesos',
+        2 => 'Clientes',
+        _ => 'Panel',
+      };
 
   bool get _enListaUsuarios => ubicacion == Rutas.adminUsuarios;
+
+  bool get _enListaClientes => ubicacion == Rutas.adminClientes;
 
   Future<void> _salir(BuildContext context, WidgetRef ref) =>
       ref.read(authControllerProvider.notifier).cerrarSesion();
@@ -38,6 +55,12 @@ class AdminShell extends ConsumerWidget {
               icon: const Icon(Icons.person_add_alt_1),
               onPressed: () => context.go(Rutas.adminUsuarioNuevo),
             ),
+          if (_enListaClientes)
+            IconButton(
+              tooltip: 'Nuevo cliente',
+              icon: const Icon(Icons.add_business),
+              onPressed: () => context.go(Rutas.adminClienteNuevo),
+            ),
           IconButton(
             tooltip: 'Cerrar sesión',
             icon: const Icon(Icons.logout),
@@ -54,9 +77,7 @@ class AdminShell extends ConsumerWidget {
                     children: [
                       NavigationRail(
                         selectedIndex: _indice,
-                        onDestinationSelected: (i) => context.go(
-                          i == 1 ? Rutas.adminUsuarios : Rutas.adminDashboard,
-                        ),
+                        onDestinationSelected: (i) => context.go(_rutas[i]),
                         labelType: NavigationRailLabelType.all,
                         destinations: const [
                           NavigationRailDestination(
@@ -68,6 +89,11 @@ class AdminShell extends ConsumerWidget {
                             icon: Icon(Icons.people_outline),
                             selectedIcon: Icon(Icons.people),
                             label: Text('Usuarios'),
+                          ),
+                          NavigationRailDestination(
+                            icon: Icon(Icons.business_outlined),
+                            selectedIcon: Icon(Icons.business),
+                            label: Text('Clientes'),
                           ),
                         ],
                       ),
@@ -83,9 +109,7 @@ class AdminShell extends ConsumerWidget {
           ? null
           : NavigationBar(
               selectedIndex: _indice,
-              onDestinationSelected: (i) => context.go(
-                i == 1 ? Rutas.adminUsuarios : Rutas.adminDashboard,
-              ),
+              onDestinationSelected: (i) => context.go(_rutas[i]),
               destinations: const [
                 NavigationDestination(
                   icon: Icon(Icons.dashboard_outlined),
@@ -96,6 +120,11 @@ class AdminShell extends ConsumerWidget {
                   icon: Icon(Icons.people_outline),
                   selectedIcon: Icon(Icons.people),
                   label: 'Usuarios',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.business_outlined),
+                  selectedIcon: Icon(Icons.business),
+                  label: 'Clientes',
                 ),
               ],
             ),
