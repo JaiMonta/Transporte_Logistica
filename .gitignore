@@ -1,3 +1,7 @@
+# Variables de entorno locales (credenciales)
+env.json
+.supabase_token
+
 # Miscellaneous
 *.class
 *.log
