@@ -1,4 +1,4 @@
-package com.armando1735.app
+package com.transportelogistica.app
 
 import io.flutter.embedding.android.FlutterActivity
 

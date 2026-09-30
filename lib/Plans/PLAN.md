@@ -27,7 +27,7 @@ comentarios, carpetas ni textos de la interfaz. El sistema debe ser genérico.
 
 ## Módulo 1 — Usuarios y accesos (CRUD)  ✅ COMPLETADO
 
-1. Proyecto Supabase y proyecto Flutter en español con ID `com.armando1735.app`.
+1. Proyecto Supabase y proyecto Flutter en español con ID `com.transportelogistica.app`.
 2. Tabla `profiles` enlazada a `auth.users` (mismo id), roles `admin` y `chofer`,
    campo `activo` y trigger que la llena al crear un usuario en Auth.
 3. Rol guardado en `app_metadata` (no en `user_metadata`, editable por el usuario).
@@ -355,6 +355,22 @@ supabase functions deploy ocr-manifiesto --project-ref fmwwablhluztdvspujwj
 # Secretos:
 supabase secrets set OPENAI_API_KEY=<clave> --project-ref fmwwablhluztdvspujwj
 ```
+
+### App móvil (APK de prueba)
+
+```
+flutter build apk --release --dart-define-from-file=env.json
+# Salida: build\app\outputs\flutter-apk\app-release.apk
+```
+
+- El App ID es **`com.transportelogistica.app`** (Android `namespace`/`applicationId`,
+  iOS `PRODUCT_BUNDLE_IDENTIFIER` y `userAgentPackageName` del mapa).
+- Hoy el `build.gradle.kts` firma *release* con las claves *debug*, así que el APK
+  se instala directamente en el teléfono (activando orígenes desconocidos).
+  Antes de distribuir formalmente: crear un keystore propio, `android/key.properties`
+  (en `.gitignore`) y un `signingConfigs.release`.
+- APK de prueba de referencia: `app-release.apk` (~71 MB), paquete
+  `com.transportelogistica.app`, versión 1.0.0 (versionCode 1).
 
 ---
 

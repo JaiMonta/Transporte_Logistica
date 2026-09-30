@@ -106,7 +106,7 @@ class _DialogoMapaState extends State<_DialogoMapa> {
                 children: [
                   TileLayer(
                     urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.armando1735.app',
+                    userAgentPackageName: 'com.transportelogistica.app',
                   ),
                   MarkerLayer(
                     markers: [
