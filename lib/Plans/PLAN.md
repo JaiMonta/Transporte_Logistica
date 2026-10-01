@@ -261,6 +261,21 @@ La fuente de verdad de usuarios es `public.profiles` (Módulo 1).
   (tipo/número/cliente). OpenAI (web) devuelve un array explícito; ML Kit (móvil)
   usa el parser `parser_manifiesto.dart` (best-effort, revisión humana).
 
+### Login persistente (recordar usuario y contraseña)
+
+- `data/credenciales_service.dart`: guarda las credenciales recordadas en
+  `flutter_secure_storage` (Keychain/Keystore). La **contraseña** solo se
+  recuerda en **móvil** (nunca en Web); el **correo** también en Web.
+- `formulario_login.dart`: precarga correo y contraseña al abrir; interruptor
+  **"Recordar usuario y contraseña"** (activado por defecto en móvil). Al
+  iniciar sesión se guarda según el interruptor.
+- **Al cerrar sesión** se borran las credenciales recordadas (hay que teclear de
+  nuevo); la sesión activa sí se conserva (reapertura de app / token vigente).
+- Pruebas: `test/credenciales_test.dart` (lógica guardar/olvidar con storage
+  falso). Total del proyecto: **60 en verde**.
+- **Futuro:** opción de desbloqueo por biometría (`local_auth`) en lugar de
+  prellenar la contraseña.
+
 ### Importación de clientes desde Excel
 
 - Script reutilizable `tool/importar_clientes_excel.ps1`: migra la hoja

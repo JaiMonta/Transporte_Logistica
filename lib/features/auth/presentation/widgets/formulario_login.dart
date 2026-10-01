@@ -30,6 +30,31 @@ class _FormularioLoginState extends ConsumerState<FormularioLogin> {
   final _contrasena = TextEditingController();
   bool _verContrasena = false;
   bool _cargando = false;
+  bool _recordarContrasena = true;
+
+  /// ¿La plataforma permite recordar la contraseña? (solo móvil).
+  bool get _puedeRecordar =>
+      ref.read(credencialesProvider).puedeRecordarContrasena;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargarCredenciales();
+  }
+
+  Future<void> _cargarCredenciales() async {
+    final servicio = ref.read(credencialesProvider);
+    final correo = await servicio.leerCorreo();
+    final contrasena = await servicio.leerContrasena();
+    if (!mounted) return;
+    setState(() {
+      if (correo != null) _correo.text = correo;
+      if (contrasena != null && contrasena.isNotEmpty) {
+        _contrasena.text = contrasena;
+        _recordarContrasena = true;
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -46,6 +71,12 @@ class _FormularioLoginState extends ConsumerState<FormularioLogin> {
       await ref.read(authControllerProvider.notifier).iniciarSesion(
             correo: _correo.text,
             contrasena: _contrasena.text,
+          );
+      // Guardar credenciales según la elección del usuario.
+      await ref.read(credencialesProvider).guardar(
+            _correo.text,
+            contrasena:
+                (_recordarContrasena && _puedeRecordar) ? _contrasena.text : null,
           );
     } catch (e) {
       if (mounted) {
@@ -111,7 +142,21 @@ class _FormularioLoginState extends ConsumerState<FormularioLogin> {
                   setState(() => _verContrasena = !_verContrasena),
             ),
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.sm),
+          if (_puedeRecordar)
+            CheckboxListTile(
+              value: _recordarContrasena,
+              onChanged: _cargando
+                  ? null
+                  : (v) => setState(() => _recordarContrasena = v ?? false),
+              controlAffinity: ListTileControlAffinity.leading,
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Recordar usuario y contraseña'),
+              subtitle: const Text(
+                'Se guarda de forma segura en este dispositivo.',
+              ),
+            ),
+          const SizedBox(height: AppSpacing.sm),
           PrimaryButton(
             texto: 'Entrar',
             cargando: _cargando,

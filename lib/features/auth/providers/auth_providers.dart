@@ -3,10 +3,16 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/supabase_client.dart';
 import '../data/auth_repository.dart';
+import '../data/credenciales_service.dart';
 import '../models/profile.dart';
 
 final authRepositoryProvider = Provider<AuthRepository>(
   (ref) => AuthRepository(ref.watch(supabaseProvider)),
+);
+
+/// Servicio de credenciales recordadas (usuario y contraseña).
+final credencialesProvider = Provider<CredencialesService>(
+  (ref) => CredencialesService(),
 );
 
 /// Estado de autenticación de Supabase (se reemite en cada cambio de sesión).
@@ -62,6 +68,8 @@ class AuthController extends Notifier<AsyncValue<void>> {
     state = const AsyncLoading();
     try {
       await ref.read(authRepositoryProvider).cerrarSesion();
+      // Al cerrar sesión se olvidan las credenciales recordadas.
+      await ref.read(credencialesProvider).olvidarTodo();
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);
