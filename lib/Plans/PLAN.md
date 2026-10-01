@@ -196,19 +196,27 @@ La fuente de verdad de usuarios es `public.profiles` (Módulo 1).
 
 - `ocr-manifiesto` desplegada: valida JWT y usuario activo; llama a OpenAI
   `gpt-4o-mini` con Structured Outputs y devuelve `{numero_pro, fecha, cliente,
-  confianza}`. La clave vive en el secreto `OPENAI_API_KEY` (aún no configurado;
-  sin ella la función responde 503 "OCR no configurado").
+  confianza}`. La clave vive en el secreto `OPENAI_API_KEY` (aún sin saldo).
+- Se usa como OCR **en Web**. En **móvil** el OCR es on-device con **ML Kit**
+  (ver `lib/Plans/OCR_OPCIONES.md`).
 
 ### Flutter (feature `manifiesto`)
 
 - `models/manifiesto.dart` (Manifiesto, enum `CotejoEstado`, join de cliente).
 - `data/manifiestos_repository.dart` (listar con búsqueda PRO + rango de fechas,
-  obtener, `existePro`, crear) y `data/ocr_repository.dart`.
+  obtener, `existePro`, crear).
+- **OCR por plataforma** (`data/`):
+  - `ocr_repository.dart`: punto único; elige estrategia por plataforma.
+  - `ocr_mlkit.dart` (import condicional) → `ocr_mlkit_movil.dart` (ML Kit) /
+    `ocr_mlkit_web.dart` (no-op).
+  - `parser_manifiesto.dart`: función pura que extrae nº PRO, fecha y cliente
+    del texto (regex + heurística).
+  - `ocr_openai.dart`: OpenAI (Web) + `resultadoDesdeTexto`.
 - `providers/manifiestos_providers.dart` (`FiltroManifiestos`, `manifiestosProvider`,
   `manifiestoProvider`).
-- `presentation/captura_manifiesto_screen.dart` (**solo móvil**; en Web avisa):
-  cámara en vivo con marco guía y linterna, subida al bucket `manifiestos`
-  (reutiliza `AlmacenamientoRepository`), OCR y formulario de revisión humana.
+- `presentation/captura_manifiesto_screen.dart` (cámara en vivo en móvil;
+  selección de archivo en Web): sube al bucket `manifiestos`, OCR y revisión
+  humana.
 - `presentation/manifiestos_screen.dart` (admin: tarjetas/tabla, búsqueda y rango
   de fechas), `presentation/mis_manifiestos_screen.dart` (chofer) y
   `presentation/manifiesto_detalle_screen.dart` (foto BOL por URL firmada +
@@ -220,15 +228,26 @@ La fuente de verdad de usuarios es `public.profiles` (Módulo 1).
 
 ### Pruebas
 
-- Unitarias: `test/modulo4_test.dart`; total del proyecto **40 en verde**.
+- Unitarias: `test/modulo4_test.dart` y `test/parser_manifiesto_test.dart`;
+  total del proyecto **55 en verde**.
 - RLS/E2E remoto (todas en verde): el chofer solo ve/crea los suyos y no puede
   editar; el admin ve y gestiona todos; PRO duplicado → 409; `ocr-manifiesto`
   sin token → 401 y sin clave → 503. Datos de prueba eliminados.
-- `flutter analyze` limpio; `flutter test` 40/40.
+- `flutter analyze` limpio; `flutter test` 55/55.
+- Compila Web (`flutter build web`) y Android (`flutter build apk`).
 
-### Pendiente para cerrar el OCR
+### OCR — decisión (ver `lib/Plans/OCR_OPCIONES.md`)
 
-- Configurar el secreto `OPENAI_API_KEY`:
+- **Móvil: Google ML Kit** (on-device, offline, sin costo; modelo *bundled*).
+  Requisitos: Android `minSdk` 24 + `com.google.mlkit:text-recognition:16.0.1` +
+  `proguard-rules.pro`; iOS `IPHONEOS_DEPLOYMENT_TARGET = 15.5` + `ios/Podfile`.
+- **Web: OpenAI** (Edge Function) o captura manual.
+- **Tesseract OCR: evaluado y descartado** para móvil (calidad y setup iOS
+  frágiles). Anotado como opción futura **solo si** se quiere OCR offline en Web.
+
+### Pendiente para cerrar el OCR (OpenAI / Web)
+
+- Configurar saldo/secreto `OPENAI_API_KEY`:
   `supabase secrets set OPENAI_API_KEY=... --project-ref fmwwablhluztdvspujwj`.
 
 ---
@@ -306,8 +325,10 @@ Resumen de lo trabajado en la jornada (además del Módulo 4, detallado arriba):
 ### Módulo 4 — Manifiestos (ver sección propia)
 
 - Captura con cámara en vivo en móvil y **por archivo en Web** (para pruebas
-  desde la web móvil), OCR con OpenAI `gpt-4o-mini` (Edge Function
-  `ocr-manifiesto`) y revisión humana antes de guardar.
+  desde la web móvil), OCR y revisión humana antes de guardar.
+- **OCR por plataforma:** ML Kit on-device en móvil y OpenAI (Edge Function
+  `ocr-manifiesto`) en Web. Análisis y decisión en `lib/Plans/OCR_OPCIONES.md`
+  (incluye Tesseract, evaluado y descartado).
 - Secreto `OPENAI_API_KEY` configurado. La función alcanza OpenAI; para operar
   falta saldo en la cuenta de OpenAI (respondió 429 "no credits remaining").
 - **Recomendación:** rotar la API key (quedó expuesta al pegarla en el chat).
