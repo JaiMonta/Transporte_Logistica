@@ -3,6 +3,7 @@ class Cliente {
   const Cliente({
     required this.id,
     required this.nombre,
+    this.codCli,
     this.nombreContacto,
     this.telefono,
     this.email,
@@ -16,6 +17,7 @@ class Cliente {
 
   final String id;
   final String nombre;
+  final String? codCli;
   final String? nombreContacto;
   final String? telefono;
   final String? email;
@@ -52,9 +54,10 @@ class Cliente {
   }
 
   factory Cliente.fromMap(Map<String, dynamic> mapa) => Cliente(
-        id: mapa['id'] as String,
-        nombre: (mapa['nombre'] as String?) ?? '',
-        nombreContacto: mapa['nombre_contacto'] as String?,
+      id: mapa['id'] as String,
+      nombre: (mapa['nombre'] as String?) ?? '',
+      codCli: mapa['cod_cli'] as String?,
+      nombreContacto: mapa['nombre_contacto'] as String?,
         telefono: mapa['telefono'] as String?,
         email: mapa['email'] as String?,
         direccion: mapa['direccion'] as String?,
@@ -67,6 +70,7 @@ class Cliente {
 
   Cliente copyWith({
     String? nombre,
+    String? codCli,
     String? nombreContacto,
     String? telefono,
     String? email,
@@ -78,6 +82,7 @@ class Cliente {
       Cliente(
         id: id,
         nombre: nombre ?? this.nombre,
+        codCli: codCli ?? this.codCli,
         nombreContacto: nombreContacto ?? this.nombreContacto,
         telefono: telefono ?? this.telefono,
         email: email ?? this.email,

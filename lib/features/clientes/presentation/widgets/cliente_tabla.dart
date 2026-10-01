@@ -24,6 +24,7 @@ class ClienteTabla extends StatelessWidget {
       child: DataTable(
         columns: const [
           DataColumn(label: Text('Nombre')),
+          DataColumn(label: Text('Código')),
           DataColumn(label: Text('Contacto')),
           DataColumn(label: Text('Teléfono')),
           DataColumn(label: Text('Correo')),
@@ -35,6 +36,9 @@ class ClienteTabla extends StatelessWidget {
           return DataRow(
             cells: [
               DataCell(Text(c.nombreVisible)),
+              DataCell(Text(
+                (c.codCli == null || c.codCli!.isEmpty) ? '—' : c.codCli!,
+              )),
               DataCell(Text(
                 (c.nombreContacto == null || c.nombreContacto!.isEmpty)
                     ? '—'

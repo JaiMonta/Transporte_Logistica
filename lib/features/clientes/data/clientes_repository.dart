@@ -23,7 +23,8 @@ class ClientesRepository {
     final termino = busqueda.trim().replaceAll(RegExp(r'[(),%]'), '');
     if (termino.isNotEmpty) {
       query = query.or(
-        'nombre.ilike.%$termino%,nombre_contacto.ilike.%$termino%,'
+        'nombre.ilike.%$termino%,cod_cli.ilike.%$termino%,'
+        'nombre_contacto.ilike.%$termino%,'
         'email.ilike.%$termino%,telefono.ilike.%$termino%,'
         'direccion.ilike.%$termino%',
       );
@@ -61,6 +62,7 @@ class ClientesRepository {
 
   Future<Cliente> crear({
     required String nombre,
+    String? codCli,
     String? nombreContacto,
     String? telefono,
     String? email,
@@ -72,6 +74,7 @@ class ClientesRepository {
         .from('clientes')
         .insert(_cuerpo(
           nombre: nombre,
+          codCli: codCli,
           nombreContacto: nombreContacto,
           telefono: telefono,
           email: email,
@@ -87,6 +90,7 @@ class ClientesRepository {
   Future<Cliente> actualizar({
     required String id,
     required String nombre,
+    String? codCli,
     String? nombreContacto,
     String? telefono,
     String? email,
@@ -98,6 +102,7 @@ class ClientesRepository {
         .from('clientes')
         .update(_cuerpo(
           nombre: nombre,
+          codCli: codCli,
           nombreContacto: nombreContacto,
           telefono: telefono,
           email: email,
@@ -117,6 +122,7 @@ class ClientesRepository {
 
   Map<String, dynamic> _cuerpo({
     required String nombre,
+    String? codCli,
     String? nombreContacto,
     String? telefono,
     String? email,
@@ -126,6 +132,7 @@ class ClientesRepository {
   }) =>
       {
         'nombre': nombre.trim(),
+        'cod_cli': _texto(codCli),
         'nombre_contacto': _texto(nombreContacto),
         'telefono': _texto(telefono),
         'email': _texto(email)?.toLowerCase(),

@@ -45,6 +45,12 @@ class ClienteCard extends StatelessWidget {
                     children: [
                       Text(cliente.nombreVisible,
                           style: tema.textTheme.titleMedium),
+                      if (cliente.codCli != null &&
+                          cliente.codCli!.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text('Código: ${cliente.codCli}',
+                            style: tema.textTheme.bodySmall),
+                      ],
                       if (cliente.nombreContacto != null &&
                           cliente.nombreContacto!.isNotEmpty) ...[
                         const SizedBox(height: 2),

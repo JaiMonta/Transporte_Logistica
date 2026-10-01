@@ -25,6 +25,7 @@ class ClienteFormScreen extends ConsumerStatefulWidget {
 class _ClienteFormScreenState extends ConsumerState<ClienteFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nombre = TextEditingController();
+  final _codCli = TextEditingController();
   final _contacto = TextEditingController();
   final _telefono = TextEditingController();
   final _correo = TextEditingController();
@@ -50,6 +51,7 @@ class _ClienteFormScreenState extends ConsumerState<ClienteFormScreen> {
   @override
   void dispose() {
     _nombre.dispose();
+    _codCli.dispose();
     _contacto.dispose();
     _telefono.dispose();
     _correo.dispose();
@@ -74,6 +76,7 @@ class _ClienteFormScreenState extends ConsumerState<ClienteFormScreen> {
       setState(() {
         _clienteOriginal = cliente;
         _nombre.text = cliente.nombre;
+        _codCli.text = cliente.codCli ?? '';
         _contacto.text = cliente.nombreContacto ?? '';
         _telefono.text = cliente.telefono ?? '';
         _correo.text = cliente.email ?? '';
@@ -127,6 +130,7 @@ class _ClienteFormScreenState extends ConsumerState<ClienteFormScreen> {
         await repo.actualizar(
           id: _clienteOriginal!.id,
           nombre: _nombre.text,
+          codCli: _codCli.text,
           nombreContacto: _contacto.text,
           telefono: _telefono.text,
           email: _correo.text,
@@ -137,6 +141,7 @@ class _ClienteFormScreenState extends ConsumerState<ClienteFormScreen> {
       } else {
         await repo.crear(
           nombre: _nombre.text,
+          codCli: _codCli.text,
           nombreContacto: _contacto.text,
           telefono: _telefono.text,
           email: _correo.text,
@@ -195,6 +200,13 @@ class _ClienteFormScreenState extends ConsumerState<ClienteFormScreen> {
                           icono: Icons.storefront_outlined,
                           textInputAction: TextInputAction.next,
                           validator: Validador.nombre,
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        AppTextField(
+                          controller: _codCli,
+                          label: 'Código de cliente (opcional)',
+                          icono: Icons.tag,
+                          textInputAction: TextInputAction.next,
                         ),
                         const SizedBox(height: AppSpacing.md),
                         AppTextField(

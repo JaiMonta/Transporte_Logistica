@@ -8,6 +8,7 @@ void main() {
       final cliente = Cliente.fromMap({
         'id': 'c1',
         'nombre': 'Distribuidora del Centro',
+        'cod_cli': 'CLI-001',
         'nombre_contacto': 'Ana Pérez',
         'telefono': '5551234567',
         'email': 'contacto@centro.com',
@@ -19,6 +20,7 @@ void main() {
       });
 
       expect(cliente.id, 'c1');
+      expect(cliente.codCli, 'CLI-001');
       expect(cliente.nombreContacto, 'Ana Pérez');
       expect(cliente.activo, isFalse);
       expect(cliente.lat, 10.4806);
