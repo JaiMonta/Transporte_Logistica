@@ -261,6 +261,20 @@ La fuente de verdad de usuarios es `public.profiles` (Módulo 1).
   (tipo/número/cliente). OpenAI (web) devuelve un array explícito; ML Kit (móvil)
   usa el parser `parser_manifiesto.dart` (best-effort, revisión humana).
 
+### Importación de clientes desde Excel
+
+- Script reutilizable `tool/importar_clientes_excel.ps1`: migra la hoja
+  (CLIENTE→nombre, COD→cod_cli, CONTACTO→nombre_contacto, TELEFONO→telefono,
+  EMAIL→email, DIRECCION→direccion, LAT→lat, LONG→lng; `activo=true`).
+- Solo importa filas con **DIRECCION y REGION** válidas; `#N/D`→null; email en
+  minúsculas (duplicados: solo el primero lo conserva); corrige latitudes sin
+  punto decimal; idempotente por `cod_cli`; soporta `-DryRun`.
+- Uso:
+  `powershell -ExecutionPolicy Bypass -File .\tool\importar_clientes_excel.ps1 -Archivo RUTA.xlsx -Hoja 1 -AdminEmail ... -AdminPassword ...`
+- Carga realizada: `C:\Desarrollo\Coordenadas.xlsx` (Hoja1) → **254 clientes**
+  (de 258 filas válidas; 4 con `cod_cli` duplicado). Estado: 254 total, 222 con
+  email, 252 con coordenadas.
+
 ### Retención y purga
 
 - Migración `20260930170000_module4_purga_manifiestos.sql`: tabla
