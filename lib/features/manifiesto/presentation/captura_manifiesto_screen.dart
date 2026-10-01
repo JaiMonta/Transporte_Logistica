@@ -17,6 +17,8 @@ import '../../../shared/widgets/offline_banner.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../../auth/models/profile.dart';
 import '../../auth/providers/auth_providers.dart';
+import '../../combustible/presentation/dialogo_combustible.dart';
+import '../../combustible/providers/combustible_providers.dart';
 import '../data/ocr_repository.dart';
 import '../models/manifiesto.dart';
 import '../providers/manifiestos_providers.dart';
@@ -244,7 +246,7 @@ class _CapturaManifiestoScreenState
         }
       }
 
-      await repo.crear(
+      final creado = await repo.crear(
         fecha: fecha,
         lineas: validas,
         bucket: _evidencia?.bucket,
@@ -255,12 +257,36 @@ class _CapturaManifiestoScreenState
       );
       if (!mounted) return;
       ref.invalidate(manifiestosProvider);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Manifiesto guardado.')),
-      );
-      final esAdmin =
-          ref.read(currentProfileProvider).value?.rol == Rol.admin;
-      context.go(esAdmin ? Rutas.adminManifiestos : Rutas.choferManifiestos);
+
+      final perfil = ref.read(currentProfileProvider).value;
+      final esAdmin = perfil?.rol == Rol.admin;
+
+      if (!esAdmin) {
+        // El chofer registra los litros iniciales y arranca la jornada.
+        final datos = await mostrarDialogoCombustible(
+          context,
+          titulo: 'Combustible inicial',
+          etiquetaLitros: 'Litros iniciales',
+        );
+        if (datos != null) {
+          await ref.read(combustibleRepositoryProvider).iniciar(
+                manifiestoId: creado.id,
+                litrosIniciales: datos.litros,
+                odometroInicial: datos.odometro,
+              );
+        }
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Manifiesto guardado.')),
+        );
+        // Comienza la entrega: ir a Entregas del día (arranca el GPS).
+        context.go(Rutas.choferEntregas);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Manifiesto guardado.')),
+        );
+        context.go(Rutas.adminManifiestos);
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)

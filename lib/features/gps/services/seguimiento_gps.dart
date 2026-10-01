@@ -74,6 +74,13 @@ final ubicacionesRepositoryProvider = Provider<UbicacionesRepository>(
   (ref) => UbicacionesRepository(ref.watch(supabaseProvider)),
 );
 
+/// Puntos GPS de un manifiesto, en orden temporal (para calcular km).
+final puntosManifiestoProvider =
+    FutureProvider.autoDispose.family<List<({double lat, double lng})>, String>(
+  (ref, manifiestoId) =>
+      ref.watch(ubicacionesRepositoryProvider).puntosDeManifiesto(manifiestoId),
+);
+
 /// Última posición conocida por usuario (para el mapa del panel).
 final ubicacionesRecientesProvider = FutureProvider.autoDispose<
     Map<String, ({double lat, double lng, DateTime? cuando})>>(

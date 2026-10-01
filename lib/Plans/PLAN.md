@@ -368,6 +368,61 @@ panel (refresco manual; Realtime queda para después).
 
 ---
 
+## Módulo: Consumo de combustible  ✅ COMPLETADO
+
+Al capturar el manifiesto el chofer registra los **litros iniciales** del tanque
+(+odómetro opcional): eso crea la **jornada de combustible** y, al guardar, se
+navega a **Entregas del día** (arranca el GPS). Durante el recorrido puede
+registrar **N recargas** (litros + monto/foto opcional). Al terminar, **cierra
+la jornada** con los **litros finales**. El administrador **valida o corrige**
+las cantidades iniciales/finales.
+
+### Cálculo
+- **km**: suma de distancias (Haversine) entre los puntos GPS del manifiesto.
+- **Consumo teórico** = `km × rendimiento` (0,32 lt/km, **configurable** en
+  `configuracion.combustible_rendimiento_lt_km`).
+- **Consumo real** = `litros iniciales + recargas − litros finales`.
+- Se usan las cantidades **validadas** por el admin si existen.
+
+### Esquema (Supabase)
+
+- Migración `20260930200000_combustible.sql`:
+  - config `combustible_rendimiento_lt_km = 0.32`.
+  - enum `combustible_estado` (`iniciada`, `en_recorrido`, `cerrada`, `validada`).
+  - `public.combustible_jornadas` (única por manifiesto): litros iniciales/finales
+    (+validados), validaciones, odómetro, km, consumo teórico/real, rendimiento,
+    estado, timestamps.
+  - `public.combustible_recargas`: litros, monto, foto (bucket `extras`), fecha.
+  - RLS: chofer solo el combustible de sus manifiestos; admin todo.
+
+### Flutter (feature `combustible`)
+
+- `models/combustible_jornada.dart` (`CombustibleJornada`, `CombustibleRecarga`,
+  `EstadoCombustible`, `CalculoCombustible` con Haversine + consumo).
+- `data/combustible_repository.dart`, `providers/combustible_providers.dart`.
+- Chofer: `dialogo_combustible.dart` (litros iniciales/finales), integrado en la
+  captura del manifiesto; `combustible_jornada_screen.dart` (recargas + cerrar
+  jornada); `chofer_combustible_selector_screen.dart`.
+- Admin: `combustible_admin_screen.dart` (lista + detalle con corregir inicial/
+  final y marcar validada).
+- Navegación: "Combustible" en `AdminShell` y en el home del chofer.
+
+### Pruebas
+
+- Unitarias: `test/combustible_test.dart` (Haversine, km, consumo teórico/real,
+  modelos). Total del proyecto **76 en verde**.
+- RLS/E2E remoto (todas en verde): el chofer inicia/recarga/cierra su jornada; el
+  admin corrige y valida; chofer **403** con manifiesto ajeno; cascada. Datos de
+  prueba eliminados.
+- `flutter analyze` limpio; `flutter test` 76/76; build web y APK (101.7 MB).
+
+### Notas
+
+- El **odómetro** es opcional (respaldo del km calculado por GPS).
+- El km por GPS es aproximado (segmentos entre puntos cada 20 min).
+
+---
+
 ## Módulos pendientes
 
 - **Módulo 6 — Pickups / Delivery**: asignados solo por admin con hora estimada;

@@ -47,4 +47,21 @@ class UbicacionesRepository {
     }
     return resultado;
   }
+
+  /// Puntos GPS de un manifiesto, en orden temporal (para calcular km).
+  Future<List<({double lat, double lng})>> puntosDeManifiesto(
+    String manifiestoId,
+  ) async {
+    final data = await _client
+        .from('ubicaciones_gps')
+        .select('lat, lng')
+        .eq('manifiesto_id', manifiestoId)
+        .order('capturado_en', ascending: true) as List<dynamic>;
+    return data
+        .map((e) => (
+              lat: ((e as Map)['lat'] as num).toDouble(),
+              lng: (e['lng'] as num).toDouble(),
+            ))
+        .toList();
+  }
 }

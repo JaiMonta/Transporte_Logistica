@@ -14,6 +14,9 @@ import '../features/auth/presentation/usuarios_screen.dart';
 import '../features/auth/providers/auth_providers.dart';
 import '../features/clientes/presentation/cliente_form_screen.dart';
 import '../features/clientes/presentation/clientes_screen.dart';
+import '../features/combustible/presentation/chofer_combustible_selector_screen.dart';
+import '../features/combustible/presentation/combustible_admin_screen.dart';
+import '../features/combustible/presentation/combustible_jornada_screen.dart';
 import '../features/entregas/presentation/chofer_mapa_selector_screen.dart';
 import '../features/entregas/presentation/entrega_mapa_screen.dart';
 import '../features/entregas/presentation/entregas_admin_screen.dart';
@@ -52,6 +55,10 @@ class Rutas {
       '/admin/entregas/mapa/$manifiestoId';
   static const String adminGps = '/admin/gps';
 
+  static const String adminCombustible = '/admin/combustible';
+  static String adminCombustibleDetalle(String jornadaId) =>
+      '/admin/combustible/$jornadaId';
+
   static const String choferHome = '/chofer/home';
   static const String choferManifiestos = '/chofer/manifiestos';
   static const String choferCapturaManifiesto = '/chofer/manifiestos/capturar';
@@ -60,6 +67,8 @@ class Rutas {
   static const String choferMapa = '/chofer/mapa';
   static String choferEntregaMapa(String manifiestoId) =>
       '/chofer/mapa/$manifiestoId';
+  static String choferCombustible(String manifiestoId) =>
+      '/chofer/combustible/$manifiestoId';
 
   static const Set<String> publicas = {login, recuperar, restablecer};
 }
@@ -166,6 +175,18 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: Rutas.adminGps,
             builder: (context, state) => const GpsAdminScreen(),
           ),
+          GoRoute(
+            path: Rutas.adminCombustible,
+            builder: (context, state) => const CombustibleAdminScreen(),
+            routes: [
+              GoRoute(
+                path: ':id',
+                builder: (context, state) => CombustibleAdminDetalleScreen(
+                  jornadaId: state.pathParameters['id']!,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
       GoRoute(
@@ -191,6 +212,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Rutas.choferEntregas,
         builder: (context, state) => const EntregasDiaScreen(),
+      ),
+      GoRoute(
+        path: '/chofer/combustible',
+        builder: (context, state) => const ChoferCombustibleSelectorScreen(),
+        routes: [
+          GoRoute(
+            path: ':id',
+            builder: (context, state) => CombustibleJornadaScreen(
+              manifiestoId: state.pathParameters['id']!,
+            ),
+          ),
+        ],
       ),
       GoRoute(
         path: Rutas.choferMapa,
@@ -308,6 +341,15 @@ class _ChoferHomeScreen extends ConsumerWidget {
               subtitle: const Text('Puntos de entrega del manifiesto'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.go(Rutas.choferMapa),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.local_gas_station_outlined),
+              title: const Text('Combustible'),
+              subtitle: const Text('Recargas y cierre de jornada'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.go('/chofer/combustible'),
             ),
           ),
         ],
