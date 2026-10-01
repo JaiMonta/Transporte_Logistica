@@ -137,6 +137,17 @@ class ManifiestosRepository {
         Manifiesto(id: manifiestoId, fecha: fecha, lineas: lineas);
   }
 
+  /// Purga manifiestos validados más antiguos que la retención.
+  ///
+  /// `dryRun = true` solo cuenta. Devuelve cuántos (se) borrarían.
+  Future<int> purgarAntiguos({int? dias, bool dryRun = false}) async {
+    final r = await _client.rpc(
+      'purgar_manifiestos_antiguos',
+      params: {'p_dias': dias, 'p_dry_run': dryRun},
+    );
+    return (r as num?)?.toInt() ?? 0;
+  }
+
   static String _fechaTexto(DateTime fecha) {
     final f = DateTime(fecha.year, fecha.month, fecha.day);
     final mes = f.month.toString().padLeft(2, '0');

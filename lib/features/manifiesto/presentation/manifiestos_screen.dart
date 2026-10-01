@@ -68,6 +68,56 @@ class _ManifiestosScreenState extends ConsumerState<ManifiestosScreen> {
     setState(() => _filtro = _filtro.copyWith(desde: null, hasta: null));
   }
 
+  Future<void> _purgarAntiguos() async {
+    final repo = ref.read(manifiestosRepositoryProvider);
+    try {
+      final conteo = await repo.purgarAntiguos(dryRun: true);
+      if (!mounted) return;
+      if (conteo == 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No hay manifiestos validados para purgar.'),
+          ),
+        );
+        return;
+      }
+      final confirmar = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Purgar manifiestos antiguos'),
+          content: Text(
+            'Se eliminarán $conteo manifiesto(s) validados con más de 3 meses '
+            '(y sus líneas y fotos). Esta acción no se puede deshacer.\n\n'
+            'No se tocan los pendientes ni los de revisión.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Purgar'),
+            ),
+          ],
+        ),
+      );
+      if (confirmar != true) return;
+
+      final borrados = await repo.purgarAntiguos(dryRun: false);
+      if (!mounted) return;
+      _refrescar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Se purgaron $borrados manifiesto(s).')),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(mensajeError(e))));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final async = ref.watch(manifiestosProvider(_filtro));
@@ -104,6 +154,11 @@ class _ManifiestosScreenState extends ConsumerState<ManifiestosScreen> {
                       icon: const Icon(Icons.clear, size: 18),
                       label: const Text('Limpiar fechas'),
                     ),
+                  TextButton.icon(
+                    onPressed: _purgarAntiguos,
+                    icon: const Icon(Icons.cleaning_services_outlined, size: 18),
+                    label: const Text('Purgar antiguos'),
+                  ),
                 ],
               ),
             ],

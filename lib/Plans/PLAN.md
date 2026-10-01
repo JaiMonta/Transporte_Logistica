@@ -261,6 +261,16 @@ La fuente de verdad de usuarios es `public.profiles` (Módulo 1).
   (tipo/número/cliente). OpenAI (web) devuelve un array explícito; ML Kit (móvil)
   usa el parser `parser_manifiesto.dart` (best-effort, revisión humana).
 
+### Retención y purga
+
+- Migración `20260930170000_module4_purga_manifiestos.sql`: tabla
+  `public.configuracion` (clave `manifiestos_retencion_dias`, por defecto 90) y
+  función `public.purgar_manifiestos_antiguos(p_dias, p_dry_run)`.
+- Borra **cabecera + líneas** de manifiestos **validados** (`cotejo='ok'`) más
+  antiguos que la retención; **no** toca pendientes ni "requiere revisión".
+- Se invoca a mano o por `pg_cron`; solo administradores. En el panel admin hay
+  un botón "Purgar antiguos" (con confirmación y conteo previo).
+
 ### Pendiente para cerrar el OCR (OpenAI / Web)
 
 - Configurar saldo/secreto `OPENAI_API_KEY`:
