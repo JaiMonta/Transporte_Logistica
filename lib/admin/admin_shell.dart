@@ -21,6 +21,8 @@ class AdminShell extends ConsumerWidget {
     Rutas.adminUsuarios,
     Rutas.adminClientes,
     Rutas.adminManifiestos,
+    Rutas.adminEntregas,
+    Rutas.adminGps,
   ];
 
   int get _indice {
@@ -34,6 +36,8 @@ class AdminShell extends ConsumerWidget {
         1 => 'Usuarios y accesos',
         2 => 'Clientes',
         3 => 'Manifiestos',
+        4 => 'Entregas',
+        5 => 'Monitoreo GPS',
         _ => 'Panel',
       };
 
@@ -110,6 +114,16 @@ class AdminShell extends ConsumerWidget {
                             selectedIcon: Icon(Icons.description),
                             label: Text('Manifiestos'),
                           ),
+                          NavigationRailDestination(
+                            icon: Icon(Icons.local_shipping_outlined),
+                            selectedIcon: Icon(Icons.local_shipping),
+                            label: Text('Entregas'),
+                          ),
+                          NavigationRailDestination(
+                            icon: Icon(Icons.gps_fixed),
+                            selectedIcon: Icon(Icons.gps_fixed),
+                            label: Text('GPS'),
+                          ),
                         ],
                       ),
                       const VerticalDivider(width: 1),
@@ -145,6 +159,16 @@ class AdminShell extends ConsumerWidget {
                   icon: Icon(Icons.description_outlined),
                   selectedIcon: Icon(Icons.description),
                   label: 'Manifiestos',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.local_shipping_outlined),
+                  selectedIcon: Icon(Icons.local_shipping),
+                  label: 'Entregas',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.gps_fixed),
+                  selectedIcon: Icon(Icons.gps_fixed),
+                  label: 'GPS',
                 ),
               ],
             ),

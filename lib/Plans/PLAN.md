@@ -307,11 +307,69 @@ La fuente de verdad de usuarios es `public.profiles` (Módulo 1).
 
 ---
 
+## Módulo 5 — Entregas + tracking GPS  ✅ COMPLETADO
+
+Una entrega por cada línea del manifiesto (cliente/sucursal). El chofer ve su
+lista del día, marca **"Entregado"** (foto del recibo **opcional** + hora del
+servidor) y avanza a la siguiente. Mapa de puntos de entrega en el panel admin y
+en el móvil del chofer. **GPS cada 20 min** en primer plano, reflejado en el
+panel (refresco manual; Realtime queda para después).
+
+### Esquema (Supabase)
+
+- Migración `20260930190000_module5_entregas.sql`:
+  - enum `entrega_estado` (`pendiente`, `entregado`, `fallido`).
+  - `public.entregas`: `manifiesto_id`, `linea_id`, `cliente_id`/`cliente_texto`,
+    `direccion`, `lat`, `lng`, `orden`, `estado`, `bucket`/`path`/`hash_sha256`
+    (recibo), `entregado_en` (hora del servidor), `entregado_por`, `notas`,
+    timestamps.
+  - `public.ubicaciones_gps`: `usuario_id`, `manifiesto_id`, `lat`, `lng`,
+    `precision`, `capturado_en`.
+  - RLS: el chofer ve/actualiza solo las entregas de **sus** manifiestos y sus
+    propias ubicaciones; el admin ve y gestiona todo.
+
+### Flutter
+
+- Feature `entregas`: `models/entrega.dart` (`Entrega`, `EstadoEntrega`),
+  `data/entregas_repository.dart` (del día, por manifiesto, `marcarEntregado`,
+  `marcarFallido`), `providers/entregas_providers.dart`.
+- `presentation/entregas_dia_screen.dart` (chofer): lista del día, botón
+  "Entregado" (foto del recibo opcional con aviso), arranque **automático del
+  GPS** al abrir; `presentation/entregas_admin_screen.dart` (admin),
+  `entrega_mapa_screen.dart` (mapa de puntos y ruta en orden),
+  `chofer_mapa_selector_screen.dart`.
+- Feature `gps`: `data/ubicaciones_repository.dart` y
+  `services/seguimiento_gps.dart` (temporizador de **20 min** reutilizando
+  `GpsTracker`); `presentation/gps_admin_screen.dart` (última posición por
+  chofer, refresco manual).
+- **Generación de entregas en la app**: al crear el manifiesto, cada línea
+  produce su entrega heredando cliente y coordenadas del catálogo.
+- Rutas y navegación: entradas "Entregas" y "GPS" en `AdminShell`; accesos en
+  el home del chofer.
+- Permisos: Android `ACCESS_FINE/COARSE_LOCATION`; iOS
+  `NSLocationWhenInUseUsageDescription`.
+
+### Pruebas
+
+- Unitarias: `test/modulo5_test.dart` (Entrega, EstadoEntrega). Total del
+  proyecto **67 en verde**.
+- RLS/E2E remoto (todas en verde): el chofer crea/ve/marca sus entregas; el admin
+  ve todas; el chofer inserta su GPS pero **403** a nombre de otro; el admin lee
+  todas las ubicaciones; borrado en cascada. Datos de prueba eliminados.
+- `flutter analyze` limpio; `flutter test` 67/67; build web y APK (101.5 MB).
+
+### Notas
+
+- **GPS en primer plano**: si el teléfono se bloquea o se sale de la app, el
+  envío se detiene. El **background real** (con servicio en primer plano/plugin)
+  queda como mejora futura.
+- Entregas de clientes sin coordenadas no se pintan en el mapa (se avisa).
+- **Realtime** del panel se verá más adelante (hoy refresco manual).
+
+---
+
 ## Módulos pendientes
 
-- **Módulo 5 — Entregas**: ligada a manifiesto, estado y secuencia, foto del
-  recibo firmado, hora del servidor (`now()`), lista del día, alerta de trabajo
-  programado si falta foto, estado visible en admin.
 - **Módulo 6 — Pickups / Delivery**: asignados solo por admin con hora estimada;
   el chofer marca "En camino" con hora del servidor; notificaciones.
 - **Módulo 7 — Jornadas y vista semanal**: tabla de jornadas, pestaña Semana,

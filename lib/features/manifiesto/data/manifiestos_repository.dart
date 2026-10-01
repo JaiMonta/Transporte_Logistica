@@ -121,13 +121,25 @@ class ManifiestosRepository {
     final manifiestoId = cabecera['id'] as String;
     try {
       if (lineas.isNotEmpty) {
-        await _client.from('manifiesto_lineas').insert([
+        final filas = [
           for (var i = 0; i < lineas.length; i++)
             lineas[i].copyWith(orden: i).aCuerpo(manifiestoId: manifiestoId),
-        ]);
+        ];
+        // Insertar líneas y recuperar sus ids para crear las entregas.
+        final insertadas = await _client
+            .from('manifiesto_lineas')
+            .insert(filas)
+            .select('id, cliente_id, cliente_texto, orden') as List<dynamic>;
+
+        await _crearEntregas(
+          manifiestoId: manifiestoId,
+          lineasInsertadas: insertadas
+              .map((e) => Map<String, dynamic>.from(e as Map))
+              .toList(),
+        );
       }
     } catch (e) {
-      // No dejar una cabecera huérfana si fallan las líneas.
+      // No dejar una cabecera huérfana si fallan las líneas/entregas.
       await _client.from('manifiestos').delete().eq('id', manifiestoId);
       rethrow;
     }
@@ -135,6 +147,52 @@ class ManifiestosRepository {
     final creado = await obtener(manifiestoId);
     return creado ??
         Manifiesto(id: manifiestoId, fecha: fecha, lineas: lineas);
+  }
+
+  /// Crea una entrega por cada línea, heredando cliente y coordenadas.
+  Future<void> _crearEntregas({
+    required String manifiestoId,
+    required List<Map<String, dynamic>> lineasInsertadas,
+  }) async {
+    // Coordenadas de los clientes referenciados (si son de catálogo).
+    final idsClientes = lineasInsertadas
+        .map((l) => l['cliente_id'] as String?)
+        .whereType<String>()
+        .toSet()
+        .toList();
+
+    final datosClientes = <String, Map<String, dynamic>>{};
+    if (idsClientes.isNotEmpty) {
+      final clientes = await _client
+          .from('clientes')
+          .select('id, direccion, lat, lng')
+          .inFilter('id', idsClientes) as List<dynamic>;
+      for (final c in clientes) {
+        final m = Map<String, dynamic>.from(c as Map);
+        datosClientes[m['id'] as String] = m;
+      }
+    }
+
+    final entregas = <Map<String, dynamic>>[];
+    for (final l in lineasInsertadas) {
+      final clienteId = l['cliente_id'] as String?;
+      final cliente = clienteId == null ? null : datosClientes[clienteId];
+      entregas.add({
+        'manifiesto_id': manifiestoId,
+        'linea_id': l['id'],
+        'cliente_id': clienteId,
+        'cliente_texto': l['cliente_texto'],
+        'direccion': cliente?['direccion'],
+        'lat': cliente?['lat'],
+        'lng': cliente?['lng'],
+        'orden': l['orden'] ?? 0,
+        'estado': 'pendiente',
+      });
+    }
+
+    if (entregas.isNotEmpty) {
+      await _client.from('entregas').insert(entregas);
+    }
   }
 
   /// Purga manifiestos validados más antiguos que la retención.

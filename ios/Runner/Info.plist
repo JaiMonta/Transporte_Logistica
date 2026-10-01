@@ -3,7 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Se usa la cámara para capturar la foto del manifiesto (BOL).</string>
+	<string>Se usa la cámara para capturar la foto del manifiesto (BOL) y del recibo de entrega.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Se usa la ubicación para reportar el recorrido de entregas.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

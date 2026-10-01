@@ -14,6 +14,11 @@ import '../features/auth/presentation/usuarios_screen.dart';
 import '../features/auth/providers/auth_providers.dart';
 import '../features/clientes/presentation/cliente_form_screen.dart';
 import '../features/clientes/presentation/clientes_screen.dart';
+import '../features/entregas/presentation/chofer_mapa_selector_screen.dart';
+import '../features/entregas/presentation/entrega_mapa_screen.dart';
+import '../features/entregas/presentation/entregas_admin_screen.dart';
+import '../features/entregas/presentation/entregas_dia_screen.dart';
+import '../features/gps/presentation/gps_admin_screen.dart';
 import '../features/manifiesto/presentation/captura_manifiesto_screen.dart';
 import '../features/manifiesto/presentation/manifiesto_detalle_screen.dart';
 import '../features/manifiesto/presentation/manifiestos_screen.dart';
@@ -42,10 +47,19 @@ class Rutas {
   static const String adminManifiestoNuevo = '/admin/manifiestos/nuevo';
   static String adminManifiestoDetalle(String id) => '/admin/manifiestos/$id';
 
+  static const String adminEntregas = '/admin/entregas';
+  static String adminEntregaMapa(String manifiestoId) =>
+      '/admin/entregas/mapa/$manifiestoId';
+  static const String adminGps = '/admin/gps';
+
   static const String choferHome = '/chofer/home';
   static const String choferManifiestos = '/chofer/manifiestos';
   static const String choferCapturaManifiesto = '/chofer/manifiestos/capturar';
   static String choferManifiestoDetalle(String id) => '/chofer/manifiestos/$id';
+  static const String choferEntregas = '/chofer/entregas';
+  static const String choferMapa = '/chofer/mapa';
+  static String choferEntregaMapa(String manifiestoId) =>
+      '/chofer/mapa/$manifiestoId';
 
   static const Set<String> publicas = {login, recuperar, restablecer};
 }
@@ -138,6 +152,20 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
+          GoRoute(
+            path: Rutas.adminEntregas,
+            builder: (context, state) => const EntregasAdminScreen(),
+          ),
+          GoRoute(
+            path: '/admin/entregas/mapa/:id',
+            builder: (context, state) => EntregaMapaScreen(
+              manifiestoId: state.pathParameters['id']!,
+            ),
+          ),
+          GoRoute(
+            path: Rutas.adminGps,
+            builder: (context, state) => const GpsAdminScreen(),
+          ),
         ],
       ),
       GoRoute(
@@ -155,6 +183,22 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: ':id',
             builder: (context, state) => ManifiestoDetalleScreen(
+              manifiestoId: state.pathParameters['id']!,
+            ),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: Rutas.choferEntregas,
+        builder: (context, state) => const EntregasDiaScreen(),
+      ),
+      GoRoute(
+        path: Rutas.choferMapa,
+        builder: (context, state) => const ChoferMapaSelectorScreen(),
+        routes: [
+          GoRoute(
+            path: ':id',
+            builder: (context, state) => EntregaMapaScreen(
               manifiestoId: state.pathParameters['id']!,
             ),
           ),
@@ -246,6 +290,24 @@ class _ChoferHomeScreen extends ConsumerWidget {
               subtitle: const Text('Consulta los manifiestos capturados'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.go(Rutas.choferManifiestos),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.local_shipping_outlined),
+              title: const Text('Entregas del día'),
+              subtitle: const Text('Marca entregas y activa el GPS'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.go(Rutas.choferEntregas),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.map_outlined),
+              title: const Text('Mapa de la ruta'),
+              subtitle: const Text('Puntos de entrega del manifiesto'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.go(Rutas.choferMapa),
             ),
           ),
         ],
