@@ -166,9 +166,12 @@ online-only y todo el servicio local queda como no-op.
 
 ## Módulo 4 — Manifiestos  ✅ COMPLETADO
 
-Alta de manifiestos con nº PRO y foto del BOL. El chofer captura desde móvil
-(cámara en vivo); el OCR propone PRO, fecha y cliente; el chofer los revisa y
-corrige antes de guardar. El administrador lista, busca y audita.
+Alta de manifiestos/guías de carga con foto del BOL. Un manifiesto tiene una
+**cabecera** (fecha única, foto, capturista) y **N líneas de documento**
+(PRO o factura, sin límite), cada una con su número y cliente (de catálogo o
+texto libre). El chofer captura desde móvil; el OCR propone las líneas; el
+chofer las revisa y corrige antes de guardar. El administrador lista, busca y
+audita.
 
 ### Reconciliación de esquema (importante)
 
@@ -181,46 +184,56 @@ La fuente de verdad de usuarios es `public.profiles` (Módulo 1).
 
 ### Esquema (Supabase)
 
-- Migración `20260930150000_module4_manifiestos.sql`: enum `cotejo_estado`
-  (`pendiente`, `ok`, `revision`) y tabla `public.manifiestos` (id, numero_pro,
-  cliente_id→clientes, fecha, capturado_por→profiles, bucket, path, hash_sha256,
-  ocr_pro, ocr_confianza, cotejo, timestamps). Índice único
-  `(lower(numero_pro), cliente_id, fecha)`; índices por fecha/cliente/capturista;
-  trigger `updated_at`.
-- Migración `20260930150200_module4_pro_unique_nulls.sql`: refuerza el índice
-  con `NULLS NOT DISTINCT` (PRO único aunque el cliente sea nulo, Postgres 17).
-- RLS: el chofer ve y crea solo los suyos (`capturado_por = auth.uid()`);
-  el admin ve y gestiona todo; update/delete solo admin.
+- Migración `20260930150000_module4_manifiestos.sql`: enum `cotejo_estado`.
+- Migración `20260930160000_module4_manifiestos_lineas.sql` (**v2: cabecera +
+  líneas, reemplaza el modelo de 1 fila**):
+  - enum `documento_tipo` (`pro`, `factura`).
+  - `public.manifiestos` (cabecera): id, fecha, capturado_por→profiles, bucket,
+    path, hash_sha256, ocr_confianza, cotejo, timestamps.
+  - `public.manifiesto_lineas`: id, manifiesto_id→manifiestos (on delete
+    cascade), tipo, numero, cliente_id→clientes (nullable), cliente_texto
+    (nullable), orden, timestamps.
+  - Índices por manifiesto, número y cliente. **Sin índice único** (la unicidad
+    tipo+número+fecha se valida en la app).
+  - RLS: cabecera como antes (chofer ve/crea lo suyo; admin todo). Líneas:
+    visibles/creables si el manifiesto es del chofer o admin (vía `exists`);
+    update/delete solo admin. Triggers `updated_at`.
+- Migración `20260930150200_module4_pro_unique_nulls.sql` (del modelo v1,
+  se conserva por historial).
 
 ### Edge Function
 
 - `ocr-manifiesto` desplegada: valida JWT y usuario activo; llama a OpenAI
-  `gpt-4o-mini` con Structured Outputs y devuelve `{numero_pro, fecha, cliente,
-  confianza}`. La clave vive en el secreto `OPENAI_API_KEY` (aún sin saldo).
+  `gpt-4o-mini` con Structured Outputs y devuelve `{fecha, confianza,
+  documentos:[{tipo, numero, cliente}]}` (array, puede haber varias líneas).
+  La clave vive en el secreto `OPENAI_API_KEY` (aún sin saldo).
 - Se usa como OCR **en Web**. En **móvil** el OCR es on-device con **ML Kit**
   (ver `lib/Plans/OCR_OPCIONES.md`).
 
 ### Flutter (feature `manifiesto`)
 
-- `models/manifiesto.dart` (Manifiesto, enum `CotejoEstado`, join de cliente).
-- `data/manifiestos_repository.dart` (listar con búsqueda PRO + rango de fechas,
-  obtener, `existePro`, crear).
+- `models/manifiesto.dart`: `Manifiesto` (cabecera + `List<ManifiestoLinea>`),
+  `ManifiestoLinea`, enums `TipoDocumento` y `CotejoEstado`.
+- `data/manifiestos_repository.dart` (listar con búsqueda por número de
+  documento + rango de fechas, obtener con join, `existeDocumento`, `crear`
+  con cabecera + líneas).
 - **OCR por plataforma** (`data/`):
   - `ocr_repository.dart`: punto único; elige estrategia por plataforma.
   - `ocr_mlkit.dart` (import condicional) → `ocr_mlkit_movil.dart` (ML Kit) /
     `ocr_mlkit_web.dart` (no-op).
-  - `parser_manifiesto.dart`: función pura que extrae nº PRO, fecha y cliente
-    del texto (regex + heurística).
+  - `parser_manifiesto.dart`: función pura que extrae la fecha y **varias**
+    líneas (tipo/número/cliente) del texto (regex + heurística, best-effort).
   - `ocr_openai.dart`: OpenAI (Web) + `resultadoDesdeTexto`.
 - `providers/manifiestos_providers.dart` (`FiltroManifiestos`, `manifiestosProvider`,
   `manifiestoProvider`).
 - `presentation/captura_manifiesto_screen.dart` (cámara en vivo en móvil;
-  selección de archivo en Web): sube al bucket `manifiestos`, OCR y revisión
-  humana.
+  selección de archivo en Web): sube al bucket `manifiestos`, OCR, **fecha única
+  + editor de líneas** (`widgets/lineas_editor.dart`) y revisión humana.
+- `widgets/selector_cliente_hibrido.dart` (catálogo o texto libre).
 - `presentation/manifiestos_screen.dart` (admin: tarjetas/tabla, búsqueda y rango
   de fechas), `presentation/mis_manifiestos_screen.dart` (chofer) y
   `presentation/manifiesto_detalle_screen.dart` (foto BOL por URL firmada +
-  metadatos).
+  tabla de líneas).
 - Rutas nuevas en `router.dart` (admin y chofer) y entrada "Manifiestos" en
   `AdminShell`; el home del chofer pasa a menú.
 - Permiso de cámara: `AndroidManifest.xml` (`CAMERA`) e iOS `Info.plist`
@@ -228,12 +241,12 @@ La fuente de verdad de usuarios es `public.profiles` (Módulo 1).
 
 ### Pruebas
 
-- Unitarias: `test/modulo4_test.dart` y `test/parser_manifiesto_test.dart`;
-  total del proyecto **55 en verde**.
-- RLS/E2E remoto (todas en verde): el chofer solo ve/crea los suyos y no puede
-  editar; el admin ve y gestiona todos; PRO duplicado → 409; `ocr-manifiesto`
-  sin token → 401 y sin clave → 503. Datos de prueba eliminados.
-- `flutter analyze` limpio; `flutter test` 55/55.
+- Unitarias: `test/modulo4_test.dart` y `test/parser_manifiesto_test.dart`
+  (incluye multi-línea); total del proyecto **54 en verde**.
+- RLS/E2E remoto (todas en verde): el chofer crea cabecera y líneas propias y no
+  puede editarlas; el admin ve y gestiona todo; borrado en cascada de líneas;
+  `ocr-manifiesto` sin token → 401 y sin clave → 503. Datos de prueba eliminados.
+- `flutter analyze` limpio; `flutter test` 54/54.
 - Compila Web (`flutter build web`) y Android (`flutter build apk`).
 
 ### OCR — decisión (ver `lib/Plans/OCR_OPCIONES.md`)
@@ -244,6 +257,9 @@ La fuente de verdad de usuarios es `public.profiles` (Módulo 1).
 - **Web: OpenAI** (Edge Function) o captura manual.
 - **Tesseract OCR: evaluado y descartado** para móvil (calidad y setup iOS
   frágiles). Anotado como opción futura **solo si** se quiere OCR offline en Web.
+- **Extracción multi-línea:** ambos OCR intentan proponer **varias líneas**
+  (tipo/número/cliente). OpenAI (web) devuelve un array explícito; ML Kit (móvil)
+  usa el parser `parser_manifiesto.dart` (best-effort, revisión humana).
 
 ### Pendiente para cerrar el OCR (OpenAI / Web)
 

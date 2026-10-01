@@ -38,13 +38,17 @@ class ManifiestoCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(manifiesto.numeroVisible,
-                          style: tema.textTheme.titleMedium),
+                      Text(
+                        '${manifiesto.totalDocumentos} documento(s)',
+                        style: tema.textTheme.titleMedium,
+                      ),
                       const SizedBox(height: 2),
-                      Text(manifiesto.clienteVisible,
-                          style: tema.textTheme.bodySmall,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis),
+                      Text(
+                        'Primer doc.: ${manifiesto.primerDocumento}',
+                        style: tema.textTheme.bodySmall,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                       const SizedBox(height: 4),
                       Row(
                         children: [

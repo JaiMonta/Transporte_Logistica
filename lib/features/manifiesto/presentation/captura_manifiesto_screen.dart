@@ -15,13 +15,12 @@ import '../../../shared/services/almacenamiento_repository.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/offline_banner.dart';
 import '../../../shared/widgets/primary_button.dart';
-import '../../../shared/validators/validador.dart';
 import '../../auth/models/profile.dart';
 import '../../auth/providers/auth_providers.dart';
-import '../../clientes/presentation/widgets/cliente_selector.dart';
 import '../data/ocr_repository.dart';
 import '../models/manifiesto.dart';
 import '../providers/manifiestos_providers.dart';
+import 'widgets/lineas_editor.dart';
 
 /// Captura de un manifiesto.
 ///
@@ -50,9 +49,8 @@ class _CapturaManifiestoScreenState
   ResultadoOcr? _ocr;
 
   final _formKey = GlobalKey<FormState>();
-  final _numeroPro = TextEditingController();
   final _fecha = TextEditingController();
-  String? _clienteId;
+  List<ManifiestoLinea> _lineas = [];
   bool _guardando = false;
 
   @override
@@ -64,7 +62,6 @@ class _CapturaManifiestoScreenState
   @override
   void dispose() {
     _camara?.dispose();
-    _numeroPro.dispose();
     _fecha.dispose();
     super.dispose();
   }
@@ -195,8 +192,8 @@ class _CapturaManifiestoScreenState
       _evidencia = evidencia;
       _ocr = ocr;
       _procesando = false;
-      _numeroPro.text = ocr?.numeroPro ?? '';
       _fecha.text = _fechaTexto(ocr?.fecha ?? DateTime.now());
+      _lineas = ocr?.aLineas() ?? [];
     });
   }
 
@@ -206,9 +203,8 @@ class _CapturaManifiestoScreenState
       _foto = null;
       _evidencia = null;
       _ocr = null;
-      _numeroPro.clear();
       _fecha.clear();
-      _clienteId = null;
+      _lineas = [];
     });
   }
 
@@ -221,28 +217,39 @@ class _CapturaManifiestoScreenState
       );
       return;
     }
+    final validas =
+        _lineas.where((l) => l.numero.trim().isNotEmpty).toList();
+    if (validas.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Agrega al menos un documento.')),
+      );
+      return;
+    }
     FocusScope.of(context).unfocus();
     setState(() => _guardando = true);
     try {
       final repo = ref.read(manifiestosRepositoryProvider);
-      final existe = await repo.existePro(
-        numeroPro: _numeroPro.text,
-        fecha: fecha,
-        clienteId: _clienteId,
-      );
-      if (existe) {
-        throw Exception(
-          'Ya existe un manifiesto con ese número para ese cliente y fecha.',
+
+      // Unicidad (tipo + número + fecha) validada en la app.
+      for (final l in validas) {
+        final existe = await repo.existeDocumento(
+          tipo: l.tipo,
+          numero: l.numero,
+          fecha: fecha,
         );
+        if (existe) {
+          throw Exception(
+            'Ya existe un documento ${l.tipo.etiqueta} ${l.numero} con la fecha ${_fechaTexto(fecha)}.',
+          );
+        }
       }
+
       await repo.crear(
-        numeroPro: _numeroPro.text,
         fecha: fecha,
-        clienteId: _clienteId,
+        lineas: validas,
         bucket: _evidencia?.bucket,
         path: _evidencia?.path,
         hashSha256: _evidencia?.hashSha256,
-        ocrPro: _ocr?.numeroPro,
         ocrConfianza: _ocr?.confianza,
         cotejo: CotejoEstado.pendiente,
       );
@@ -442,14 +449,6 @@ class _CapturaManifiestoScreenState
                   _bannerConfianza(context, _ocr!.confianzaPorcentaje!),
                 const SizedBox(height: AppSpacing.sm),
                 AppTextField(
-                  controller: _numeroPro,
-                  label: 'Número PRO',
-                  icono: Icons.confirmation_number_outlined,
-                  textInputAction: TextInputAction.next,
-                  validator: Validador.nombre,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                AppTextField(
                   controller: _fecha,
                   label: 'Fecha (AAAA-MM-DD)',
                   icono: Icons.event_outlined,
@@ -458,12 +457,12 @@ class _CapturaManifiestoScreenState
                       ? 'Usa el formato AAAA-MM-DD.'
                       : null,
                 ),
-                const SizedBox(height: AppSpacing.md),
-                ClienteSelector(
-                  valor: _clienteId,
-                  onCambio: (v) => setState(() => _clienteId = v),
+                const SizedBox(height: AppSpacing.lg),
+                LineasEditor(
+                  lineas: _lineas,
+                  onCambio: (l) => setState(() => _lineas = l),
                 ),
-                const SizedBox(height: AppSpacing.xl),
+                const SizedBox(height: AppSpacing.md),
                 PrimaryButton(
                   texto: 'Guardar manifiesto',
                   cargando: _guardando,

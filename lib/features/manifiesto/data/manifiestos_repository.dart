@@ -2,7 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/manifiesto.dart';
 
-/// Acceso a los manifiestos capturados.
+/// Acceso a los manifiestos (cabecera + líneas).
 ///
 /// Lecturas y escrituras directas a PostgREST (protegidas por RLS):
 /// el chofer solo ve y crea los suyos; el administrador gestiona todo.
@@ -12,7 +12,7 @@ class ManifiestosRepository {
   final SupabaseClient _client;
 
   static const String _seleccion =
-      '*, clientes(nombre), profiles(nombre, email)';
+      '*, profiles(nombre, email), manifiesto_lineas(*, clientes(nombre))';
 
   Future<List<Manifiesto>> listar({
     String busqueda = '',
@@ -23,7 +23,17 @@ class ManifiestosRepository {
 
     final termino = busqueda.trim().replaceAll(RegExp(r'[(),%]'), '');
     if (termino.isNotEmpty) {
-      query = query.ilike('numero_pro', '%$termino%');
+      // Busca manifiestos que tengan una línea cuyo número coincida.
+      final coincidencias = await _client
+          .from('manifiesto_lineas')
+          .select('manifiesto_id')
+          .ilike('numero', '%$termino%') as List<dynamic>;
+      final ids = coincidencias
+          .map((e) => (e as Map)['manifiesto_id'] as String)
+          .toSet()
+          .toList();
+      if (ids.isEmpty) return [];
+      query = query.inFilter('id', ids);
     }
     if (desde != null) {
       query = query.gte('fecha', _fechaTexto(desde));
@@ -50,61 +60,81 @@ class ManifiestosRepository {
     return Manifiesto.fromMap(Map<String, dynamic>.from(data));
   }
 
-  /// ¿Ya existe un manifiesto con ese PRO, cliente y fecha?
-  Future<bool> existePro({
-    required String numeroPro,
+  /// ¿Ya existe una línea con ese tipo y número en un manifiesto de esa fecha?
+  ///
+  /// La unicidad se valida en la app (no hay índice único en la base).
+  Future<bool> existeDocumento({
+    required TipoDocumento tipo,
+    required String numero,
     required DateTime fecha,
-    String? clienteId,
-    String? excluirId,
+    String? excluirLineaId,
   }) async {
-    final numero = numeroPro.trim();
-    if (numero.isEmpty) return false;
+    final n = numero.trim();
+    if (n.isEmpty) return false;
 
-    dynamic query = _client
+    // IDs de manifiestos de esa fecha.
+    final manis = await _client
         .from('manifiestos')
         .select('id')
-        .ilike('numero_pro', numero)
-        .eq('fecha', _fechaTexto(fecha));
-    query = clienteId == null
-        ? query.isFilter('cliente_id', null)
-        : query.eq('cliente_id', clienteId);
-    if (excluirId != null) {
-      query = query.neq('id', excluirId);
-    }
+        .eq('fecha', _fechaTexto(fecha)) as List<dynamic>;
+    final ids = manis.map((e) => (e as Map)['id'] as String).toList();
+    if (ids.isEmpty) return false;
 
+    dynamic query = _client
+        .from('manifiesto_lineas')
+        .select('id')
+        .eq('tipo', tipo.valor)
+        .ilike('numero', n)
+        .inFilter('manifiesto_id', ids);
+    if (excluirLineaId != null) {
+      query = query.neq('id', excluirLineaId);
+    }
     final data = await query.limit(1) as List<dynamic>;
     return data.isNotEmpty;
   }
 
+  /// Crea la cabecera y sus líneas. Devuelve el manifiesto creado.
   Future<Manifiesto> crear({
-    required String numeroPro,
     required DateTime fecha,
-    String? clienteId,
+    required List<ManifiestoLinea> lineas,
     String? bucket,
     String? path,
     String? hashSha256,
-    String? ocrPro,
     double? ocrConfianza,
     CotejoEstado cotejo = CotejoEstado.pendiente,
   }) async {
     final uid = _client.auth.currentUser?.id;
-    final data = await _client
+    final cabecera = await _client
         .from('manifiestos')
         .insert({
-          'numero_pro': numeroPro.trim(),
           'fecha': _fechaTexto(fecha),
-          'cliente_id': clienteId,
           'capturado_por': uid,
           'bucket': bucket,
           'path': path,
           'hash_sha256': hashSha256,
-          'ocr_pro': ocrPro,
           'ocr_confianza': ocrConfianza,
           'cotejo': cotejo.valor,
         })
-        .select(_seleccion)
+        .select('id')
         .single();
-    return Manifiesto.fromMap(Map<String, dynamic>.from(data));
+
+    final manifiestoId = cabecera['id'] as String;
+    try {
+      if (lineas.isNotEmpty) {
+        await _client.from('manifiesto_lineas').insert([
+          for (var i = 0; i < lineas.length; i++)
+            lineas[i].copyWith(orden: i).aCuerpo(manifiestoId: manifiestoId),
+        ]);
+      }
+    } catch (e) {
+      // No dejar una cabecera huérfana si fallan las líneas.
+      await _client.from('manifiestos').delete().eq('id', manifiestoId);
+      rethrow;
+    }
+
+    final creado = await obtener(manifiestoId);
+    return creado ??
+        Manifiesto(id: manifiestoId, fecha: fecha, lineas: lineas);
   }
 
   static String _fechaTexto(DateTime fecha) {

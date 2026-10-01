@@ -1,4 +1,20 @@
-import '../../clientes/models/cliente.dart';
+/// Tipo de documento de una línea del manifiesto.
+enum TipoDocumento {
+  pro,
+  factura;
+
+  static TipoDocumento desde(String? valor) => TipoDocumento.values.firstWhere(
+        (t) => t.name == valor,
+        orElse: () => TipoDocumento.pro,
+      );
+
+  String get valor => name;
+
+  String get etiqueta => switch (this) {
+        TipoDocumento.pro => 'PRO',
+        TipoDocumento.factura => 'Factura',
+      };
+}
 
 /// Estado del cotejo documental del manifiesto (revisión humana del OCR).
 enum CotejoEstado {
@@ -20,49 +36,126 @@ enum CotejoEstado {
       };
 }
 
-/// Manifiesto capturado en campo (tabla `manifiestos`).
+/// Línea del manifiesto (tabla `manifiesto_lineas`).
+class ManifiestoLinea {
+  const ManifiestoLinea({
+    this.id,
+    required this.tipo,
+    required this.numero,
+    this.clienteId,
+    this.clienteTexto,
+    this.clienteNombre,
+    this.orden = 0,
+  });
+
+  final String? id;
+  final TipoDocumento tipo;
+  final String numero;
+  final String? clienteId;
+  final String? clienteTexto;
+  final String? clienteNombre;
+  final int orden;
+
+  String get numeroVisible =>
+      numero.trim().isNotEmpty ? numero.trim() : 'Sin número';
+
+  /// Cliente del catálogo o el texto libre.
+  String get clienteVisible {
+    if (clienteNombre != null && clienteNombre!.trim().isNotEmpty) {
+      return clienteNombre!.trim();
+    }
+    if (clienteTexto != null && clienteTexto!.trim().isNotEmpty) {
+      return clienteTexto!.trim();
+    }
+    return 'Sin cliente';
+  }
+
+  factory ManifiestoLinea.fromMap(Map<String, dynamic> mapa) {
+    final clienteMap = mapa['clientes'];
+    String? clienteNombre;
+    if (clienteMap is Map) {
+      clienteNombre = clienteMap['nombre'] as String?;
+    }
+
+    return ManifiestoLinea(
+      id: mapa['id'] as String?,
+      tipo: TipoDocumento.desde(mapa['tipo'] as String?),
+      numero: (mapa['numero'] as String?) ?? '',
+      clienteId: mapa['cliente_id'] as String?,
+      clienteTexto: mapa['cliente_texto'] as String?,
+      clienteNombre: clienteNombre,
+      orden: (mapa['orden'] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  /// Cuerpo para insert/update (sin el join del cliente).
+  Map<String, dynamic> aCuerpo({required String manifiestoId}) => {
+        'manifiesto_id': manifiestoId,
+        'tipo': tipo.valor,
+        'numero': numero.trim(),
+        'cliente_id': clienteId,
+        'cliente_texto': _texto(clienteTexto),
+        'orden': orden,
+      };
+
+  ManifiestoLinea copyWith({
+    TipoDocumento? tipo,
+    String? numero,
+    String? clienteId,
+    String? clienteTexto,
+    int? orden,
+  }) =>
+      ManifiestoLinea(
+        id: id,
+        tipo: tipo ?? this.tipo,
+        numero: numero ?? this.numero,
+        clienteId: clienteId ?? this.clienteId,
+        clienteTexto: clienteTexto ?? this.clienteTexto,
+        clienteNombre: clienteNombre,
+        orden: orden ?? this.orden,
+      );
+
+  static String? _texto(String? valor) {
+    final t = valor?.trim();
+    return (t == null || t.isEmpty) ? null : t;
+  }
+}
+
+/// Cabecera del manifiesto/guía de carga (tabla `manifiestos`).
 class Manifiesto {
   const Manifiesto({
     required this.id,
-    required this.numeroPro,
     required this.fecha,
-    this.clienteId,
-    this.clienteNombre,
     this.capturadoPor,
     this.capturadoPorNombre,
     this.bucket,
     this.path,
     this.hashSha256,
-    this.ocrPro,
     this.ocrConfianza,
     this.cotejo = CotejoEstado.pendiente,
+    this.lineas = const [],
     this.creadoEn,
     this.actualizadoEn,
   });
 
   final String id;
-  final String numeroPro;
   final DateTime fecha;
-  final String? clienteId;
-  final String? clienteNombre;
   final String? capturadoPor;
   final String? capturadoPorNombre;
   final String? bucket;
   final String? path;
   final String? hashSha256;
-  final String? ocrPro;
   final double? ocrConfianza;
   final CotejoEstado cotejo;
+  final List<ManifiestoLinea> lineas;
   final DateTime? creadoEn;
   final DateTime? actualizadoEn;
 
-  String get numeroVisible =>
-      numeroPro.trim().isNotEmpty ? numeroPro.trim() : 'Sin número';
+  int get totalDocumentos => lineas.length;
 
-  String get clienteVisible =>
-      (clienteNombre?.trim().isNotEmpty ?? false)
-          ? clienteNombre!.trim()
-          : 'Sin cliente';
+  /// Resumen de la primera línea (para tarjetas/tablas).
+  String get primerDocumento =>
+      lineas.isEmpty ? 'Sin documentos' : lineas.first.numeroVisible;
 
   /// ¿Tiene foto del BOL registrada?
   bool get tieneFoto =>
@@ -73,13 +166,6 @@ class Manifiesto {
       ocrConfianza == null ? null : (ocrConfianza! * 100).round();
 
   factory Manifiesto.fromMap(Map<String, dynamic> mapa) {
-    // El cliente puede venir embebido por el join (clientes(nombre)).
-    final clienteMap = mapa['clientes'];
-    String? clienteNombre;
-    if (clienteMap is Map) {
-      clienteNombre = clienteMap['nombre'] as String?;
-    }
-
     final perfilMap = mapa['profiles'];
     String? capturadoPorNombre;
     if (perfilMap is Map) {
@@ -87,51 +173,53 @@ class Manifiesto {
           (perfilMap['nombre'] as String?) ?? (perfilMap['email'] as String?);
     }
 
+    final lineasMap = mapa['manifiesto_lineas'];
+    final lineas = <ManifiestoLinea>[];
+    if (lineasMap is List) {
+      for (final item in lineasMap) {
+        if (item is Map) {
+          lineas.add(ManifiestoLinea.fromMap(Map<String, dynamic>.from(item)));
+        }
+      }
+      lineas.sort((a, b) => a.orden.compareTo(b.orden));
+    }
+
     return Manifiesto(
       id: mapa['id'] as String,
-      numeroPro: (mapa['numero_pro'] as String?) ?? '',
       fecha: _fecha(mapa['fecha']) ?? DateTime.now(),
-      clienteId: mapa['cliente_id'] as String?,
-      clienteNombre: clienteNombre,
       capturadoPor: mapa['capturado_por'] as String?,
       capturadoPorNombre: capturadoPorNombre,
       bucket: mapa['bucket'] as String?,
       path: mapa['path'] as String?,
       hashSha256: mapa['hash_sha256'] as String?,
-      ocrPro: mapa['ocr_pro'] as String?,
       ocrConfianza: _doble(mapa['ocr_confianza']),
       cotejo: CotejoEstado.desde(mapa['cotejo'] as String?),
+      lineas: lineas,
       creadoEn: _fecha(mapa['created_at']),
       actualizadoEn: _fecha(mapa['updated_at']),
     );
   }
 
   Manifiesto copyWith({
-    String? numeroPro,
     DateTime? fecha,
-    String? clienteId,
-    String? clienteNombre,
     String? bucket,
     String? path,
     String? hashSha256,
-    String? ocrPro,
     double? ocrConfianza,
     CotejoEstado? cotejo,
+    List<ManifiestoLinea>? lineas,
   }) =>
       Manifiesto(
         id: id,
-        numeroPro: numeroPro ?? this.numeroPro,
         fecha: fecha ?? this.fecha,
-        clienteId: clienteId ?? this.clienteId,
-        clienteNombre: clienteNombre ?? this.clienteNombre,
         capturadoPor: capturadoPor,
         capturadoPorNombre: capturadoPorNombre,
         bucket: bucket ?? this.bucket,
         path: path ?? this.path,
         hashSha256: hashSha256 ?? this.hashSha256,
-        ocrPro: ocrPro ?? this.ocrPro,
         ocrConfianza: ocrConfianza ?? this.ocrConfianza,
         cotejo: cotejo ?? this.cotejo,
+        lineas: lineas ?? this.lineas,
         creadoEn: creadoEn,
         actualizadoEn: actualizadoEn,
       );
@@ -144,7 +232,4 @@ class Manifiesto {
 
   static DateTime? _fecha(Object? valor) =>
       valor == null ? null : DateTime.tryParse(valor.toString());
-
-  /// Utilidad para el `ClienteSelector` (nombre para mostrar).
-  static String etiquetaCliente(Cliente cliente) => cliente.nombreVisible;
 }

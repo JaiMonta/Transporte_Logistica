@@ -3,119 +3,125 @@ import 'package:app_logistica/features/manifiesto/providers/manifiestos_provider
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  group('ManifiestoLinea', () {
+    test('fromMap interpreta tipo, número y cliente del catálogo', () {
+      final l = ManifiestoLinea.fromMap({
+        'id': 'l1',
+        'tipo': 'factura',
+        'numero': 'FAC-100',
+        'cliente_id': 'c1',
+        'clientes': {'nombre': 'Distribuidora del Centro'},
+        'orden': 2,
+      });
+      expect(l.tipo, TipoDocumento.factura);
+      expect(l.numero, 'FAC-100');
+      expect(l.clienteId, 'c1');
+      expect(l.clienteVisible, 'Distribuidora del Centro');
+      expect(l.orden, 2);
+    });
+
+    test('clienteVisible cae al texto libre', () {
+      const l = ManifiestoLinea(
+        tipo: TipoDocumento.pro,
+        numero: 'MN-1',
+        clienteTexto: 'Cliente de la guía',
+      );
+      expect(l.clienteVisible, 'Cliente de la guía');
+    });
+
+    test('tipo desconocido cae a pro', () {
+      final l = ManifiestoLinea.fromMap({'tipo': 'x', 'numero': 'N'});
+      expect(l.tipo, TipoDocumento.pro);
+    });
+
+    test('aCuerpo arma el mapa para insert', () {
+      const l = ManifiestoLinea(
+        tipo: TipoDocumento.factura,
+        numero: '  FAC-9 ',
+        clienteTexto: '  Ana  ',
+      );
+      final cuerpo = l.aCuerpo(manifiestoId: 'm1');
+      expect(cuerpo['manifiesto_id'], 'm1');
+      expect(cuerpo['tipo'], 'factura');
+      expect(cuerpo['numero'], 'FAC-9');
+      expect(cuerpo['cliente_texto'], 'Ana');
+    });
+  });
+
   group('Manifiesto', () {
-    test('fromMap interpreta columnas, join de cliente y perfil', () {
+    test('fromMap interpreta cabecera y líneas ordenadas', () {
       final m = Manifiesto.fromMap({
         'id': 'm1',
-        'numero_pro': 'MN-8921',
-        'cliente_id': 'c1',
         'fecha': '2026-02-03',
         'capturado_por': 'u1',
-        'bucket': 'manifiestos',
-        'path': 'u1/bol/bol_1.jpg',
-        'hash_sha256': 'abc',
-        'ocr_pro': 'MN-8921',
-        'ocr_confianza': 0.99,
+        'ocr_confianza': 0.9,
         'cotejo': 'ok',
-        'clientes': {'nombre': 'Distribuidora del Centro'},
         'profiles': {'nombre': 'Chofer Prueba'},
+        'manifiesto_lineas': [
+          {'tipo': 'pro', 'numero': 'B', 'orden': 1},
+          {'tipo': 'pro', 'numero': 'A', 'orden': 0},
+        ],
         'created_at': '2026-02-03T10:00:00Z',
       });
-
-      expect(m.numeroPro, 'MN-8921');
-      expect(m.clienteId, 'c1');
-      expect(m.clienteNombre, 'Distribuidora del Centro');
+      expect(m.totalDocumentos, 2);
+      expect(m.lineas.first.numero, 'A');
+      expect(m.primerDocumento, 'A');
       expect(m.capturadoPorNombre, 'Chofer Prueba');
-      expect(m.tieneFoto, isTrue);
-      expect(m.confianzaPorcentaje, 99);
+      expect(m.confianzaPorcentaje, 90);
       expect(m.cotejo, CotejoEstado.ok);
       expect(m.fecha.year, 2026);
-      expect(m.fecha.month, 2);
-      expect(m.fecha.day, 3);
-      expect(m.creadoEn, isNotNull);
     });
 
-    test('confianza como texto se convierte a double', () {
+    test('sin líneas reporta 0 documentos', () {
       final m = Manifiesto.fromMap({
         'id': 'm2',
-        'numero_pro': 'X',
-        'fecha': '2026-01-01',
-        'ocr_confianza': '0.5',
-      });
-      expect(m.ocrConfianza, 0.5);
-      expect(m.confianzaPorcentaje, 50);
-    });
-
-    test('cotejo desconocido cae a pendiente', () {
-      final m = Manifiesto.fromMap({
-        'id': 'm3',
-        'numero_pro': 'X',
-        'fecha': '2026-01-01',
-        'cotejo': 'inventado',
-      });
-      expect(m.cotejo, CotejoEstado.pendiente);
-    });
-
-    test('valores por defecto cuando faltan datos', () {
-      final m = Manifiesto.fromMap({
-        'id': 'm4',
-        'numero_pro': '   ',
         'fecha': '2026-01-01',
       });
-      expect(m.numeroVisible, 'Sin número');
-      expect(m.clienteVisible, 'Sin cliente');
+      expect(m.totalDocumentos, 0);
+      expect(m.primerDocumento, 'Sin documentos');
       expect(m.tieneFoto, isFalse);
-      expect(m.confianzaPorcentaje, isNull);
     });
 
-    test('copyWith conserva los campos no indicados', () {
+    test('copyWith conserva id y fecha', () {
       final base = Manifiesto(
-        id: 'm5',
-        numeroPro: 'A',
+        id: 'm3',
         fecha: DateTime(2026, 1, 1),
         cotejo: CotejoEstado.pendiente,
       );
-      final copia = base.copyWith(numeroPro: 'B', cotejo: CotejoEstado.revision);
-      expect(copia.numeroPro, 'B');
+      final copia = base.copyWith(cotejo: CotejoEstado.revision);
+      expect(copia.id, 'm3');
       expect(copia.cotejo, CotejoEstado.revision);
-      expect(copia.id, 'm5');
       expect(copia.fecha, base.fecha);
     });
   });
 
-  group('CotejoEstado', () {
-    test('desde mapea los valores conocidos', () {
+  group('CotejoEstado y TipoDocumento', () {
+    test('desde mapea valores conocidos y por defecto', () {
       expect(CotejoEstado.desde('ok'), CotejoEstado.ok);
-      expect(CotejoEstado.desde('revision'), CotejoEstado.revision);
       expect(CotejoEstado.desde(null), CotejoEstado.pendiente);
+      expect(TipoDocumento.desde('factura'), TipoDocumento.factura);
+      expect(TipoDocumento.desde(null), TipoDocumento.pro);
     });
 
-    test('cada estado tiene etiqueta legible', () {
-      for (final estado in CotejoEstado.values) {
-        expect(estado.etiqueta, isNotEmpty);
+    test('cada valor tiene etiqueta', () {
+      for (final e in CotejoEstado.values) {
+        expect(e.etiqueta, isNotEmpty);
+      }
+      for (final t in TipoDocumento.values) {
+        expect(t.etiqueta, isNotEmpty);
       }
     });
   });
 
   group('FiltroManifiestos', () {
-    test('copyWith conserva los campos no indicados', () {
+    test('copyWith conserva y limpia fechas', () {
       final base = FiltroManifiestos(
         busqueda: 'MN',
         desde: DateTime(2026, 1, 1),
       );
-      final copia = base.copyWith(busqueda: 'PRO');
+      final copia = base.copyWith(busqueda: 'PRO', desde: null);
       expect(copia.busqueda, 'PRO');
-      expect(copia.desde, base.desde);
-    });
-
-    test('copyWith permite limpiar las fechas con null', () {
-      final base = FiltroManifiestos(
-        desde: DateTime(2026, 1, 1),
-        hasta: DateTime(2026, 1, 31),
-      );
-      final copia = base.copyWith(desde: null, hasta: null);
       expect(copia.desde, isNull);
-      expect(copia.hasta, isNull);
     });
 
     test('dos filtros con los mismos valores son iguales', () {

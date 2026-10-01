@@ -3,23 +3,35 @@ import 'dart:typed_data';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../models/manifiesto.dart';
 import 'parser_manifiesto.dart';
 
-/// Resultado del OCR de un manifiesto.
+/// Resultado del OCR de un manifiesto: fecha de cabecera y documentos.
 class ResultadoOcr {
   const ResultadoOcr({
-    required this.numeroPro,
     required this.fecha,
-    required this.cliente,
+    required this.documentos,
     required this.confianza,
   });
 
-  final String numeroPro;
   final DateTime? fecha;
-  final String cliente;
+  final List<DocumentoDetectado> documentos;
   final double confianza;
 
   int? get confianzaPorcentaje => (confianza * 100).round();
+
+  bool get tieneAlgo => fecha != null || documentos.isNotEmpty;
+
+  /// Líneas listas para el editor.
+  List<ManifiestoLinea> aLineas() => [
+        for (var i = 0; i < documentos.length; i++)
+          ManifiestoLinea(
+            tipo: documentos[i].tipo,
+            numero: documentos[i].numero,
+            clienteTexto: documentos[i].cliente,
+            orden: i,
+          ),
+      ];
 }
 
 /// Extracción de campos vía la Edge Function `ocr-manifiesto` (OpenAI).
@@ -47,14 +59,29 @@ class OcrOpenAi {
         throw Exception(_mensaje(data));
       }
       return ResultadoOcr(
-        numeroPro: (data['numero_pro'] as String?) ?? '',
         fecha: _fecha(data['fecha']),
-        cliente: (data['cliente'] as String?) ?? '',
+        documentos: _documentos(data['documentos']),
         confianza: _doble(data['confianza']) ?? 0,
       );
     } on FunctionException catch (e) {
       throw Exception(_desdeFuncion(e));
     }
+  }
+
+  static List<DocumentoDetectado> _documentos(Object? raw) {
+    if (raw is! List) return [];
+    final out = <DocumentoDetectado>[];
+    for (final item in raw) {
+      if (item is! Map) continue;
+      final numero = (item['numero'] as String?)?.trim() ?? '';
+      if (numero.isEmpty) continue;
+      out.add(DocumentoDetectado(
+        tipo: TipoDocumento.desde(item['tipo'] as String?),
+        numero: numero,
+        cliente: (item['cliente'] as String?)?.trim(),
+      ));
+    }
+    return out;
   }
 
   static String _mensaje(Object? data) {
@@ -81,15 +108,11 @@ class OcrOpenAi {
 }
 
 /// Convierte el texto crudo del OCR (on-device) en [ResultadoOcr].
-///
-/// La confianza de ML Kit no es un score global por documento, por lo que se
-/// reporta 0 (la revisión humana es obligatoria de todos modos).
 ResultadoOcr resultadoDesdeTexto(String texto) {
   final parseo = ParserManifiesto.parsear(texto);
   return ResultadoOcr(
-    numeroPro: parseo.numeroPro,
     fecha: parseo.fecha,
-    cliente: parseo.cliente,
+    documentos: parseo.documentos,
     confianza: parseo.tieneAlgo ? 0.5 : 0,
   );
 }

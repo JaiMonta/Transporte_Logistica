@@ -94,11 +94,20 @@ Web es OpenAI o captura manual.
   (`!kIsWeb` → ML Kit + parser; Web → OpenAI). La pantalla de captura **no cambia**.
 
 ### Pruebas
-- `test/parser_manifiesto_test.dart` (15 pruebas): folio, fechas (ISO, dd/mm,
-  dd-mm, aaaa/mm), cliente y documento integral.
-- Total del proyecto: **55 en verde** (`flutter analyze` limpio).
+- `test/parser_manifiesto_test.dart` (multi-línea): folio, factura, fechas
+  (ISO, dd/mm, dd-mm), varios documentos, deduplicación y documento integral.
+- Total del proyecto: **54 en verde** (`flutter analyze` limpio).
 - Compila Web (`flutter build web`) y Android (`flutter build apk`).
 - ML Kit **no se puede probar en Web ni en escritorio**: requiere dispositivo móvil.
+
+### Extracción multi-línea
+Un manifiesto/guía puede tener **N líneas** de documento (PRO o factura), cada
+una con su número y cliente. El OCR intenta proponerlas todas:
+- **OpenAI (web):** el esquema de salida devuelve
+  `{fecha, confianza, documentos:[{tipo, numero, cliente}]}`.
+- **ML Kit (móvil):** el texto se pasa a `ParserManifiesto.parsear`, que detecta
+  filas best-effort (etiquetas PRO/FACTURA/FACT y códigos tipo `MN-8921`).
+- La revisión humana (editor de líneas) permite agregar, quitar o corregir.
 
 ### Notas
 - APK de referencia con ML Kit: ~100.7 MB (antes ~71 MB) por el modelo embebido;

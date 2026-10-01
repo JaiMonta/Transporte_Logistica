@@ -100,16 +100,6 @@ class _ContenidoState extends ConsumerState<_Contenido> {
               _foto(context),
               const SizedBox(height: AppSpacing.md),
               _FilaDato(
-                icono: Icons.confirmation_number_outlined,
-                etiqueta: 'Número PRO',
-                valor: m.numeroVisible,
-              ),
-              _FilaDato(
-                icono: Icons.business_outlined,
-                etiqueta: 'Cliente',
-                valor: m.clienteVisible,
-              ),
-              _FilaDato(
                 icono: Icons.event_outlined,
                 etiqueta: 'Fecha',
                 valor: _fechaTexto(m.fecha),
@@ -121,12 +111,6 @@ class _ContenidoState extends ConsumerState<_Contenido> {
                     ? '—'
                     : m.capturadoPorNombre!,
               ),
-              if (m.ocrPro != null && m.ocrPro!.isNotEmpty)
-                _FilaDato(
-                  icono: Icons.auto_awesome,
-                  etiqueta: 'PRO detectado por OCR',
-                  valor: m.ocrPro!,
-                ),
               if (m.confianzaPorcentaje != null)
                 _FilaDato(
                   icono: Icons.percent,
@@ -146,6 +130,11 @@ class _ContenidoState extends ConsumerState<_Contenido> {
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
+              Text('Documentos (${m.totalDocumentos})',
+                  style: tema.textTheme.labelLarge),
+              const SizedBox(height: AppSpacing.sm),
+              _tablaLineas(context, m),
+              const SizedBox(height: AppSpacing.lg),
               Text(
                 'Registrado: ${_fechaHora(m.creadoEn)}',
                 style: tema.textTheme.bodySmall,
@@ -153,6 +142,30 @@ class _ContenidoState extends ConsumerState<_Contenido> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _tablaLineas(BuildContext context, Manifiesto m) {
+    if (m.lineas.isEmpty) {
+      return const Text('Sin documentos registrados.');
+    }
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        columns: const [
+          DataColumn(label: Text('Tipo')),
+          DataColumn(label: Text('Número')),
+          DataColumn(label: Text('Cliente')),
+        ],
+        rows: [
+          for (final l in m.lineas)
+            DataRow(cells: [
+              DataCell(Text(l.tipo.etiqueta)),
+              DataCell(Text(l.numeroVisible)),
+              DataCell(Text(l.clienteVisible)),
+            ]),
+        ],
       ),
     );
   }

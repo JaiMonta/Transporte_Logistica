@@ -33,23 +33,38 @@ const ESQUEMA = {
     type: "object",
     additionalProperties: false,
     properties: {
-      numero_pro: { type: "string" },
       fecha: { type: "string" },
-      cliente: { type: "string" },
       confianza: { type: "number" },
+      documentos: {
+        type: "array",
+        items: {
+          type: "object",
+          additionalProperties: false,
+          properties: {
+            tipo: { type: "string", enum: ["pro", "factura"] },
+            numero: { type: "string" },
+            cliente: { type: "string" },
+          },
+          required: ["tipo", "numero", "cliente"],
+        },
+      },
     },
-    required: ["numero_pro", "fecha", "cliente", "confianza"],
+    required: ["fecha", "confianza", "documentos"],
   },
 } as const;
 
 const INSTRUCCIONES =
-  `Eres un sistema de extracción documental de manifiestos de carga (Bill of Lading).
+  `Eres un sistema de extracción documental de manifiestos o guías de carga (Bill of Lading).
 Lee la imagen y extrae:
-- numero_pro: el número o folio del manifiesto (solo el identificador, sin texto adicional).
 - fecha: la fecha del documento en formato YYYY-MM-DD. Si no es legible, devuelve cadena vacía.
-- cliente: el nombre del cliente o destinatario que figura en el documento.
+- documentos: TODAS las líneas de documento que aparezcan (pueden ser una o muchas).
+  Para cada una:
+    * tipo: "pro" si es un PRO/folio/manifiesto; "factura" si es un número de factura.
+    * numero: el número o folio del documento, sin texto adicional.
+    * cliente: el nombre del cliente o destinatario de esa línea (cadena vacía si no aparece).
 - confianza: tu confianza global de 0 a 1 en la extracción.
 Si un campo no aparece o es ilegible, devuélvelo como cadena vacía (o 0 en confianza). No inventes datos.`;
+
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -203,19 +218,29 @@ Deno.serve(async (req: Request): Promise<Response> => {
     return fail("El OCR no devolvió un JSON válido.", 502);
   }
 
-  const numeroPro = typeof extraido.numero_pro === "string"
-    ? extraido.numero_pro.trim()
-    : "";
-  const cliente = typeof extraido.cliente === "string" ? extraido.cliente.trim() : "";
   const confianza = typeof extraido.confianza === "number"
     ? Math.min(1, Math.max(0, extraido.confianza))
     : 0;
 
+  const documentosBrutos = Array.isArray(extraido.documentos)
+    ? extraido.documentos
+    : [];
+  const documentos = documentosBrutos
+    .map((d) => {
+      if (!d || typeof d !== "object") return null;
+      const item = d as Record<string, unknown>;
+      const numero = typeof item.numero === "string" ? item.numero.trim() : "";
+      if (!numero) return null;
+      const tipo = item.tipo === "factura" ? "factura" : "pro";
+      const cliente = typeof item.cliente === "string" ? item.cliente.trim() : "";
+      return { tipo, numero, cliente };
+    })
+    .filter((d) => d !== null);
+
   return json({
     ok: true,
-    numero_pro: numeroPro,
     fecha: normalizarFecha(extraido.fecha),
-    cliente,
     confianza,
+    documentos,
   });
 });

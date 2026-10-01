@@ -20,8 +20,8 @@ class ManifiestoTabla extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: DataTable(
         columns: const [
-          DataColumn(label: Text('Nº PRO')),
-          DataColumn(label: Text('Cliente')),
+          DataColumn(label: Text('Documentos')),
+          DataColumn(label: Text('Primer doc.')),
           DataColumn(label: Text('Fecha')),
           DataColumn(label: Text('Capturó')),
           DataColumn(label: Text('OCR')),
@@ -31,8 +31,8 @@ class ManifiestoTabla extends StatelessWidget {
         rows: manifiestos.map((m) {
           return DataRow(
             cells: [
-              DataCell(Text(m.numeroVisible)),
-              DataCell(Text(m.clienteVisible)),
+              DataCell(Text('${m.totalDocumentos}')),
+              DataCell(Text(m.primerDocumento)),
               DataCell(Text(_fechaTexto(m.fecha))),
               DataCell(Text(
                 (m.capturadoPorNombre == null ||
