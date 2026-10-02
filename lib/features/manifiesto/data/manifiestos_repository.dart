@@ -203,6 +203,7 @@ class ManifiestosRepository {
     required String id,
     String? camionId,
     String? localidadMasLejana,
+    String? fletesTabuladorId,
     double? costoFlete,
     CotejoEstado? cotejo,
   }) async {
@@ -211,6 +212,7 @@ class ManifiestosRepository {
         .update({
           'camion_id': camionId,
           'localidad_mas_lejana': localidadMasLejana,
+          'fletes_tabulador_id': fletesTabuladorId,
           'costo_flete': costoFlete,
           if (cotejo != null) 'cotejo': cotejo.valor,
         })

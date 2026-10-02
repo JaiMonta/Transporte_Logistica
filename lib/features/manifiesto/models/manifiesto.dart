@@ -136,6 +136,7 @@ class Manifiesto {
     this.camionId,
     this.camionNombre,
     this.localidadMasLejana,
+    this.fletesTabuladorId,
     this.costoFlete,
     this.lineas = const [],
     this.creadoEn,
@@ -154,6 +155,7 @@ class Manifiesto {
   final String? camionId;
   final String? camionNombre;
   final String? localidadMasLejana;
+  final String? fletesTabuladorId;
   final double? costoFlete;
   final List<ManifiestoLinea> lineas;
   final DateTime? creadoEn;
@@ -221,6 +223,7 @@ class Manifiesto {
       camionId: mapa['camion_id'] as String?,
       camionNombre: camionNombre,
       localidadMasLejana: mapa['localidad_mas_lejana'] as String?,
+      fletesTabuladorId: mapa['fletes_tabulador_id'] as String?,
       costoFlete: _doble(mapa['costo_flete']),
       lineas: lineas,
       creadoEn: _fecha(mapa['created_at']),
@@ -237,6 +240,7 @@ class Manifiesto {
     CotejoEstado? cotejo,
     String? camionId,
     String? localidadMasLejana,
+    String? fletesTabuladorId,
     double? costoFlete,
     List<ManifiestoLinea>? lineas,
   }) =>
@@ -253,6 +257,7 @@ class Manifiesto {
         camionId: camionId ?? this.camionId,
         camionNombre: camionNombre,
         localidadMasLejana: localidadMasLejana ?? this.localidadMasLejana,
+        fletesTabuladorId: fletesTabuladorId ?? this.fletesTabuladorId,
         costoFlete: costoFlete ?? this.costoFlete,
         lineas: lineas ?? this.lineas,
         creadoEn: creadoEn,

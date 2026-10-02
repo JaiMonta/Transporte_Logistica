@@ -20,7 +20,8 @@ import '../features/combustible/presentation/chofer_combustible_selector_screen.
 import '../features/combustible/presentation/combustible_admin_screen.dart';
 import '../features/combustible/presentation/combustible_jornada_screen.dart';
 import '../features/entregas/presentation/chofer_mapa_selector_screen.dart';
-import '../features/entregas/presentation/entrega_mapa_screen.dart';
+import '../features/fletes/presentation/flete_form_screen.dart';
+import '../features/fletes/presentation/fletes_screen.dart';import '../features/entregas/presentation/entrega_mapa_screen.dart';
 import '../features/entregas/presentation/entregas_admin_screen.dart';
 import '../features/entregas/presentation/entregas_dia_screen.dart';
 import '../features/entregas/presentation/entregas_mapa_agregado_screen.dart';
@@ -66,6 +67,9 @@ class Rutas {
   static const String adminCamiones = '/admin/camiones';
   static const String adminCamionNuevo = '/admin/camiones/nuevo';
   static String adminCamionEditar(String id) => '/admin/camiones/$id';
+
+  static const String adminFletes = '/admin/fletes';
+  static String adminFleteEditar(String id) => '/admin/fletes/$id';
 
   static const String choferHome = '/chofer/home';
   static const String choferManifiestos = '/chofer/manifiestos';
@@ -213,6 +217,18 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: ':id',
                 builder: (context, state) => CamionFormScreen(
                   camionId: state.pathParameters['id'],
+                ),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: Rutas.adminFletes,
+            builder: (context, state) => const FletesScreen(),
+            routes: [
+              GoRoute(
+                path: ':id',
+                builder: (context, state) => FleteFormScreen(
+                  fleteId: state.pathParameters['id']!,
                 ),
               ),
             ],

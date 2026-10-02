@@ -5,10 +5,14 @@ import '../../../core/theme.dart';
 import '../../../shared/errors/mensajes_error.dart';
 import '../../../shared/services/almacenamiento_providers.dart';
 import '../../../shared/services/almacenamiento_repository.dart';
-import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/status_pill.dart';
 import '../../auth/models/profile.dart';
 import '../../auth/providers/auth_providers.dart';
+import '../../camiones/providers/camiones_providers.dart';
+import '../../fletes/models/tabulador_flete.dart';
+import '../../fletes/presentation/widgets/selector_localidad_flete.dart';
+import '../../fletes/providers/fletes_providers.dart';
+import '../../fletes/services/calculo_flete.dart';
 import '../models/manifiesto.dart';
 import '../providers/manifiestos_providers.dart';
 
@@ -133,6 +137,13 @@ class _ContenidoState extends ConsumerState<_Contenido> {
                     ? '—'
                     : m.localidadMasLejana!,
               ),
+              _FilaDato(
+                icono: Icons.attach_money,
+                etiqueta: 'Costo de flete',
+                valor: m.costoFlete == null
+                    ? '—'
+                    : '\$${m.costoFlete!.toStringAsFixed(2)}',
+              ),
               const SizedBox(height: AppSpacing.sm),
               Align(
                 alignment: Alignment.centerLeft,
@@ -178,64 +189,78 @@ class _ContenidoState extends ConsumerState<_Contenido> {
   }
 
   Future<void> _editarLocalidad(Manifiesto m) async {
-    final controller =
-        TextEditingController(text: m.localidadMasLejana ?? '');
-    final formKey = GlobalKey<FormState>();
-    final guardar = await showDialog<bool>(
+    TabuladorFlete? elegido;
+    if (m.fletesTabuladorId != null) {
+      elegido =
+          await ref.read(fletesRepositoryProvider).obtener(m.fletesTabuladorId!);
+    }
+
+    if (!mounted) return;
+    await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Localidad más lejana'),
-        content: Form(
-          key: formKey,
-          child: AppTextField(
-            controller: controller,
-            label: 'Localidad',
-            icono: Icons.place_outlined,
-            hint: 'La del punto más lejano del recorrido',
-            validator: (v) => (v ?? '').trim().isEmpty
-                ? 'Ingresa la localidad.'
-                : null,
+        content: SizedBox(
+          width: 420,
+          child: SelectorLocalidadFlete(
+            onSeleccion: (f) => elegido = f,
           ),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(context),
             child: const Text('Cancelar'),
           ),
           FilledButton(
-            onPressed: () {
-              if (formKey.currentState!.validate()) {
-                Navigator.pop(context, true);
-              }
+            onPressed: () async {
+              final f = elegido;
+              if (f == null) return;
+              Navigator.pop(context);
+              await _guardarLocalidad(m, f);
             },
             child: const Text('Guardar'),
           ),
         ],
       ),
     );
-    if (guardar != true) {
-      controller.dispose();
-      return;
-    }
+  }
+
+  Future<void> _guardarLocalidad(Manifiesto m, TabuladorFlete flete) async {
     try {
+      // Capacidad del camión asignado (si tiene).
+      double? capacidadKg;
+      if (m.camionId != null) {
+        final camion =
+            await ref.read(camionesRepositoryProvider).obtener(m.camionId!);
+        capacidadKg = camion?.capacidadKg;
+      }
+      final costo = CalculoFlete.precioFlete(
+        tabulador: flete,
+        capacidadKg: capacidadKg,
+      );
       await ref.read(manifiestosRepositoryProvider).actualizarCabecera(
             id: m.id,
             camionId: m.camionId,
-            localidadMasLejana: controller.text.trim(),
-            costoFlete: m.costoFlete,
+            localidadMasLejana: flete.localidad,
+            fletesTabuladorId: flete.id,
+            costoFlete: costo,
           );
       if (!mounted) return;
       ref.invalidate(manifiestoProvider(m.id));
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Localidad actualizada.')),
+        SnackBar(
+          content: Text(
+            costo == null
+                ? 'Localidad actualizada (sin camión/capacidad para calcular el flete).'
+                : 'Localidad actualizada. Flete: \$${costo.toStringAsFixed(2)}',
+          ),
+        ),
       );
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(mensajeError(e))));
       }
-    } finally {
-      controller.dispose();
     }
   }
 

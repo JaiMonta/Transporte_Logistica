@@ -498,6 +498,59 @@ asignado (obligatorio)**.
 
 ---
 
+## Módulo: Fletes (Fase 1)  ✅ COMPLETADO
+
+Tabulador de fletes (precio por localidad y capacidad) + flete base del
+manifiesto. El **motor de extras** será la Fase 2.
+
+### Datos (Excel `Tabulador.xlsx`)
+- Hoja **TABULADOR**: 101 localidades con KM y precios USD por capacidad
+  (tiers: 1,2 / 2,5 / 3,5 / 5 / 6 / 7,5 / 10 / 12 / 15 / 30 T).
+- Hoja **EXTRAS**: parámetros por capacidad (caleta, mora, reparto, desvío,
+  fin de semana) — solo referencia por ahora.
+
+### Esquema (Supabase)
+
+- Migración `20260930230000_fletes.sql`:
+  - `public.fletes_tabulador` (region, localidad única, km, 10 precios) con RLS
+    (lectura autenticada; escritura solo admin).
+  - `public.fletes_extras` (capacidad_t única + parámetros) misma RLS.
+  - `manifiestos.fletes_tabulador_id → fletes_tabulador`.
+
+### Importación
+
+- Script `tool/importar_tabulador_excel.ps1` (idempotente por localidad; params
+  como el de clientes; `-DryRun`). Cargó **101 localidades + 11 extras**.
+
+### Flutter (feature `fletes`)
+
+- `models/tabulador_flete.dart` (`TabuladorFlete`, enum `TierCapacidad`).
+- `services/calculo_flete.dart` (puro): `tierDeCapacidadKg` (**tier inmediato
+  superior**; >30 T → 30 T; sin capacidad → null) y `precioFlete`.
+- `data/fletes_repository.dart`, `providers/fletes_providers.dart`.
+- **Admin editable**: `fletes_screen` (búsqueda localidad/región) y
+  `flete_form_screen` (editar los 10 precios); entrada "Fletes" en `AdminShell`.
+- **Manifiesto (detalle):** selector de localidad del tabulador
+  (`SelectorLocalidadFlete`); al elegir, guarda `localidad_mas_lejana` +
+  `fletes_tabulador_id` y calcula `costo_flete` según el tier del camión.
+
+### Pruebas
+
+- `test/fletes_test.dart` (tiers, precios, modelo). Total del proyecto
+  **95 en verde**; `flutter analyze` limpio.
+- E2E remoto: camión 8 T + VALENCIA → tier 10 T → **191.77 USD**; chofer lee
+  (200) pero no escribe (403). Datos de prueba limpiados.
+- Web redeployada y APK (101.9 MB).
+
+### Pendiente (Fase 2)
+
+- Motor de extras (caleta ×2/guía, reparto por clientes, desvío por distancia,
+  retorno/devolución, fin de semana +5%, mora, picking especial genérico) y su
+  aprobación; nomenclatura genérica de plantas ("Planta acopio/Warehouse",
+  "Despacho") según la regla §1.
+
+---
+
 ## Módulos pendientes
 
 - **Módulo 6 — Pickups / Delivery**: asignados solo por admin con hora estimada;
