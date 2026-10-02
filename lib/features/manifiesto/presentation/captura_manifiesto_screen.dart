@@ -17,6 +17,7 @@ import '../../../shared/widgets/offline_banner.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../../auth/models/profile.dart';
 import '../../auth/providers/auth_providers.dart';
+import '../../camiones/providers/camiones_providers.dart';
 import '../../combustible/presentation/dialogo_combustible.dart';
 import '../../combustible/providers/combustible_providers.dart';
 import '../data/ocr_repository.dart';
@@ -53,6 +54,7 @@ class _CapturaManifiestoScreenState
   final _formKey = GlobalKey<FormState>();
   final _fecha = TextEditingController();
   List<ManifiestoLinea> _lineas = [];
+  String? _camionId;
   bool _guardando = false;
 
   @override
@@ -227,6 +229,13 @@ class _CapturaManifiestoScreenState
       );
       return;
     }
+    final esAdmin = ref.read(currentProfileProvider).value?.rol == Rol.admin;
+    if (!esAdmin && _camionId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Selecciona el camión.')),
+      );
+      return;
+    }
     FocusScope.of(context).unfocus();
     setState(() => _guardando = true);
     try {
@@ -249,6 +258,7 @@ class _CapturaManifiestoScreenState
       final creado = await repo.crear(
         fecha: fecha,
         lineas: validas,
+        camionId: _camionId,
         bucket: _evidencia?.bucket,
         path: _evidencia?.path,
         hashSha256: _evidencia?.hashSha256,
@@ -483,6 +493,11 @@ class _CapturaManifiestoScreenState
                       ? 'Usa el formato AAAA-MM-DD.'
                       : null,
                 ),
+                const SizedBox(height: AppSpacing.md),
+                _SelectorCamion(
+                  valor: _camionId,
+                  onCambio: (v) => setState(() => _camionId = v),
+                ),
                 const SizedBox(height: AppSpacing.lg),
                 LineasEditor(
                   lineas: _lineas,
@@ -588,6 +603,69 @@ class _BotonCaptura extends StatelessWidget {
               )
             : const Icon(Icons.photo_camera, color: Colors.white, size: 36),
       ),
+    );
+  }
+}
+
+/// Selector del camión asignado al chofer.
+class _SelectorCamion extends ConsumerWidget {
+  const _SelectorCamion({required this.valor, required this.onCambio});
+
+  final String? valor;
+  final ValueChanged<String?> onCambio;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final esAdmin = ref.watch(currentProfileProvider).value?.rol == Rol.admin;
+    final async = esAdmin
+        ? ref.watch(camionesActivosProvider)
+        : ref.watch(camionesDelChoferProvider);
+    return async.when(
+      loading: () => const InputDecorator(
+        decoration: InputDecoration(labelText: 'Camión'),
+        child: SizedBox(
+          height: 24,
+          child: Center(
+            child: SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+        ),
+      ),
+      error: (e, _) => InputDecorator(
+        decoration: const InputDecoration(labelText: 'Camión'),
+        child: Text('No se pudieron cargar los camiones: $e'),
+      ),
+      data: (camiones) {
+        if (camiones.isEmpty) {
+          return InputDecorator(
+            decoration: const InputDecoration(labelText: 'Camión'),
+            child: Text(esAdmin
+                ? 'No hay camiones activos'
+                : 'No tienes camiones asignados'),
+          );
+        }
+        final valido = camiones.any((c) => c.id == valor) ? valor : null;
+        return DropdownButtonFormField<String>(
+          initialValue: valido,
+          decoration: const InputDecoration(labelText: 'Camión'),
+          items: camiones
+              .map((c) => DropdownMenuItem(
+                    value: c.id,
+                    child: Text(
+                      '${c.marcaVisible} · ${c.placa}',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ))
+              .toList(),
+          onChanged: onCambio,
+          validator: esAdmin
+              ? null
+              : (v) => (v == null || v.isEmpty) ? 'Selecciona el camión.' : null,
+        );
+      },
     );
   }
 }

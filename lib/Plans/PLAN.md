@@ -482,6 +482,20 @@ asignado (obligatorio)**.
   gestiona; placa duplicada → 409. Datos de prueba eliminados.
 - `flutter analyze` limpio; `flutter test` 84/84; build web y APK (101.9 MB).
 
+### Enlace camión ↔ manifiesto y flete (provisionado)
+
+- Migración `20260930220000_manifiesto_camion.sql`: `manifiestos` incorpora
+  `camion_id → camiones (on delete set null)`, `localidad_mas_lejana` y
+  `costo_flete` (provisionado; se calculará con la tabla de fletes:
+  capacidad × localidad).
+- **Chofer:** al capturar el manifiesto elige **su camión asignado**
+  (`camionesDelChoferProvider`); el admin puede elegir cualquier camión activo.
+  El detalle del manifiesto y las tarjetas muestran el camión.
+- **Admin:** en el detalle del manifiesto puede fijar la **localidad más lejana**
+  (hoy manual; luego podría derivarse del punto más lejano por geocodificación).
+- **Pendiente:** tabla de fletes (capacidad del camión × localidad) y cálculo
+  automático de `costo_flete`.
+
 ---
 
 ## Módulos pendientes

@@ -12,7 +12,8 @@ class ManifiestosRepository {
   final SupabaseClient _client;
 
   static const String _seleccion =
-      '*, profiles(nombre, email), manifiesto_lineas(*, clientes(nombre))';
+      '*, profiles(nombre, email), camiones(marca, placa), '
+      'manifiesto_lineas(*, clientes(nombre))';
 
   Future<List<Manifiesto>> listar({
     String busqueda = '',
@@ -97,6 +98,7 @@ class ManifiestosRepository {
   Future<Manifiesto> crear({
     required DateTime fecha,
     required List<ManifiestoLinea> lineas,
+    String? camionId,
     String? bucket,
     String? path,
     String? hashSha256,
@@ -109,6 +111,7 @@ class ManifiestosRepository {
         .insert({
           'fecha': _fechaTexto(fecha),
           'capturado_por': uid,
+          'camion_id': camionId,
           'bucket': bucket,
           'path': path,
           'hash_sha256': hashSha256,
@@ -193,6 +196,28 @@ class ManifiestosRepository {
     if (entregas.isNotEmpty) {
       await _client.from('entregas').insert(entregas);
     }
+  }
+
+  /// Actualiza datos de cabecera que gestiona el administrador.
+  Future<Manifiesto> actualizarCabecera({
+    required String id,
+    String? camionId,
+    String? localidadMasLejana,
+    double? costoFlete,
+    CotejoEstado? cotejo,
+  }) async {
+    final data = await _client
+        .from('manifiestos')
+        .update({
+          'camion_id': camionId,
+          'localidad_mas_lejana': localidadMasLejana,
+          'costo_flete': costoFlete,
+          if (cotejo != null) 'cotejo': cotejo.valor,
+        })
+        .eq('id', id)
+        .select(_seleccion)
+        .single();
+    return Manifiesto.fromMap(Map<String, dynamic>.from(data));
   }
 
   /// Purga manifiestos validados más antiguos que la retención.

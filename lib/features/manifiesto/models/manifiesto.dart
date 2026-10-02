@@ -133,6 +133,10 @@ class Manifiesto {
     this.hashSha256,
     this.ocrConfianza,
     this.cotejo = CotejoEstado.pendiente,
+    this.camionId,
+    this.camionNombre,
+    this.localidadMasLejana,
+    this.costoFlete,
     this.lineas = const [],
     this.creadoEn,
     this.actualizadoEn,
@@ -147,9 +151,18 @@ class Manifiesto {
   final String? hashSha256;
   final double? ocrConfianza;
   final CotejoEstado cotejo;
+  final String? camionId;
+  final String? camionNombre;
+  final String? localidadMasLejana;
+  final double? costoFlete;
   final List<ManifiestoLinea> lineas;
   final DateTime? creadoEn;
   final DateTime? actualizadoEn;
+
+  String get camionVisible =>
+      (camionNombre?.trim().isNotEmpty ?? false)
+          ? camionNombre!.trim()
+          : 'Sin camión';
 
   int get totalDocumentos => lineas.length;
 
@@ -184,6 +197,17 @@ class Manifiesto {
       lineas.sort((a, b) => a.orden.compareTo(b.orden));
     }
 
+    final camionMap = mapa['camiones'];
+    String? camionNombre;
+    if (camionMap is Map) {
+      final marca = (camionMap['marca'] as String?)?.trim();
+      final placa = (camionMap['placa'] as String?)?.trim();
+      camionNombre = [marca, placa].whereType<String>()
+          .where((s) => s.isNotEmpty)
+          .join(' · ');
+      if (camionNombre.isEmpty) camionNombre = null;
+    }
+
     return Manifiesto(
       id: mapa['id'] as String,
       fecha: _fecha(mapa['fecha']) ?? DateTime.now(),
@@ -194,6 +218,10 @@ class Manifiesto {
       hashSha256: mapa['hash_sha256'] as String?,
       ocrConfianza: _doble(mapa['ocr_confianza']),
       cotejo: CotejoEstado.desde(mapa['cotejo'] as String?),
+      camionId: mapa['camion_id'] as String?,
+      camionNombre: camionNombre,
+      localidadMasLejana: mapa['localidad_mas_lejana'] as String?,
+      costoFlete: _doble(mapa['costo_flete']),
       lineas: lineas,
       creadoEn: _fecha(mapa['created_at']),
       actualizadoEn: _fecha(mapa['updated_at']),
@@ -207,6 +235,9 @@ class Manifiesto {
     String? hashSha256,
     double? ocrConfianza,
     CotejoEstado? cotejo,
+    String? camionId,
+    String? localidadMasLejana,
+    double? costoFlete,
     List<ManifiestoLinea>? lineas,
   }) =>
       Manifiesto(
@@ -219,6 +250,10 @@ class Manifiesto {
         hashSha256: hashSha256 ?? this.hashSha256,
         ocrConfianza: ocrConfianza ?? this.ocrConfianza,
         cotejo: cotejo ?? this.cotejo,
+        camionId: camionId ?? this.camionId,
+        camionNombre: camionNombre,
+        localidadMasLejana: localidadMasLejana ?? this.localidadMasLejana,
+        costoFlete: costoFlete ?? this.costoFlete,
         lineas: lineas ?? this.lineas,
         creadoEn: creadoEn,
         actualizadoEn: actualizadoEn,

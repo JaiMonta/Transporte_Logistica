@@ -57,6 +57,16 @@ final camionesActivosProvider =
   return ref.watch(camionesRepositoryProvider).listar(activo: true);
 });
 
+/// Camiones activos asignados al chofer autenticado (para la captura).
+final camionesDelChoferProvider =
+    FutureProvider.autoDispose<List<Camion>>((ref) async {
+  final uid = ref.watch(supabaseProvider).auth.currentUser?.id;
+  if (uid == null) return const [];
+  final camiones =
+      await ref.watch(camionesRepositoryProvider).listar(activo: true);
+  return camiones.where((c) => c.choferId == uid).toList();
+});
+
 /// Choferes activos para asignar a un camión.
 final choferesActivosProvider =
     FutureProvider.autoDispose<List<({String id, String nombre})>>((ref) async {

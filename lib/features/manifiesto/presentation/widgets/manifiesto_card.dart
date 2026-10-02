@@ -64,6 +64,24 @@ class ManifiestoCard extends StatelessWidget {
                           ],
                         ],
                       ),
+                      if (manifiesto.camionId != null) ...[
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(Icons.local_shipping_outlined,
+                                size: 14, color: AppColors.onSurfaceVariant),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                manifiesto.camionVisible,
+                                style: tema.textTheme.bodySmall,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ),

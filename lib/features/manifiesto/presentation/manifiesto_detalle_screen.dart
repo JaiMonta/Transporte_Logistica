@@ -5,7 +5,10 @@ import '../../../core/theme.dart';
 import '../../../shared/errors/mensajes_error.dart';
 import '../../../shared/services/almacenamiento_providers.dart';
 import '../../../shared/services/almacenamiento_repository.dart';
+import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/status_pill.dart';
+import '../../auth/models/profile.dart';
+import '../../auth/providers/auth_providers.dart';
 import '../models/manifiesto.dart';
 import '../providers/manifiestos_providers.dart';
 
@@ -117,6 +120,19 @@ class _ContenidoState extends ConsumerState<_Contenido> {
                   etiqueta: 'Confianza del OCR',
                   valor: '${m.confianzaPorcentaje}%',
                 ),
+              _FilaDato(
+                icono: Icons.local_shipping_outlined,
+                etiqueta: 'Camión',
+                valor: m.camionVisible,
+              ),
+              _FilaDato(
+                icono: Icons.place_outlined,
+                etiqueta: 'Localidad más lejana',
+                valor: (m.localidadMasLejana == null ||
+                        m.localidadMasLejana!.isEmpty)
+                    ? '—'
+                    : m.localidadMasLejana!,
+              ),
               const SizedBox(height: AppSpacing.sm),
               Align(
                 alignment: Alignment.centerLeft,
@@ -135,6 +151,8 @@ class _ContenidoState extends ConsumerState<_Contenido> {
               const SizedBox(height: AppSpacing.sm),
               _tablaLineas(context, m),
               const SizedBox(height: AppSpacing.lg),
+              _accionesAdmin(context, m),
+              const SizedBox(height: AppSpacing.lg),
               Text(
                 'Registrado: ${_fechaHora(m.creadoEn)}',
                 style: tema.textTheme.bodySmall,
@@ -144,6 +162,81 @@ class _ContenidoState extends ConsumerState<_Contenido> {
         ),
       ),
     );
+  }
+
+  Widget _accionesAdmin(BuildContext context, Manifiesto m) {
+    final perfil = ref.watch(currentProfileProvider).value;
+    if (perfil?.rol != Rol.admin) return const SizedBox.shrink();
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: OutlinedButton.icon(
+        onPressed: () => _editarLocalidad(m),
+        icon: const Icon(Icons.place_outlined),
+        label: const Text('Editar localidad más lejana'),
+      ),
+    );
+  }
+
+  Future<void> _editarLocalidad(Manifiesto m) async {
+    final controller =
+        TextEditingController(text: m.localidadMasLejana ?? '');
+    final formKey = GlobalKey<FormState>();
+    final guardar = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Localidad más lejana'),
+        content: Form(
+          key: formKey,
+          child: AppTextField(
+            controller: controller,
+            label: 'Localidad',
+            icono: Icons.place_outlined,
+            hint: 'La del punto más lejano del recorrido',
+            validator: (v) => (v ?? '').trim().isEmpty
+                ? 'Ingresa la localidad.'
+                : null,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () {
+              if (formKey.currentState!.validate()) {
+                Navigator.pop(context, true);
+              }
+            },
+            child: const Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+    if (guardar != true) {
+      controller.dispose();
+      return;
+    }
+    try {
+      await ref.read(manifiestosRepositoryProvider).actualizarCabecera(
+            id: m.id,
+            camionId: m.camionId,
+            localidadMasLejana: controller.text.trim(),
+            costoFlete: m.costoFlete,
+          );
+      if (!mounted) return;
+      ref.invalidate(manifiestoProvider(m.id));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Localidad actualizada.')),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(mensajeError(e))));
+      }
+    } finally {
+      controller.dispose();
+    }
   }
 
   Widget _tablaLineas(BuildContext context, Manifiesto m) {

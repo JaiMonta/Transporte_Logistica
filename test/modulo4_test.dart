@@ -82,6 +82,27 @@ void main() {
       expect(m.tieneFoto, isFalse);
     });
 
+    test('fromMap interpreta camión y localidad', () {
+      final m = Manifiesto.fromMap({
+        'id': 'm6',
+        'fecha': '2026-01-01',
+        'camion_id': 'cam1',
+        'camiones': {'marca': 'Marca X', 'placa': 'ABC123'},
+        'localidad_mas_lejana': 'Valencia',
+        'costo_flete': 350,
+      });
+      expect(m.camionId, 'cam1');
+      expect(m.camionNombre, 'Marca X · ABC123');
+      expect(m.camionVisible, 'Marca X · ABC123');
+      expect(m.localidadMasLejana, 'Valencia');
+      expect(m.costoFlete, 350);
+    });
+
+    test('camionVisible cae a "Sin camión"', () {
+      final m = Manifiesto.fromMap({'id': 'm7', 'fecha': '2026-01-01'});
+      expect(m.camionVisible, 'Sin camión');
+    });
+
     test('copyWith conserva id y fecha', () {
       final base = Manifiesto(
         id: 'm3',
