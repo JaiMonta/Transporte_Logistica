@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,8 +14,8 @@ import '../providers/clientes_providers.dart';
 import 'widgets/cliente_card.dart';
 import 'widgets/cliente_tabla.dart';
 
-/// Catálogo de clientes con búsqueda y filtro por estado.
-/// Muestra tarjetas en teléfono y tabla en pantalla ancha.
+/// CatÃ¡logo de clientes con bÃºsqueda y filtro por estado.
+/// Muestra tarjetas en telÃ©fono y tabla en pantalla ancha.
 class ClientesScreen extends ConsumerStatefulWidget {
   const ClientesScreen({super.key});
 
@@ -45,18 +45,18 @@ class _ClientesScreenState extends ConsumerState<ClientesScreen> {
   void _refrescar() => ref.invalidate(clientesProvider(_filtro));
 
   void _editar(Cliente cliente) =>
-      context.go(Rutas.adminClienteEditar(cliente.id));
+      context.push(Rutas.adminClienteEditar(cliente.id));
 
   Future<void> _alternarActivo(Cliente cliente) async {
     final accion = cliente.activo ? 'desactivar' : 'reactivar';
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('¿${accion[0].toUpperCase()}${accion.substring(1)} cliente?'),
+        title: Text('Â¿${accion[0].toUpperCase()}${accion.substring(1)} cliente?'),
         content: Text(
           cliente.activo
-              ? 'El cliente dejará de aparecer para los choferes, pero se conserva su historial.'
-              : 'El cliente volverá a estar disponible para los choferes.',
+              ? 'El cliente dejarÃ¡ de aparecer para los choferes, pero se conserva su historial.'
+              : 'El cliente volverÃ¡ a estar disponible para los choferes.',
         ),
         actions: [
           TextButton(
@@ -65,7 +65,7 @@ class _ClientesScreenState extends ConsumerState<ClientesScreen> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Sí, $accion'),
+            child: Text('SÃ­, $accion'),
           ),
         ],
       ),
@@ -108,7 +108,7 @@ class _ClientesScreenState extends ConsumerState<ClientesScreen> {
               AppTextField(
                 controller: _busqueda,
                 label: 'Buscar',
-                hint: 'Nombre, contacto, correo o dirección',
+                hint: 'Nombre, contacto, correo o direcciÃ³n',
                 icono: Icons.search,
                 onChanged: _onBuscar,
               ),
@@ -191,7 +191,7 @@ class _VacioVista extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.xs),
         Center(
-          child: Text('Ajusta la búsqueda o los filtros.',
+          child: Text('Ajusta la bÃºsqueda o los filtros.',
               style: Theme.of(context).textTheme.bodySmall),
         ),
       ],

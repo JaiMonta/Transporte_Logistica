@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -7,7 +7,7 @@ import '../../../core/theme.dart';
 import '../../../shared/errors/mensajes_error.dart';
 import '../../manifiesto/providers/manifiestos_providers.dart';
 
-/// Selector de manifiesto del día para ver su mapa de entregas (chofer).
+/// Selector de manifiesto del dÃ­a para ver su mapa de entregas (chofer).
 class ChoferMapaSelectorScreen extends ConsumerWidget {
   const ChoferMapaSelectorScreen({super.key});
 
@@ -42,7 +42,7 @@ class ChoferMapaSelectorScreen extends ConsumerWidget {
                       ),
                       trailing: const Icon(Icons.map_outlined),
                       onTap: () =>
-                          context.go(Rutas.choferEntregaMapa(m.id)),
+                          context.push(Rutas.choferEntregaMapa(m.id)),
                     ),
                   );
                 },

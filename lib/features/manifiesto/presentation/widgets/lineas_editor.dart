@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme.dart';
-import '../../../clientes/presentation/widgets/selector_cliente_hibrido.dart';
+import '../../../clientes/presentation/widgets/selector_cliente_busqueda.dart';
 import '../../models/manifiesto.dart';
 
 /// Editor de las líneas (PRO/factura) de un manifiesto.
@@ -130,7 +130,7 @@ class _LineasEditorState extends State<LineasEditor> {
             onChanged: (_) => _emitir(),
           ),
           const SizedBox(height: AppSpacing.md),
-          SelectorClienteHibrido(
+          SelectorClienteBusqueda(
             clienteId: item.clienteId,
             clienteTexto: item.clienteTexto,
             habilitado: widget.habilitado,

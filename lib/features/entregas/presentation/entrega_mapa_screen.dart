@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../../../core/theme.dart';
 import '../../../shared/errors/mensajes_error.dart';
+import '../../../shared/widgets/mapa_vista.dart';
 import '../models/entrega.dart';
 import '../providers/entregas_providers.dart';
 import 'widgets/entrega_card.dart';
@@ -35,22 +36,23 @@ class EntregaMapaScreen extends ConsumerWidget {
             child: Text(mensajeError(e), textAlign: TextAlign.center),
           ),
         ),
-        data: (entregas) => _Mapa(entregas: entregas),
+        data: (entregas) => MapaEntregas(entregas: entregas),
       ),
     );
   }
 }
 
-class _Mapa extends StatelessWidget {
-  const _Mapa({required this.entregas});
+/// Mapa de una lista de entregas (puntos + ruta en orden).
+class MapaEntregas extends StatelessWidget {
+  const MapaEntregas({super.key, required this.entregas});
 
   final List<Entrega> entregas;
 
-  static const LatLng _centroPorDefecto = LatLng(10.4806, -66.9036);
-
   @override
   Widget build(BuildContext context) {
-    final conPuntos = entregas.where((e) => e.tieneUbicacion).toList();
+    final conPuntos = entregas.where((e) => e.tieneUbicacion).toList()
+      ..sort((a, b) => a.orden.compareTo(b.orden));
+
     if (conPuntos.isEmpty) {
       return Center(
         child: Padding(
@@ -78,53 +80,28 @@ class _Mapa extends StatelessWidget {
       );
     }
 
-    final puntos = conPuntos
-        .map((e) => LatLng(e.lat!, e.lng!))
-        .toList(growable: false);
-    final centro = puntos.isEmpty
-        ? _centroPorDefecto
-        : LatLng(
-            puntos.map((p) => p.latitude).reduce((a, b) => a + b) /
-                puntos.length,
-            puntos.map((p) => p.longitude).reduce((a, b) => a + b) /
-                puntos.length,
-          );
+    final puntos = conPuntos.map((e) => LatLng(e.lat!, e.lng!)).toList();
 
-    return FlutterMap(
-      options: MapOptions(initialCenter: centro, initialZoom: 12),
-      children: [
-        TileLayer(
-          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          userAgentPackageName: 'com.transportelogistica.app',
+    return MapaVista(
+      polilineas: [
+        Polyline(
+          points: puntos,
+          strokeWidth: 3,
+          color: AppColors.primary.withValues(alpha: 0.6),
         ),
-        // Línea de la ruta en el orden de entrega.
-        PolylineLayer(
-          polylines: [
-            Polyline(
-              points: puntos,
-              strokeWidth: 3,
-              color: AppColors.primary.withValues(alpha: 0.6),
+      ],
+      marcadores: [
+        for (var i = 0; i < conPuntos.length; i++)
+          Marker(
+            point: LatLng(conPuntos[i].lat!, conPuntos[i].lng!),
+            width: 44,
+            height: 44,
+            alignment: Alignment.topCenter,
+            child: _Marcador(
+              orden: conPuntos[i].orden + 1,
+              estado: conPuntos[i].estado,
             ),
-          ],
-        ),
-        MarkerLayer(
-          markers: [
-            for (var i = 0; i < conPuntos.length; i++)
-              Marker(
-                point: LatLng(conPuntos[i].lat!, conPuntos[i].lng!),
-                width: 44,
-                height: 44,
-                alignment: Alignment.topCenter,
-                child: _Marcador(
-                  orden: conPuntos[i].orden + 1,
-                  estado: conPuntos[i].estado,
-                ),
-              ),
-          ],
-        ),
-        const RichAttributionWidget(
-          attributions: [TextSourceAttribution('OpenStreetMap contributors')],
-        ),
+          ),
       ],
     );
   }

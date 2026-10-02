@@ -21,6 +21,7 @@ import '../features/entregas/presentation/chofer_mapa_selector_screen.dart';
 import '../features/entregas/presentation/entrega_mapa_screen.dart';
 import '../features/entregas/presentation/entregas_admin_screen.dart';
 import '../features/entregas/presentation/entregas_dia_screen.dart';
+import '../features/entregas/presentation/entregas_mapa_agregado_screen.dart';
 import '../features/gps/presentation/gps_admin_screen.dart';
 import '../features/manifiesto/presentation/captura_manifiesto_screen.dart';
 import '../features/manifiesto/presentation/manifiesto_detalle_screen.dart';
@@ -51,6 +52,7 @@ class Rutas {
   static String adminManifiestoDetalle(String id) => '/admin/manifiestos/$id';
 
   static const String adminEntregas = '/admin/entregas';
+  static const String adminEntregasMapa = '/admin/entregas/mapa';
   static String adminEntregaMapa(String manifiestoId) =>
       '/admin/entregas/mapa/$manifiestoId';
   static const String adminGps = '/admin/gps';
@@ -166,10 +168,16 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const EntregasAdminScreen(),
           ),
           GoRoute(
-            path: '/admin/entregas/mapa/:id',
-            builder: (context, state) => EntregaMapaScreen(
-              manifiestoId: state.pathParameters['id']!,
-            ),
+            path: Rutas.adminEntregasMapa,
+            builder: (context, state) => const EntregasMapaAgregadoScreen(),
+            routes: [
+              GoRoute(
+                path: ':id',
+                builder: (context, state) => EntregaMapaScreen(
+                  manifiestoId: state.pathParameters['id']!,
+                ),
+              ),
+            ],
           ),
           GoRoute(
             path: Rutas.adminGps,

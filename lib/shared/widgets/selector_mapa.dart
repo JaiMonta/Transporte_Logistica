@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../core/theme.dart';
+import 'mapa_vista.dart';
 
 /// Resultado de la selección de un punto en el mapa.
 class PuntoSeleccionado {
@@ -43,7 +44,6 @@ class _DialogoMapa extends StatefulWidget {
 
 class _DialogoMapaState extends State<_DialogoMapa> {
   late LatLng _seleccion;
-  final MapController _mapa = MapController();
 
   @override
   void initState() {
@@ -52,12 +52,6 @@ class _DialogoMapaState extends State<_DialogoMapa> {
     _seleccion = tieneInicial
         ? LatLng(widget.latInicial!, widget.lngInicial!)
         : _centroPorDefecto;
-  }
-
-  @override
-  void dispose() {
-    _mapa.dispose();
-    super.dispose();
   }
 
   @override
@@ -96,37 +90,21 @@ class _DialogoMapaState extends State<_DialogoMapa> {
             ),
             const Divider(height: 1),
             Expanded(
-              child: FlutterMap(
-                mapController: _mapa,
-                options: MapOptions(
-                  initialCenter: _seleccion,
-                  initialZoom: (widget.latInicial != null) ? 15 : 6,
-                  onTap: (_, punto) => setState(() => _seleccion = punto),
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.transportelogistica.app',
-                  ),
-                  MarkerLayer(
-                    markers: [
-                      Marker(
-                        point: _seleccion,
-                        width: 44,
-                        height: 44,
-                        alignment: Alignment.topCenter,
-                        child: const Icon(
-                          Icons.location_pin,
-                          size: 44,
-                          color: AppColors.peligro,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const RichAttributionWidget(
-                    attributions: [
-                      TextSourceAttribution('OpenStreetMap contributors'),
-                    ],
+              child: MapaVista(
+                centroPorDefecto: _seleccion,
+                zoomPorDefecto: (widget.latInicial != null) ? 15 : 6,
+                onTap: (punto) => setState(() => _seleccion = punto),
+                marcadores: [
+                  Marker(
+                    point: _seleccion,
+                    width: 44,
+                    height: 44,
+                    alignment: Alignment.topCenter,
+                    child: const Icon(
+                      Icons.location_pin,
+                      size: 44,
+                      color: AppColors.peligro,
+                    ),
                   ),
                 ],
               ),

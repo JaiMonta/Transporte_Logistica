@@ -10,7 +10,7 @@ import '../models/entrega.dart';
 import '../providers/entregas_providers.dart';
 import 'widgets/entrega_card.dart';
 
-/// Panel admin de entregas del día (vista de estado, sin acción de entrega).
+/// Panel admin de entregas (estado + mapa agregado de rutas pendientes).
 class EntregasAdminScreen extends ConsumerStatefulWidget {
   const EntregasAdminScreen({super.key});
 
@@ -20,16 +20,39 @@ class EntregasAdminScreen extends ConsumerStatefulWidget {
 }
 
 class _EntregasAdminScreenState extends ConsumerState<EntregasAdminScreen> {
-  final FiltroEntregas _filtro = FiltroEntregas(dia: DateTime.now());
+  FiltroEntregas _filtro = FiltroEntregas(dia: DateTime.now());
 
   void _verMapa(Entrega e) =>
-      context.go(Rutas.adminEntregaMapa(e.manifiestoId));
+      context.push(Rutas.adminEntregaMapa(e.manifiestoId));
 
   @override
   Widget build(BuildContext context) {
     final async = ref.watch(entregasDelDiaProvider(_filtro));
     return Column(
       children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+          child: Row(
+            children: [
+              Expanded(
+                child: Wrap(
+                  spacing: AppSpacing.sm,
+                  children: [
+                    _chipModo('Pendientes', ModoEntregas.pendientes),
+                    _chipModo('Hoy', ModoEntregas.hoy),
+                    _chipModo('Todas', ModoEntregas.todas),
+                  ],
+                ),
+              ),
+              TextButton.icon(
+                onPressed: () => context.push(Rutas.adminEntregasMapa),
+                icon: const Icon(Icons.map_outlined, size: 18),
+                label: const Text('Mapa'),
+              ),
+            ],
+          ),
+        ),
         const Divider(height: 1),
         Expanded(
           child: async.when(
@@ -51,10 +74,8 @@ class _EntregasAdminScreenState extends ConsumerState<EntregasAdminScreen> {
                         itemCount: entregas.length,
                         separatorBuilder: (_, _) =>
                             const SizedBox(height: AppSpacing.sm),
-                        itemBuilder: (context, i) => EntregaCard(
+                        itemBuilder: (context, i) => _FilaConCliente(
                           entrega: entregas[i],
-                          habilitado: false,
-                          onEntregar: (_) {},
                           onVerMapa: _verMapa,
                         ),
                       ),
@@ -68,6 +89,29 @@ class _EntregasAdminScreenState extends ConsumerState<EntregasAdminScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _chipModo(String texto, ModoEntregas modo) => ChoiceChip(
+        label: Text(texto),
+        selected: _filtro.modo == modo,
+        onSelected: (_) => setState(() => _filtro = _filtro.copyWith(modo: modo)),
+      );
+}
+
+class _FilaConCliente extends StatelessWidget {
+  const _FilaConCliente({required this.entrega, required this.onVerMapa});
+
+  final Entrega entrega;
+  final ValueChanged<Entrega> onVerMapa;
+
+  @override
+  Widget build(BuildContext context) {
+    return EntregaCard(
+      entrega: entrega,
+      habilitado: false,
+      onEntregar: (_) {},
+      onVerMapa: onVerMapa,
     );
   }
 }
@@ -139,7 +183,7 @@ class _VacioVista extends StatelessWidget {
             size: 56, color: AppColors.onSurfaceVariant),
         const SizedBox(height: AppSpacing.md),
         Center(
-          child: Text('No hay entregas para hoy.',
+          child: Text('No hay entregas para mostrar.',
               style: Theme.of(context).textTheme.titleMedium),
         ),
       ],

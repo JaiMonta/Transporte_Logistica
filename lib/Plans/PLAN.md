@@ -423,6 +423,30 @@ las cantidades iniciales/finales.
 
 ---
 
+## Mejoras transversales (UX/visual)  ✅ COMPLETADO
+
+1. **Flecha "atrás":** las navegaciones a subpantallas (formularios, detalles,
+   mapas, combustible, selectores) usan `context.push` y las pantallas del panel
+   incluyen `leading` de retroceso (`context.pop()`; si no hay pila, a la raíz).
+2. **Manifiestos pendientes en Entregas:** la lista incluye filtro **Pendientes /
+   Hoy / Todas** (por defecto **Pendientes**, que trae las entregas pendientes
+   **sin fecha límite**). El admin ve todas; el chofer solo las suyas (RLS).
+3. **Búsqueda de cliente por nombre:** `SelectorClienteBusqueda` reemplaza al
+   desplegable; filtra el catálogo por nombre y permite "texto libre".
+4. **Mapa de rutas pendientes (admin):** `EntregasMapaAgregadoScreen` dibuja
+   todas las rutas pendientes con un color por manifiesto; accesible desde
+   Entregas y GPS (aunque no haya señales GPS).
+5. **Ruta desde la 1.ª fila:** las entregas/ruta se ordenan por `orden`
+   (la primera fila del manifiesto es el punto 1).
+6. **Mapas unificados:** widget `MapaVista` (capa **OpenStreetMap**, sin API) con
+   **encuadre automático** (`CameraFit.bounds`) y atribución OSM, usado en todos
+   los mapas (entrega, agregado, GPS y selector) → mismo aspecto siempre.
+
+- Verificación: `flutter analyze` limpio, `flutter test` **76/76**, web
+  redeployada y APK reconstruido.
+
+---
+
 ## Módulos pendientes
 
 - **Módulo 6 — Pickups / Delivery**: asignados solo por admin con hora estimada;

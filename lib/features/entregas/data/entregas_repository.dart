@@ -31,7 +31,37 @@ class EntregasRepository {
         .eq('fecha', dia) as List<dynamic>;
     final ids = manis.map((e) => (e as Map)['id'] as String).toList();
     if (ids.isEmpty) return [];
+    return _porManifiestos(ids);
+  }
 
+  /// Entregas pendientes (sin fecha límite).
+  ///
+  /// El RLS limita al chofer a las de sus manifiestos; el admin ve todas.
+  Future<List<Entrega>> pendientes() async {
+    final data = await _client
+        .from('entregas')
+        .select(_seleccion)
+        .eq('estado', 'pendiente')
+        .order('manifiesto_id', ascending: true)
+        .order('orden', ascending: true) as List<dynamic>;
+    return data
+        .map((e) => Entrega.fromMap(Map<String, dynamic>.from(e as Map)))
+        .toList();
+  }
+
+  /// Todas las entregas (el RLS filtra por rol).
+  Future<List<Entrega>> todas() async {
+    final data = await _client
+        .from('entregas')
+        .select(_seleccion)
+        .order('manifiesto_id', ascending: true)
+        .order('orden', ascending: true) as List<dynamic>;
+    return data
+        .map((e) => Entrega.fromMap(Map<String, dynamic>.from(e as Map)))
+        .toList();
+  }
+
+  Future<List<Entrega>> _porManifiestos(List<String> ids) async {
     final data = await _client
         .from('entregas')
         .select(_seleccion)

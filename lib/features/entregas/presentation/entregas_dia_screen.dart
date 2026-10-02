@@ -26,7 +26,7 @@ class EntregasDiaScreen extends ConsumerStatefulWidget {
 }
 
 class _EntregasDiaScreenState extends ConsumerState<EntregasDiaScreen> {
-  final FiltroEntregas _filtro =
+  FiltroEntregas _filtro =
       FiltroEntregas(dia: DateTime.now());
   bool _gpsActivo = false;
   String? _avisoGps;
@@ -128,26 +128,50 @@ class _EntregasDiaScreenState extends ConsumerState<EntregasDiaScreen> {
   }
 
   void _verMapa(Entrega entrega) =>
-      context.go(Rutas.choferEntregaMapa(entrega.manifiestoId));
+      context.push(Rutas.choferEntregaMapa(entrega.manifiestoId));
+
+  Widget _chipModo(String texto, ModoEntregas modo) => ChoiceChip(
+        label: Text(texto),
+        selected: _filtro.modo == modo,
+        onSelected: (_) => setState(() => _filtro = _filtro.copyWith(modo: modo)),
+      );
 
   @override
   Widget build(BuildContext context) {
     final async = ref.watch(entregasDelDiaProvider(_filtro));
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Entregas del día'),
+        title: const Text('Entregas'),
+        leading: IconButton(
+          tooltip: 'Atrás',
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.canPop()
+              ? context.pop()
+              : context.go(Rutas.choferHome),
+        ),
         actions: [
           IconButton(
             tooltip: 'Mapa de la ruta',
             icon: const Icon(Icons.map_outlined),
-            onPressed: () => context.go(Rutas.choferMapa),
+            onPressed: () => context.push(Rutas.choferMapa),
           ),
         ],
       ),
       body: Column(
         children: [
           const OfflineBanner(),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+            child: Wrap(
+              spacing: AppSpacing.sm,
+              children: [
+                _chipModo('Pendientes', ModoEntregas.pendientes),
+                _chipModo('Hoy', ModoEntregas.hoy),
+                _chipModo('Todas', ModoEntregas.todas),
+              ],
+            ),
+          ),
           if (_avisoGps != null)
             Container(
               width: double.infinity,

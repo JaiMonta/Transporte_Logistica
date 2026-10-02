@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,8 +15,8 @@ import '../providers/usuarios_providers.dart';
 import 'widgets/usuario_card.dart';
 import 'widgets/usuario_tabla.dart';
 
-/// Lista de usuarios con búsqueda y filtros por rol y estado.
-/// Muestra tarjetas en teléfono y tabla en pantalla ancha.
+/// Lista de usuarios con bÃºsqueda y filtros por rol y estado.
+/// Muestra tarjetas en telÃ©fono y tabla en pantalla ancha.
 class UsuariosScreen extends ConsumerStatefulWidget {
   const UsuariosScreen({super.key});
 
@@ -46,18 +46,18 @@ class _UsuariosScreenState extends ConsumerState<UsuariosScreen> {
   void _refrescar() => ref.invalidate(usuariosProvider(_filtro));
 
   void _editar(Profile usuario) =>
-      context.go(Rutas.adminUsuarioEditar(usuario.id));
+      context.push(Rutas.adminUsuarioEditar(usuario.id));
 
   Future<void> _alternarActivo(Profile usuario) async {
     final accion = usuario.activo ? 'desactivar' : 'reactivar';
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('¿${accion[0].toUpperCase()}${accion.substring(1)} usuario?'),
+        title: Text('Â¿${accion[0].toUpperCase()}${accion.substring(1)} usuario?'),
         content: Text(
           usuario.activo
-              ? 'El usuario no podrá iniciar sesión, pero se conserva su historial.'
-              : 'El usuario podrá volver a iniciar sesión.',
+              ? 'El usuario no podrÃ¡ iniciar sesiÃ³n, pero se conserva su historial.'
+              : 'El usuario podrÃ¡ volver a iniciar sesiÃ³n.',
         ),
         actions: [
           TextButton(
@@ -66,7 +66,7 @@ class _UsuariosScreenState extends ConsumerState<UsuariosScreen> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Sí, $accion'),
+            child: Text('SÃ­, $accion'),
           ),
         ],
       ),
@@ -101,7 +101,7 @@ class _UsuariosScreenState extends ConsumerState<UsuariosScreen> {
     final guardar = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Restablecer contraseña'),
+        title: const Text('Restablecer contraseÃ±a'),
         content: Form(
           key: formKey,
           child: Column(
@@ -112,7 +112,7 @@ class _UsuariosScreenState extends ConsumerState<UsuariosScreen> {
               const SizedBox(height: AppSpacing.md),
               AppTextField(
                 controller: contrasena,
-                label: 'Nueva contraseña',
+                label: 'Nueva contraseÃ±a',
                 icono: Icons.lock_outline,
                 obscure: true,
                 validator: Validador.contrasena,
@@ -145,7 +145,7 @@ class _UsuariosScreenState extends ConsumerState<UsuariosScreen> {
             );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Contraseña restablecida.')),
+            const SnackBar(content: Text('ContraseÃ±a restablecida.')),
           );
         }
       } catch (e) {
@@ -172,7 +172,7 @@ class _UsuariosScreenState extends ConsumerState<UsuariosScreen> {
               AppTextField(
                 controller: _busqueda,
                 label: 'Buscar',
-                hint: 'Nombre, correo o teléfono',
+                hint: 'Nombre, correo o telÃ©fono',
                 icono: Icons.search,
                 onChanged: _onBuscar,
               ),
@@ -267,7 +267,7 @@ class _VacioVista extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.xs),
         Center(
-          child: Text('Ajusta la búsqueda o los filtros.',
+          child: Text('Ajusta la bÃºsqueda o los filtros.',
               style: Theme.of(context).textTheme.bodySmall),
         ),
       ],

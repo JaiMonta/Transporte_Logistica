@@ -45,7 +45,7 @@ class _ManifiestosScreenState extends ConsumerState<ManifiestosScreen> {
   void _refrescar() => ref.invalidate(manifiestosProvider(_filtro));
 
   void _verDetalle(Manifiesto m) =>
-      context.go(Rutas.adminManifiestoDetalle(m.id));
+      context.push(Rutas.adminManifiestoDetalle(m.id));
 
   Future<void> _elegirRango() async {
     final rango = await showDateRangePicker(

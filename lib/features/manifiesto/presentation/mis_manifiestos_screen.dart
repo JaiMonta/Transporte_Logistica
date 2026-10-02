@@ -27,7 +27,7 @@ class _MisManifiestosScreenState extends ConsumerState<MisManifiestosScreen> {
   final FiltroManifiestos _filtro = const FiltroManifiestos();
 
   void _verDetalle(Manifiesto m) =>
-      context.go(Rutas.choferManifiestoDetalle(m.id));
+      context.push(Rutas.choferManifiestoDetalle(m.id));
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +35,18 @@ class _MisManifiestosScreenState extends ConsumerState<MisManifiestosScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mis manifiestos'),
+        leading: IconButton(
+          tooltip: 'Atrás',
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.canPop()
+              ? context.pop()
+              : context.go(Rutas.choferHome),
+        ),
         actions: [
           IconButton(
             tooltip: 'Capturar manifiesto',
             icon: const Icon(Icons.add_a_photo_outlined),
-            onPressed: () => context.go(Rutas.choferCapturaManifiesto),
+            onPressed: () => context.push(Rutas.choferCapturaManifiesto),
           ),
         ],
       ),
@@ -87,7 +94,7 @@ class _MisManifiestosScreenState extends ConsumerState<MisManifiestosScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go(Rutas.choferCapturaManifiesto),
+        onPressed: () => context.push(Rutas.choferCapturaManifiesto),
         icon: const Icon(Icons.add_a_photo_outlined),
         label: const Text('Capturar'),
       ),

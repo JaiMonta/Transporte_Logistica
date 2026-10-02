@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -6,8 +6,8 @@ import '../core/router.dart';
 import '../features/auth/providers/auth_providers.dart';
 import '../shared/widgets/offline_banner.dart';
 
-/// Contenedor del panel de administración: navegación lateral en pantalla
-/// ancha y barra inferior en móvil.
+/// Contenedor del panel de administraciÃ³n: navegaciÃ³n lateral en pantalla
+/// ancha y barra inferior en mÃ³vil.
 class AdminShell extends ConsumerWidget {
   const AdminShell({super.key, required this.ubicacion, required this.child});
 
@@ -63,22 +63,22 @@ class AdminShell extends ConsumerWidget {
             IconButton(
               tooltip: 'Nuevo usuario',
               icon: const Icon(Icons.person_add_alt_1),
-              onPressed: () => context.go(Rutas.adminUsuarioNuevo),
+              onPressed: () => context.push(Rutas.adminUsuarioNuevo),
             ),
           if (_enListaClientes)
             IconButton(
               tooltip: 'Nuevo cliente',
               icon: const Icon(Icons.add_business),
-              onPressed: () => context.go(Rutas.adminClienteNuevo),
+              onPressed: () => context.push(Rutas.adminClienteNuevo),
             ),
           if (_enListaManifiestos)
             IconButton(
               tooltip: 'Subir manifiesto',
               icon: const Icon(Icons.upload_file),
-              onPressed: () => context.go(Rutas.adminManifiestoNuevo),
+              onPressed: () => context.push(Rutas.adminManifiestoNuevo),
             ),
           IconButton(
-            tooltip: 'Cerrar sesión',
+            tooltip: 'Cerrar sesiÃ³n',
             icon: const Icon(Icons.logout),
             onPressed: () => _salir(context, ref),
           ),

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -40,7 +40,7 @@ class CombustibleAdminScreen extends ConsumerWidget {
                           const SizedBox(height: AppSpacing.sm),
                       itemBuilder: (context, i) => _JornadaCard(
                         jornada: jornadas[i],
-                        onVerDetalle: () => context.go(
+                        onVerDetalle: () => context.push(
                           Rutas.adminCombustibleDetalle(jornadas[i].id),
                         ),
                       ),
@@ -66,12 +66,12 @@ class _JornadaCard extends StatelessWidget {
       child: ListTile(
         leading: const Icon(Icons.local_gas_station_outlined),
         title: Text(
-          'Inicial: ${_n(jornada.inicialEfectivo)} lt · '
+          'Inicial: ${_n(jornada.inicialEfectivo)} lt Â· '
           'Final: ${_n(jornada.finalEfectivo)} lt',
           style: tema.textTheme.titleSmall,
         ),
         subtitle: Text(
-          '${jornada.estado.etiqueta} · Recargas: ${_n(jornada.totalRecargasLt)} lt · '
+          '${jornada.estado.etiqueta} Â· Recargas: ${_n(jornada.totalRecargasLt)} lt Â· '
           'Km: ${_n(jornada.kmRecorridos)}',
         ),
         trailing: const Icon(Icons.chevron_right),
@@ -80,10 +80,10 @@ class _JornadaCard extends StatelessWidget {
     );
   }
 
-  static String _n(double? v) => v == null ? '—' : v.toStringAsFixed(2);
+  static String _n(double? v) => v == null ? 'â€”' : v.toStringAsFixed(2);
 }
 
-/// Detalle/validación de una jornada de combustible (admin).
+/// Detalle/validaciÃ³n de una jornada de combustible (admin).
 class CombustibleAdminDetalleScreen extends ConsumerStatefulWidget {
   const CombustibleAdminDetalleScreen({
     super.key,
@@ -122,7 +122,7 @@ class _CombustibleAdminDetalleScreenState
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             validator: (v) {
               final n = double.tryParse((v ?? '').replaceAll(',', '.'));
-              if (n == null || n < 0) return 'Ingresa un número válido.';
+              if (n == null || n < 0) return 'Ingresa un nÃºmero vÃ¡lido.';
               return null;
             },
           ),
@@ -223,7 +223,7 @@ class _CombustibleAdminDetalleScreenState
               _fila('Litros finales (validado)', _n(j.litrosFinalesValidados)),
               const Divider(),
               _fila('Km recorridos', _n(j.kmRecorridos)),
-              _fila('Consumo teórico', '${_n(j.consumoTeoricoLt)} lt'),
+              _fila('Consumo teÃ³rico', '${_n(j.consumoTeoricoLt)} lt'),
               _fila('Consumo real', '${_n(j.consumoRealLt)} lt'),
               const SizedBox(height: AppSpacing.lg),
               OutlinedButton.icon(
@@ -260,7 +260,7 @@ class _CombustibleAdminDetalleScreenState
         ),
       );
 
-  static String _n(double? v) => v == null ? '—' : v.toStringAsFixed(2);
+  static String _n(double? v) => v == null ? 'â€”' : v.toStringAsFixed(2);
 }
 
 class _VacioVista extends StatelessWidget {
@@ -275,7 +275,7 @@ class _VacioVista extends StatelessWidget {
             size: 56, color: AppColors.onSurfaceVariant),
         const SizedBox(height: AppSpacing.md),
         Center(
-          child: Text('Aún no hay jornadas de combustible.',
+          child: Text('AÃºn no hay jornadas de combustible.',
               style: Theme.of(context).textTheme.titleMedium),
         ),
       ],
