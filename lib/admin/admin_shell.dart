@@ -24,6 +24,7 @@ class AdminShell extends ConsumerWidget {
     Rutas.adminEntregas,
     Rutas.adminGps,
     Rutas.adminCombustible,
+    Rutas.adminCamiones,
   ];
 
   int get _indice {
@@ -40,6 +41,7 @@ class AdminShell extends ConsumerWidget {
         4 => 'Entregas',
         5 => 'Monitoreo GPS',
         6 => 'Combustible',
+        7 => 'Camiones',
         _ => 'Panel',
       };
 
@@ -48,6 +50,8 @@ class AdminShell extends ConsumerWidget {
   bool get _enListaClientes => ubicacion == Rutas.adminClientes;
 
   bool get _enListaManifiestos => ubicacion == Rutas.adminManifiestos;
+
+  bool get _enListaCamiones => ubicacion == Rutas.adminCamiones;
 
   Future<void> _salir(BuildContext context, WidgetRef ref) =>
       ref.read(authControllerProvider.notifier).cerrarSesion();
@@ -76,6 +80,12 @@ class AdminShell extends ConsumerWidget {
               tooltip: 'Subir manifiesto',
               icon: const Icon(Icons.upload_file),
               onPressed: () => context.push(Rutas.adminManifiestoNuevo),
+            ),
+          if (_enListaCamiones)
+            IconButton(
+              tooltip: 'Nuevo camión',
+              icon: const Icon(Icons.add_box_outlined),
+              onPressed: () => context.push(Rutas.adminCamionNuevo),
             ),
           IconButton(
             tooltip: 'Cerrar sesiÃ³n',
@@ -131,6 +141,11 @@ class AdminShell extends ConsumerWidget {
                             selectedIcon: Icon(Icons.local_gas_station),
                             label: Text('Combustible'),
                           ),
+                          NavigationRailDestination(
+                            icon: Icon(Icons.local_shipping_outlined),
+                            selectedIcon: Icon(Icons.local_shipping),
+                            label: Text('Camiones'),
+                          ),
                         ],
                       ),
                       const VerticalDivider(width: 1),
@@ -181,6 +196,11 @@ class AdminShell extends ConsumerWidget {
                   icon: Icon(Icons.local_gas_station_outlined),
                   selectedIcon: Icon(Icons.local_gas_station),
                   label: 'Combustible',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.local_shipping_outlined),
+                  selectedIcon: Icon(Icons.local_shipping),
+                  label: 'Camiones',
                 ),
               ],
             ),

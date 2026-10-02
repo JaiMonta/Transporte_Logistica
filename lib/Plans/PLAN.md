@@ -447,6 +447,43 @@ las cantidades iniciales/finales.
 
 ---
 
+## Módulo: Camiones  ✅ COMPLETADO
+
+Catálogo de camiones en el panel admin (registrar, editar,
+**desactivar/reactivar**). El chofer solo lee los activos.
+
+### Datos
+Marca, placa (**única**), modelo, año, capacidad (kg), volumen (m³) y **chofer
+asignado (obligatorio)**.
+
+### Esquema (Supabase)
+
+- Migración `20260930210000_camiones.sql`: `public.camiones` con índice único
+  `lower(placa)`, `chofer_id → profiles (on delete restrict)`, `activo` (baja
+  lógica) y trigger `updated_at`.
+- RLS: chofer ve solo activos; insert/update/delete solo admin.
+
+### Flutter (feature `camiones`)
+
+- `models/camion.dart`, `data/camiones_repository.dart`
+  (listar/buscar, obtener, `existePlaca`, crear, actualizar, cambiarActivo),
+  `providers/camiones_providers.dart` (+ `choferesActivosProvider`).
+- Pantallas: `camiones_screen.dart` (búsqueda + filtro activos/inactivos;
+  tarjetas/tabla), `camion_form_screen.dart` (con **selector de chofer activo**
+  obligatorio), `widgets/camion_card.dart`, `widgets/camion_tabla.dart`.
+- Navegación: entrada "Camiones" en `AdminShell` (rail + barra inferior) con
+  acción "Nuevo camión"; rutas `adminCamiones`/`adminCamionNuevo`/`adminCamionEditar`.
+
+### Pruebas
+
+- Unitarias: `test/camiones_test.dart` (Camion, FiltroCamiones). Total del
+  proyecto **84 en verde**.
+- RLS/E2E remoto (todas en verde): chofer ve solo activos y no crea (403); admin
+  gestiona; placa duplicada → 409. Datos de prueba eliminados.
+- `flutter analyze` limpio; `flutter test` 84/84; build web y APK (101.9 MB).
+
+---
+
 ## Módulos pendientes
 
 - **Módulo 6 — Pickups / Delivery**: asignados solo por admin con hora estimada;
