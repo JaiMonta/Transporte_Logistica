@@ -651,6 +651,75 @@ Resumen de lo trabajado en la jornada (además del Módulo 4, detallado arriba):
 
 ---
 
+## Registro del día (jornada actual)  ✅ COMPLETADO
+
+Resumen de la jornada. Cada punto tiene su sección detallada arriba y su commit.
+
+### Commits de la jornada
+
+| Commit | Resumen |
+| --- | --- |
+| `2b36e43` | Login persistente en móvil: recordar usuario y contraseña (secure storage) |
+| `7aae567` | Módulo 5: entregas ligadas a manifiesto + tracking GPS cada 20 min |
+| `b14794c` | Módulo combustible: litros iniciales/finales, recargas y cálculo lt/km |
+| `7f3a781` | Mejoras UX: flecha atrás, pendientes en entregas, búsqueda de cliente, mapa agregado y mapas unificados |
+| `659af45` | Agregar PDF de firma en `Estructura` |
+| `299b675` | Módulo camiones: catálogo CRUD con chofer asignado y placa única |
+| `c56c31e` | Enlace camión↔manifiesto + localidad más lejana y costo de flete provisionado |
+| `25393b8` | Módulo fletes Fase 1: tabulador por localidad/capacidad + importador Excel |
+
+### 1. Login persistente (móvil)
+
+- `CredencialesService` guarda usuario/contraseña en `flutter_secure_storage`
+  (contraseña solo en móvil; en Web solo el correo). Interruptor "Recordar
+  usuario y contraseña" (activado por defecto); al cerrar sesión se olvidan.
+- Pruebas: `test/credenciales_test.dart`.
+
+### 2. Módulo 5 — Entregas + GPS
+
+- Una entrega por línea del manifiesto; el chofer marca "Entregado" (foto del
+  recibo opcional + hora del servidor); mapa de puntos y ruta; GPS cada 20 min
+  en primer plano. Esquema: `entregas`, `ubicaciones_gps`, enum `entrega_estado`.
+
+### 3. Módulo combustible
+
+- Al capturar el manifiesto el chofer registra litros iniciales (inicia la
+  jornada y arranca el GPS); recargas durante el recorrido; cierre con litros
+  finales; cálculo km (Haversine) y consumo teórico/real; el admin valida o
+  corrige. Esquema: `combustible_jornadas`, `combustible_recargas`, config
+  `combustible_rendimiento_lt_km`.
+
+### 4. Mejoras transversales (UX/visual)
+
+- Flecha atrás (`context.push` + `leading`), filtro Pendientes/Hoy/Todas en
+  Entregas, búsqueda de cliente por nombre, mapa agregado de rutas pendientes y
+  widget `MapaVista` unificado (OpenStreetMap con encuadre automático).
+
+### 5. Módulo camiones
+
+- Catálogo CRUD con marca, placa única, modelo, año, capacidad (kg), volumen
+  (m³) y **chofer obligatorio**; baja lógica. Esquema `camiones`.
+
+### 6. Enlace camión ↔ manifiesto
+
+- `manifiestos.camion_id`; el chofer elige su camión al capturar. Campos
+  `localidad_mas_lejana` y `costo_flete`.
+
+### 7. Módulo fletes (Fase 1)
+
+- Tabulador (101 localidades × 10 tiers) importado desde `Tabulador.xlsx` con
+  `tool/importar_tabulador_excel.ps1`; catálogo editable en el panel; cálculo de
+  `costo_flete` por localidad y capacidad (tier inmediato superior). El motor de
+  extras queda para la Fase 2.
+
+### Verificación y despliegue
+
+- `flutter analyze` limpio y `flutter test` **95/95** al cierre de la jornada.
+- Web: **https://transporte-logistica-fabab.web.app** (redeploy al final).
+- APK: `build\app\outputs\flutter-apk\app-release.apk` (~101.9 MB).
+
+---
+
 ## Despliegue
 
 ### Web (Firebase Hosting)
