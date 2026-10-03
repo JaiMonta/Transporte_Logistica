@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+﻿import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,12 +12,14 @@ import '../../../shared/services/almacenamiento_providers.dart';
 import '../../../shared/services/almacenamiento_repository.dart';
 import '../../../shared/widgets/offline_banner.dart';
 import '../../../shared/widgets/responsive_layout.dart';
+import '../../fletes/models/extra.dart';
+import '../../fletes/providers/fletes_providers.dart';
 import '../../gps/services/seguimiento_gps.dart';
 import '../models/entrega.dart';
 import '../providers/entregas_providers.dart';
 import 'widgets/entrega_card.dart';
 
-/// Entregas del día (chofer). Arranca el seguimiento GPS al abrir.
+/// Entregas del dÃ­a (chofer). Arranca el seguimiento GPS al abrir.
 class EntregasDiaScreen extends ConsumerStatefulWidget {
   const EntregasDiaScreen({super.key});
 
@@ -44,8 +46,62 @@ class _EntregasDiaScreenState extends ConsumerState<EntregasDiaScreen> {
       _gpsActivo = ok;
       _avisoGps = ok
           ? null
-          : 'No se pudo activar el GPS. Revisa los permisos de ubicación.';
+          : 'No se pudo activar el GPS. Revisa los permisos de ubicaciÃ³n.';
     });
+  }
+
+  /// El chofer avisa (sugiere) una devolución o mora; el admin aprueba.
+  Future<void> _avisar(Entrega entrega) async {
+    final tipo = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.keyboard_return),
+              title: const Text('Avisar devolución / retorno'),
+              onTap: () => Navigator.pop(context, 'retorno'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.hourglass_empty),
+              title: const Text('Avisar mora (cliente)'),
+              onTap: () => Navigator.pop(context, 'mora'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (tipo == null) return;
+
+    final esMora = tipo == 'mora';
+    TipoExtra tipoExtra = esMora ? TipoExtra.mora : TipoExtra.retorno;
+    String descripcion = esMora
+        ? 'Aviso de mora (${entrega.clienteVisible})'
+        : 'Aviso de devolución (${entrega.clienteVisible})';
+
+    try {
+      await ref.read(extrasRepositoryProvider).crear(Extra(
+            id: '',
+            manifiestoId: entrega.manifiestoId,
+            tipo: tipoExtra,
+            descripcion: descripcion,
+            monto: 0,
+            origen: 'chofer',
+          ));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Aviso enviado. El administrador lo revisará.'),
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(mensajeError(e))));
+      }
+    }
   }
 
   Future<void> _entregar(Entrega entrega) async {
@@ -55,7 +111,7 @@ class _EntregasDiaScreenState extends ConsumerState<EntregasDiaScreen> {
       builder: (context) => AlertDialog(
         title: const Text('Confirmar entrega'),
         content: Text(
-          '¿Marcar como entregado a "${entrega.clienteVisible}"?\n\n'
+          'Â¿Marcar como entregado a "${entrega.clienteVisible}"?\n\n'
           'Puedes adjuntar la foto del recibo firmado (opcional).',
         ),
         actions: [
@@ -78,7 +134,7 @@ class _EntregasDiaScreenState extends ConsumerState<EntregasDiaScreen> {
     EvidenciaSubida? evidencia;
     if (quiereFoto == true) {
       evidencia = await _tomarFotoRecibo(entrega);
-      if (evidencia == null) return; // canceló
+      if (evidencia == null) return; // cancelÃ³
     }
 
     try {
@@ -143,7 +199,7 @@ class _EntregasDiaScreenState extends ConsumerState<EntregasDiaScreen> {
       appBar: AppBar(
         title: const Text('Entregas'),
         leading: IconButton(
-          tooltip: 'Atrás',
+          tooltip: 'AtrÃ¡s',
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.canPop()
               ? context.pop()
@@ -190,7 +246,7 @@ class _EntregasDiaScreenState extends ConsumerState<EntregasDiaScreen> {
                   const Icon(Icons.gps_fixed,
                       size: 16, color: AppColors.tertiary),
                   const SizedBox(width: AppSpacing.sm),
-                  Text('Ubicación activa (reporta cada 20 min).',
+                  Text('UbicaciÃ³n activa (reporta cada 20 min).',
                       style: Theme.of(context).textTheme.bodySmall),
                 ],
               ),
@@ -220,6 +276,7 @@ class _EntregasDiaScreenState extends ConsumerState<EntregasDiaScreen> {
                             entrega: entregas[i],
                             onEntregar: _entregar,
                             onVerMapa: _verMapa,
+                            onAvisar: _avisar,
                           ),
                         ),
                         ancho: ListView.separated(
@@ -231,6 +288,7 @@ class _EntregasDiaScreenState extends ConsumerState<EntregasDiaScreen> {
                             entrega: entregas[i],
                             onEntregar: _entregar,
                             onVerMapa: _verMapa,
+                            onAvisar: _avisar,
                           ),
                         ),
                       ),

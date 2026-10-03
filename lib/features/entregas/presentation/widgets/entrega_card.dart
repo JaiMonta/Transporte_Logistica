@@ -18,12 +18,14 @@ class EntregaCard extends StatelessWidget {
     required this.entrega,
     required this.onEntregar,
     required this.onVerMapa,
+    this.onAvisar,
     this.habilitado = true,
   });
 
   final Entrega entrega;
   final ValueChanged<Entrega> onEntregar;
   final ValueChanged<Entrega> onVerMapa;
+  final ValueChanged<Entrega>? onAvisar;
   final bool habilitado;
 
   @override
@@ -111,6 +113,12 @@ class EntregaCard extends StatelessWidget {
                     label: const Text('Mapa'),
                   ),
                 const Spacer(),
+                if (onAvisar != null)
+                  TextButton.icon(
+                    onPressed: () => onAvisar!(entrega),
+                    icon: const Icon(Icons.campaign_outlined, size: 18),
+                    label: const Text('Avisar'),
+                  ),
                 if (pendiente && habilitado)
                   FilledButton.icon(
                     onPressed: () => onEntregar(entrega),

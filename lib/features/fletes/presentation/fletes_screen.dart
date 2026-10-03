@@ -23,6 +23,7 @@ class _FletesScreenState extends ConsumerState<FletesScreen> {
   final _busqueda = TextEditingController();
   Timer? _debounce;
   FiltroFletes _filtro = const FiltroFletes();
+  TierCapacidad _tier = TierCapacidad.t10;
 
   @override
   void dispose() {
@@ -48,12 +49,45 @@ class _FletesScreenState extends ConsumerState<FletesScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
-          child: AppTextField(
-            controller: _busqueda,
-            label: 'Buscar',
-            hint: 'Localidad o región',
-            icono: Icons.search,
-            onChanged: _onBuscar,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppTextField(
+                controller: _busqueda,
+                label: 'Buscar',
+                hint: 'Localidad o región',
+                icono: Icons.search,
+                onChanged: _onBuscar,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              // Selector de capacidad: los precios mostrados corresponden a
+              // esta capacidad.
+              Row(
+                children: [
+                  const Icon(Icons.tune, size: 18,
+                      color: AppColors.onSurfaceVariant),
+                  const SizedBox(width: AppSpacing.sm),
+                  const Text('Capacidad:'),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: DropdownButtonFormField<TierCapacidad>(
+                      initialValue: _tier,
+                      isExpanded: true,
+                      items: [
+                        for (final t in TierCapacidad.values)
+                          DropdownMenuItem(
+                            value: t,
+                            child: Text('${t.etiqueta} (USD)'),
+                          ),
+                      ],
+                      onChanged: (v) {
+                        if (v != null) setState(() => _tier = v);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
         const Divider(height: 1),
@@ -77,6 +111,7 @@ class _FletesScreenState extends ConsumerState<FletesScreen> {
                           const SizedBox(height: AppSpacing.sm),
                       itemBuilder: (context, i) => _FleteCard(
                         flete: fletes[i],
+                        tier: _tier,
                         onEditar: _editar,
                       ),
                     ),
@@ -89,14 +124,20 @@ class _FletesScreenState extends ConsumerState<FletesScreen> {
 }
 
 class _FleteCard extends StatelessWidget {
-  const _FleteCard({required this.flete, required this.onEditar});
+  const _FleteCard({
+    required this.flete,
+    required this.tier,
+    required this.onEditar,
+  });
 
   final TabuladorFlete flete;
+  final TierCapacidad tier;
   final ValueChanged<TabuladorFlete> onEditar;
 
   @override
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
+    final precio = flete.precioPara(tier);
     return Card(
       child: ListTile(
         leading: const Icon(Icons.local_shipping_outlined),
@@ -105,7 +146,27 @@ class _FleteCard extends StatelessWidget {
           '${flete.region ?? '—'} · KM ${flete.km?.toStringAsFixed(0) ?? '—'}',
           style: tema.textTheme.bodySmall,
         ),
-        trailing: const Icon(Icons.edit_outlined),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  precio == null ? '—' : '\$${precio.toStringAsFixed(2)}',
+                  style: tema.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                  ),
+                ),
+                Text(tier.etiqueta, style: tema.textTheme.labelSmall),
+              ],
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            const Icon(Icons.edit_outlined),
+          ],
+        ),
         onTap: () => onEditar(flete),
       ),
     );

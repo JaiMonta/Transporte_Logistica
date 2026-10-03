@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/supabase_client.dart';
 import '../../../core/theme.dart';
 import '../../../shared/errors/mensajes_error.dart';
 import '../../../shared/services/almacenamiento_providers.dart';
@@ -9,9 +10,13 @@ import '../../../shared/widgets/status_pill.dart';
 import '../../auth/models/profile.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../camiones/providers/camiones_providers.dart';
+import '../../entregas/providers/entregas_providers.dart';
+import '../../fletes/models/extra.dart';
 import '../../fletes/models/tabulador_flete.dart';
+import '../../fletes/presentation/widgets/bloque_extras.dart';
 import '../../fletes/presentation/widgets/selector_localidad_flete.dart';
 import '../../fletes/providers/fletes_providers.dart';
+import '../../fletes/services/calculo_extras.dart';
 import '../../fletes/services/calculo_flete.dart';
 import '../models/manifiesto.dart';
 import '../providers/manifiestos_providers.dart';
@@ -164,6 +169,13 @@ class _ContenidoState extends ConsumerState<_Contenido> {
               const SizedBox(height: AppSpacing.lg),
               _accionesAdmin(context, m),
               const SizedBox(height: AppSpacing.lg),
+              if (ref.watch(currentProfileProvider).value?.rol == Rol.admin)
+                BloqueExtras(
+                  manifiestoId: m.id,
+                  fleteBase: m.costoFlete,
+                  onCalcularSugeridos: () => _calcularExtrasSugeridos(m),
+                ),
+              const SizedBox(height: AppSpacing.lg),
               Text(
                 'Registrado: ${_fechaHora(m.creadoEn)}',
                 style: tema.textTheme.bodySmall,
@@ -178,13 +190,34 @@ class _ContenidoState extends ConsumerState<_Contenido> {
   Widget _accionesAdmin(BuildContext context, Manifiesto m) {
     final perfil = ref.watch(currentProfileProvider).value;
     if (perfil?.rol != Rol.admin) return const SizedBox.shrink();
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: OutlinedButton.icon(
-        onPressed: () => _editarLocalidad(m),
-        icon: const Icon(Icons.place_outlined),
-        label: const Text('Editar localidad más lejana'),
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OutlinedButton.icon(
+          onPressed: () => _editarLocalidad(m),
+          icon: const Icon(Icons.place_outlined),
+          label: const Text('Editar localidad más lejana'),
+        ),
+        SwitchListTile(
+          value: m.esFinSemana,
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Servicio en fin de semana (+5%)'),
+          onChanged: (v) async {
+            final messenger = ScaffoldMessenger.of(context);
+            try {
+              await ref
+                  .read(manifiestosRepositoryProvider)
+                  .marcarFinSemana(id: m.id, valor: v);
+              ref.invalidate(manifiestoProvider(m.id));
+            } catch (e) {
+              messenger.showSnackBar(SnackBar(content: Text(mensajeError(e))));
+            }
+          },
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        const _TituloSeccion('Entregas: marcar "otra localidad" (desvío)'),
+        _EntregasOtraLocalidad(manifiestoId: m.id),
+      ],
     );
   }
 
@@ -262,6 +295,121 @@ class _ContenidoState extends ConsumerState<_Contenido> {
             .showSnackBar(SnackBar(content: Text(mensajeError(e))));
       }
     }
+  }
+
+  /// Calcula y crea los extras sugeridos a partir de las entregas.
+  Future<void> _calcularExtrasSugeridos(Manifiesto m) async {
+    final repo = ref.read(extrasRepositoryProvider);
+    await repo.eliminarSugeridos(m.id);
+
+    final entregas =
+        await ref.read(entregasRepositoryProvider).porManifiesto(m.id);
+    final fleteBase = m.costoFlete ?? 0;
+
+    // Capacidad del camión y tarifas de extras por capacidad.
+    double? capacidadKg;
+    if (m.camionId != null) {
+      final camion = await ref.read(camionesRepositoryProvider).obtener(m.camionId!);
+      capacidadKg = camion?.capacidadKg;
+    }
+    final extrasCfg = await ref.read(supabaseProvider).from('fletes_extras').select();
+    final tarifas = _tarifasPorCapacidad(
+      (extrasCfg as List).map((e) => Map<String, dynamic>.from(e as Map)).toList(),
+      capacidadKg,
+    );
+
+    final nuevos = <Extra>[];
+
+    // Caleta: 2 por manifiesto.
+    if (tarifas.caleta > 0) {
+      nuevos.add(Extra(
+        id: '',
+        manifiestoId: m.id,
+        tipo: TipoExtra.caleta,
+        descripcion: '2 por guía de carga',
+        base: tarifas.caleta,
+        monto: CalculoExtras.caleta(tarifas.caleta),
+      ));
+    }
+
+    // Reparto: agrupa clientes a <=10 km.
+    final puntos = [
+      for (final e in entregas)
+        PuntoEntrega(id: e.id, lat: e.lat, lng: e.lng),
+    ];
+    final nRepartos = CalculoExtras.repartos(puntos);
+    if (nRepartos > 0 && tarifas.reparto > 0) {
+      nuevos.add(Extra(
+        id: '',
+        manifiestoId: m.id,
+        tipo: TipoExtra.reparto,
+        descripcion: '$nRepartos reparto(s)',
+        base: tarifas.reparto,
+        monto: tarifas.reparto * nRepartos,
+      ));
+    }
+
+    // Desvío: entregas marcadas como "otra localidad".
+    final nDesvio = entregas.where((e) => e.esOtraLocalidad).length;
+    final montoDesvio =
+        CalculoExtras.desvio(capacidadKg, fleteBase, nDesvio);
+    if (montoDesvio > 0) {
+      nuevos.add(Extra(
+        id: '',
+        manifiestoId: m.id,
+        tipo: TipoExtra.desvio,
+        descripcion: '$nDesvio desvío(s) a otra localidad',
+        base: fleteBase,
+        monto: montoDesvio,
+      ));
+    }
+
+    // Fin de semana.
+    if (m.esFinSemana) {
+      nuevos.add(Extra(
+        id: '',
+        manifiestoId: m.id,
+        tipo: TipoExtra.finSemana,
+        descripcion: 'Servicio en fin de semana (5%)',
+        base: fleteBase,
+        monto: CalculoExtras.finDeSemana(fleteBase),
+        porcentaje: 5,
+      ));
+    }
+
+    if (nuevos.isEmpty) {
+      throw Exception('No hay extras que calcular con los datos actuales.');
+    }
+    await repo.crearLote(nuevos);
+  }
+
+  ({double caleta, double mora, double reparto}) _tarifasPorCapacidad(
+    List<Map<String, dynamic>> filas,
+    double? capacidadKg,
+  ) {
+    // Capacidad del camión en toneladas; si no hay, usa la menor.
+    final ton = (capacidadKg ?? 0) / 1000;
+    Map<String, dynamic>? elegida;
+    double mejor = double.infinity;
+    for (final f in filas) {
+      final c = (f['capacidad_t'] as num?)?.toDouble() ?? 0;
+      if (ton <= c && c - ton < mejor) {
+        mejor = c - ton;
+        elegida = f;
+      }
+    }
+    elegida ??= filas.isNotEmpty ? filas.first : null;
+    double num0(Object? v) {
+      if (v == null) return 0;
+      if (v is num) return v.toDouble();
+      final s = v.toString().replaceAll('%', '').replaceAll(',', '.');
+      return double.tryParse(s) ?? 0;
+    }
+    return (
+      caleta: num0(elegida?['caleta']),
+      mora: num0(elegida?['mora']),
+      reparto: num0(elegida?['reparto']),
+    );
   }
 
   Widget _tablaLineas(BuildContext context, Manifiesto m) {
@@ -386,6 +534,59 @@ class _FilaDato extends StatelessWidget {
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TituloSeccion extends StatelessWidget {
+  const _TituloSeccion(this.texto);
+
+  final String texto;
+
+  @override
+  Widget build(BuildContext context) =>
+      Text(texto, style: Theme.of(context).textTheme.labelLarge);
+}
+
+/// Lista de entregas con casilla "otra localidad" (genera desvío).
+class _EntregasOtraLocalidad extends ConsumerWidget {
+  const _EntregasOtraLocalidad({required this.manifiestoId});
+
+  final String manifiestoId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(entregasDeManifiestoProvider(manifiestoId));
+    return async.when(
+      loading: () => const Padding(
+        padding: EdgeInsets.all(AppSpacing.sm),
+        child: LinearProgressIndicator(),
+      ),
+      error: (e, _) => Text(mensajeError(e)),
+      data: (entregas) => Column(
+        children: [
+          for (final e in entregas)
+            CheckboxListTile(
+              value: e.esOtraLocalidad,
+              contentPadding: EdgeInsets.zero,
+              dense: true,
+              title: Text('${e.orden + 1}. ${e.clienteVisible}'),
+              onChanged: (v) async {
+                final messenger = ScaffoldMessenger.of(context);
+                try {
+                  await ref
+                      .read(entregasRepositoryProvider)
+                      .marcarOtraLocalidad(id: e.id, valor: v ?? false);
+                  ref.invalidate(entregasDeManifiestoProvider(manifiestoId));
+                } catch (err) {
+                  messenger.showSnackBar(
+                    SnackBar(content: Text(mensajeError(err))),
+                  );
+                }
+              },
+            ),
         ],
       ),
     );

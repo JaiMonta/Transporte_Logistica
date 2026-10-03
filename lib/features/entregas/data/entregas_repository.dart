@@ -111,6 +111,16 @@ class EntregasRepository {
     return Entrega.fromMap(Map<String, dynamic>.from(data));
   }
 
+  /// Marca si la entrega es en otra localidad (genera desvío).
+  Future<void> marcarOtraLocalidad({
+    required String id,
+    required bool valor,
+  }) async {
+    await _client
+        .from('entregas')
+        .update({'es_otra_localidad': valor}).eq('id', id);
+  }
+
   Future<Entrega> marcarFallido({required String id, String? notas}) async {
     final data = await _client
         .from('entregas')

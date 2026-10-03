@@ -222,6 +222,16 @@ class ManifiestosRepository {
     return Manifiesto.fromMap(Map<String, dynamic>.from(data));
   }
 
+  /// Marca el manifiesto como servicio de fin de semana.
+  Future<void> marcarFinSemana({
+    required String id,
+    required bool valor,
+  }) async {
+    await _client
+        .from('manifiestos')
+        .update({'es_fin_semana': valor}).eq('id', id);
+  }
+
   /// Purga manifiestos validados más antiguos que la retención.
   ///
   /// `dryRun = true` solo cuenta. Devuelve cuántos (se) borrarían.

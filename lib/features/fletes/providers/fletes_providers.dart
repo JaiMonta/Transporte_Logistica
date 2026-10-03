@@ -1,11 +1,24 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/supabase_client.dart';
+import '../data/extras_repository.dart';
 import '../data/fletes_repository.dart';
+import '../models/extra.dart';
 import '../models/tabulador_flete.dart';
 
 final fletesRepositoryProvider = Provider<FletesRepository>(
   (ref) => FletesRepository(ref.watch(supabaseProvider)),
+);
+
+final extrasRepositoryProvider = Provider<ExtrasRepository>(
+  (ref) => ExtrasRepository(ref.watch(supabaseProvider)),
+);
+
+/// Extras de un manifiesto.
+final extrasDeManifiestoProvider =
+    FutureProvider.autoDispose.family<List<Extra>, String>(
+  (ref, manifiestoId) =>
+      ref.watch(extrasRepositoryProvider).porManifiesto(manifiestoId),
 );
 
 /// Filtro de búsqueda del tabulador.

@@ -92,69 +92,72 @@ class _PanelImagen extends StatelessWidget {
         ),
         LayoutBuilder(
           builder: (context, restricciones) {
-            final alto = restricciones.maxHeight;
             return Padding(
-              padding: EdgeInsets.all(expandido ? AppSpacing.xl : AppSpacing.md),
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: SingleChildScrollView(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+              padding: EdgeInsets.all(expandido ? AppSpacing.lg : AppSpacing.md),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Logo arriba, extremo superior izquierdo, cercano al borde.
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Image(
                         image: PantallaBienvenida._logo,
-                        width: 160,
-                        height: 160,
-                        errorBuilder: (_, _, _) => const Icon(
+                        width: expandido ? 140 : 96,
+                        height: expandido ? 140 : 96,
+                        errorBuilder: (_, _, _) => Icon(
                           Icons.local_shipping,
-                          size: 120,
+                          size: expandido ? 120 : 84,
                           color: Colors.white,
                         ),
                       ),
                       const SizedBox(width: AppSpacing.md),
-                      Flexible(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'LOGÍSTICA\nDE TRANSPORTE',
-                              textAlign: TextAlign.start,
-                              style: TextStyle(
-                                fontFamily: 'SpaceGrotesk',
-                                fontSize:
-                                    expandido ? (alto < 420 ? 28 : 36) : 26,
-                                height: 1.05,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 1,
-                                color: Colors.white,
-                                shadows: const [
-                                  Shadow(
-                                    color: Color(0x99000000),
-                                    blurRadius: 12,
-                                    offset: Offset(0, 2),
-                                  ),
-                                ],
-                              ),
+                      // Texto grande al lado del logo, en una sola línea.
+                      Expanded(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'LOGÍSTICA DE TRANSPORTE',
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontFamily: 'SpaceGrotesk',
+                              fontSize: 40,
+                              height: 1.05,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1,
+                              color: Colors.white,
+                              shadows: const [
+                                Shadow(
+                                  color: Color(0x99000000),
+                                  blurRadius: 12,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: AppSpacing.sm),
-                            Text(
-                              'Control de flota, manifiestos y entregas en un solo lugar.',
-                              textAlign: TextAlign.start,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge
-                                  ?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.92),
-                                  ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
+                  // Empuja el lema inferior bien abajo.
+                  const Spacer(),
+                  const Spacer(),
+                  // Lema pequeño, centrado y más abajo.
+                  SizedBox(
+                    width: double.infinity,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        'Control de flotas, manifiestos y entregas en un solo lugar',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.92),
+                            ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             );
           },

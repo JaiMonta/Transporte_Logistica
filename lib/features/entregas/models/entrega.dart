@@ -1,4 +1,4 @@
-/// Estado de una entrega.
+﻿/// Estado de una entrega.
 enum EstadoEntrega {
   pendiente,
   entregado,
@@ -38,6 +38,7 @@ class Entrega {
     this.entregadoEn,
     this.entregadoPor,
     this.notas,
+    this.esOtraLocalidad = false,
     this.creadoEn,
     this.actualizadoEn,
   });
@@ -59,6 +60,7 @@ class Entrega {
   final DateTime? entregadoEn;
   final String? entregadoPor;
   final String? notas;
+  final bool esOtraLocalidad;
   final DateTime? creadoEn;
   final DateTime? actualizadoEn;
 
@@ -108,6 +110,7 @@ class Entrega {
       entregadoEn: _fecha(mapa['entregado_en']),
       entregadoPor: mapa['entregado_por'] as String?,
       notas: mapa['notas'] as String?,
+      esOtraLocalidad: (mapa['es_otra_localidad'] as bool?) ?? false,
       creadoEn: _fecha(mapa['created_at']),
       actualizadoEn: _fecha(mapa['updated_at']),
     );
@@ -121,6 +124,7 @@ class Entrega {
     DateTime? entregadoEn,
     String? entregadoPor,
     String? notas,
+    bool? esOtraLocalidad,
   }) =>
       Entrega(
         id: id,
@@ -140,6 +144,7 @@ class Entrega {
         entregadoEn: entregadoEn ?? this.entregadoEn,
         entregadoPor: entregadoPor ?? this.entregadoPor,
         notas: notas ?? this.notas,
+        esOtraLocalidad: esOtraLocalidad ?? this.esOtraLocalidad,
         creadoEn: creadoEn,
         actualizadoEn: actualizadoEn,
       );

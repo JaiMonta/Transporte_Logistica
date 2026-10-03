@@ -138,6 +138,7 @@ class Manifiesto {
     this.localidadMasLejana,
     this.fletesTabuladorId,
     this.costoFlete,
+    this.esFinSemana = false,
     this.lineas = const [],
     this.creadoEn,
     this.actualizadoEn,
@@ -157,6 +158,7 @@ class Manifiesto {
   final String? localidadMasLejana;
   final String? fletesTabuladorId;
   final double? costoFlete;
+  final bool esFinSemana;
   final List<ManifiestoLinea> lineas;
   final DateTime? creadoEn;
   final DateTime? actualizadoEn;
@@ -225,6 +227,7 @@ class Manifiesto {
       localidadMasLejana: mapa['localidad_mas_lejana'] as String?,
       fletesTabuladorId: mapa['fletes_tabulador_id'] as String?,
       costoFlete: _doble(mapa['costo_flete']),
+      esFinSemana: (mapa['es_fin_semana'] as bool?) ?? false,
       lineas: lineas,
       creadoEn: _fecha(mapa['created_at']),
       actualizadoEn: _fecha(mapa['updated_at']),
@@ -242,6 +245,7 @@ class Manifiesto {
     String? localidadMasLejana,
     String? fletesTabuladorId,
     double? costoFlete,
+    bool? esFinSemana,
     List<ManifiestoLinea>? lineas,
   }) =>
       Manifiesto(
@@ -259,6 +263,7 @@ class Manifiesto {
         localidadMasLejana: localidadMasLejana ?? this.localidadMasLejana,
         fletesTabuladorId: fletesTabuladorId ?? this.fletesTabuladorId,
         costoFlete: costoFlete ?? this.costoFlete,
+        esFinSemana: esFinSemana ?? this.esFinSemana,
         lineas: lineas ?? this.lineas,
         creadoEn: creadoEn,
         actualizadoEn: actualizadoEn,

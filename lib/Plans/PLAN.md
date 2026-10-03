@@ -551,6 +551,63 @@ manifiesto. El **motor de extras** será la Fase 2.
 
 ---
 
+## Módulo: Fletes (Fase 2 — motor de extras)  ✅ COMPLETADO
+
+Los extras **se suman aparte** del flete base y se **desglosan por ítem**. El
+chofer **avisa** (devolución/mora) y el **administrador aprueba/rechaza/edita**.
+
+### Reglas
+
+- **Caleta:** 2 × tarifa por manifiesto.
+- **Reparto:** 1 por cliente entregado; clientes a **≤10 km** entre sí cuentan
+  como **1 reparto** (clustering por distancia).
+- **Desvío** (entregas marcadas "otra localidad"): `≤3 t=$6` · `>3 y ≤6 t=$12` ·
+  `>6 t=20%` del flete base.
+- **Retorno:** parcial (≤20% cap.)=+15% · completa=60%.
+- **Mora:** tarifa por capacidad.
+- **Fin de semana:** +5%.
+- **Picking:** fijo $119.
+
+### Esquema (Supabase)
+
+- Migración `20260930240000_fletes_extras_motor.sql`:
+  - enums `extra_tipo` (caleta, reparto, desvio, retorno, mora, fin_semana,
+    picking) y `extra_estado` (sugerido, aprobado, rechazado).
+  - `public.manifiesto_extras` (manifiesto_id, tipo, descripcion, base, monto,
+    porcentaje, estado, origen, aprobado_por/en, notas, timestamps).
+  - `manifiestos.es_fin_semana`; `entregas.es_otra_localidad`.
+  - parámetros en `configuracion` (radio reparto, tramos de desvío, retorno,
+    fin de semana, picking).
+  - RLS: chofer ve/crea (avisa) lo suyo; admin gestiona y aprueba.
+
+### Flutter
+
+- `services/calculo_extras.dart` (puro): `repartos` (clustering ≤10 km),
+  `desvio` (tramos), `retorno`, `finDeSemana`, `caleta`, `distanciaKm`.
+- `models/extra.dart`, `data/extras_repository.dart`, providers
+  (`extrasRepositoryProvider`, `extrasDeManifiestoProvider`).
+- **Admin (detalle del manifiesto):** `BloqueExtras` con desglose por ítem,
+  botón **"Calcular sugeridos"** (según entregas, capacidad y tarifas),
+  aprobar/rechazar/editar/eliminar, y resumen **Flete base + Extras aprobados =
+  Total**. Incluye interruptor **fin de semana** y checklist de entregas
+  **"otra localidad"** (desvío).
+- **Chofer (entrega):** botón **"Avisar"** → devolución/retorno o mora (crea un
+  extra `sugerido`).
+
+### Pruebas
+
+- `test/calculo_extras_test.dart` (repartos por proximidad, tramos de desvío,
+  retorno, fin de semana, caleta, distancia). Total del proyecto **109 en verde**.
+- E2E/RLS remoto: el chofer avisa (sugerido) pero **no** aprueba; el admin
+  aprueba y fija monto; limpieza en cascada.
+- `flutter analyze` limpio; build web y APK (102.5 MB).
+
+### Pendiente
+
+- Panel de **Facturación semanal** (Módulo 9) que consolide flete + extras.
+
+---
+
 ## Módulos pendientes
 
 - **Módulo 6 — Pickups / Delivery**: asignados solo por admin con hora estimada;
