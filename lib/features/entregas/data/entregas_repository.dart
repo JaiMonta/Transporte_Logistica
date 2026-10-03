@@ -121,6 +121,18 @@ class EntregasRepository {
         .update({'es_otra_localidad': valor}).eq('id', id);
   }
 
+  /// Asigna la localidad del tabulador (y su distancia) a una entrega.
+  Future<void> asignarLocalidad({
+    required String id,
+    required String localidad,
+    double? distanciaKm,
+  }) async {
+    await _client.from('entregas').update({
+      'localidad': localidad,
+      'localidad_distancia_km': distanciaKm,
+    }).eq('id', id);
+  }
+
   Future<Entrega> marcarFallido({required String id, String? notas}) async {
     final data = await _client
         .from('entregas')

@@ -616,6 +616,27 @@ chofer **avisa** (devolución/mora) y el **administrador aprueba/rechaza/edita**
 - Dato de prueba preparado: manifiesto `21c6af79` con camión 7.5 t + CARACAS →
   flete 260.05 USD (factura del 28-09 al 04-10 verificada con monto).
 
+### Cálculo correcto por manifiesto (reglas del negocio)
+
+- **Migración `20260930260000`:** config del **origen de carga** (Maracay:
+  `origen_carga_nombre/lat/lng`) y columnas `entregas.localidad` +
+  `entregas.localidad_distancia_km`.
+- **Flete base:** se toma la **localidad más lejana** de las entregas (mayor `km`
+  en el tabulador) respecto al origen, × capacidad del camión. Se recalcula al
+  regenerar la factura; el admin puede cambiar la localidad.
+- **Extras automáticos (aprobados)** al generar/rehacer la factura:
+  - **Caleta:** 2 × tarifa por manifiesto (según capacidad).
+  - **Reparto:** nº de grupos de entregas con coordenadas a ≤ 10 km entre sí.
+  - **Desvío:** entregas marcadas "otra localidad" (marca el admin).
+  - **Fin de semana:** +5%.
+  - Manuales (mora/retorno) siguen por aprobación del admin.
+- **Admin:** en el detalle del manifiesto, cada entrega tiene **selector de
+  localidad** (tabulador) + casilla "otra localidad"; también botón para
+  recalcular extras ("Calcular sugeridos").
+- Servicio `CalculoExtras.localidadMasCercana` / `localidadMasLejana`.
+- Pruebas: 119 en verde. Escenario de prueba: Guacara(38)–Valencia(49)–Flor
+  Amarillo(43) con origen Maracay → más lejana = VALENCIA.
+
 ---
 
 ## Módulo: Facturación semanal  ✅ COMPLETADO

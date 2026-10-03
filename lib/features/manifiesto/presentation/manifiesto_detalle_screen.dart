@@ -654,7 +654,7 @@ class _TituloSeccion extends StatelessWidget {
       Text(texto, style: Theme.of(context).textTheme.labelLarge);
 }
 
-/// Lista de entregas con casilla "otra localidad" (genera desvío).
+/// Lista de entregas: localidad (para el flete) y "otra localidad" (desvío).
 class _EntregasOtraLocalidad extends ConsumerWidget {
   const _EntregasOtraLocalidad({required this.manifiestoId});
 
@@ -663,6 +663,8 @@ class _EntregasOtraLocalidad extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(entregasDeManifiestoProvider(manifiestoId));
+    final tabulador = ref.watch(tabuladorProvider(const FiltroFletes()));
+    final localidades = tabulador.value ?? const <TabuladorFlete>[];
     return async.when(
       loading: () => const Padding(
         padding: EdgeInsets.all(AppSpacing.sm),
@@ -672,24 +674,81 @@ class _EntregasOtraLocalidad extends ConsumerWidget {
       data: (entregas) => Column(
         children: [
           for (final e in entregas)
-            CheckboxListTile(
-              value: e.esOtraLocalidad,
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-              title: Text('${e.orden + 1}. ${e.clienteVisible}'),
-              onChanged: (v) async {
-                final messenger = ScaffoldMessenger.of(context);
-                try {
-                  await ref
-                      .read(entregasRepositoryProvider)
-                      .marcarOtraLocalidad(id: e.id, valor: v ?? false);
-                  ref.invalidate(entregasDeManifiestoProvider(manifiestoId));
-                } catch (err) {
-                  messenger.showSnackBar(
-                    SnackBar(content: Text(mensajeError(err))),
-                  );
-                }
-              },
+            Card(
+              margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${e.orden + 1}. ${e.clienteVisible}',
+                        style: Theme.of(context).textTheme.titleSmall),
+                    const SizedBox(height: AppSpacing.xs),
+                    DropdownButtonFormField<String>(
+                      initialValue: localidades
+                              .any((l) => l.localidad == e.localidad)
+                          ? e.localidad
+                          : null,
+                      isExpanded: true,
+                      decoration: const InputDecoration(
+                        labelText: 'Localidad (tabulador)',
+                        isDense: true,
+                      ),
+                      items: [
+                        for (final l in localidades)
+                          DropdownMenuItem(
+                            value: l.localidad,
+                            child: Text(
+                              '${l.localidad} · KM ${l.km?.toStringAsFixed(0) ?? '—'}',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                      ],
+                      onChanged: (v) async {
+                        if (v == null) return;
+                        final messenger = ScaffoldMessenger.of(context);
+                        try {
+                          final fila =
+                              localidades.firstWhere((l) => l.localidad == v);
+                          await ref
+                              .read(entregasRepositoryProvider)
+                              .asignarLocalidad(
+                                id: e.id,
+                                localidad: v,
+                                distanciaKm: fila.km,
+                              );
+                          ref.invalidate(
+                              entregasDeManifiestoProvider(manifiestoId));
+                        } catch (err) {
+                          messenger.showSnackBar(
+                            SnackBar(content: Text(mensajeError(err))),
+                          );
+                        }
+                      },
+                    ),
+                    CheckboxListTile(
+                      value: e.esOtraLocalidad,
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                      title: const Text('Otra localidad (desvío)'),
+                      onChanged: (v) async {
+                        final messenger = ScaffoldMessenger.of(context);
+                        try {
+                          await ref
+                              .read(entregasRepositoryProvider)
+                              .marcarOtraLocalidad(id: e.id, valor: v ?? false);
+                          ref.invalidate(
+                              entregasDeManifiestoProvider(manifiestoId));
+                        } catch (err) {
+                          messenger.showSnackBar(
+                            SnackBar(content: Text(mensajeError(err))),
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
             ),
         ],
       ),

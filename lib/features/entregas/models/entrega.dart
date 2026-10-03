@@ -39,6 +39,8 @@ class Entrega {
     this.entregadoPor,
     this.notas,
     this.esOtraLocalidad = false,
+    this.localidad,
+    this.localidadDistanciaKm,
     this.creadoEn,
     this.actualizadoEn,
   });
@@ -61,6 +63,8 @@ class Entrega {
   final String? entregadoPor;
   final String? notas;
   final bool esOtraLocalidad;
+  final String? localidad;
+  final double? localidadDistanciaKm;
   final DateTime? creadoEn;
   final DateTime? actualizadoEn;
 
@@ -111,6 +115,8 @@ class Entrega {
       entregadoPor: mapa['entregado_por'] as String?,
       notas: mapa['notas'] as String?,
       esOtraLocalidad: (mapa['es_otra_localidad'] as bool?) ?? false,
+      localidad: mapa['localidad'] as String?,
+      localidadDistanciaKm: _doble(mapa['localidad_distancia_km']),
       creadoEn: _fecha(mapa['created_at']),
       actualizadoEn: _fecha(mapa['updated_at']),
     );
@@ -125,6 +131,8 @@ class Entrega {
     String? entregadoPor,
     String? notas,
     bool? esOtraLocalidad,
+    String? localidad,
+    double? localidadDistanciaKm,
   }) =>
       Entrega(
         id: id,
@@ -145,6 +153,8 @@ class Entrega {
         entregadoPor: entregadoPor ?? this.entregadoPor,
         notas: notas ?? this.notas,
         esOtraLocalidad: esOtraLocalidad ?? this.esOtraLocalidad,
+        localidad: localidad ?? this.localidad,
+        localidadDistanciaKm: localidadDistanciaKm ?? this.localidadDistanciaKm,
         creadoEn: creadoEn,
         actualizadoEn: actualizadoEn,
       );

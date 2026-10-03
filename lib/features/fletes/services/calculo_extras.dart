@@ -126,7 +126,66 @@ class CalculoExtras {
   /// Total de caleta: 2 × tarifa por manifiesto.
   static double caleta(double tarifaPorCapacidad) => tarifaPorCapacidad * 2;
 
+  /// Localidad del tabulador más cercana a un punto (por coordenadas).
+  ///
+  /// Devuelve null si no hay localidades con coordenadas o el punto no tiene.
+  static LocalidadPunto? localidadMasCercana(
+    double? lat,
+    double? lng,
+    List<LocalidadPunto> localidades,
+  ) {
+    if (lat == null || lng == null) return null;
+    LocalidadPunto? mejor;
+    var mejorDist = double.infinity;
+    for (final l in localidades) {
+      if (!l.tieneUbicacion) continue;
+      final d = distanciaKm(lat, lng, l.lat!, l.lng!);
+      if (d < mejorDist) {
+        mejorDist = d;
+        mejor = l;
+      }
+    }
+    return mejor;
+  }
+
+  /// Localidad más lejana al origen configurable, dada una lista de localidades
+  /// de las entregas. Devuelve null si no hay ninguna con coordenadas.
+  static LocalidadPunto? localidadMasLejana(
+    List<LocalidadPunto> localidades, {
+    required double origenLat,
+    required double origenLng,
+  }) {
+    LocalidadPunto? mejor;
+    var mejorDist = -1.0;
+    for (final l in localidades) {
+      if (!l.tieneUbicacion) continue;
+      final d = distanciaKm(origenLat, origenLng, l.lat!, l.lng!);
+      if (d > mejorDist) {
+        mejorDist = d;
+        mejor = l;
+      }
+    }
+    return mejor;
+  }
+
   static double _rad(double grados) => grados * math.pi / 180;
+}
+
+/// Localidad del tabulador con coordenadas (para proximidad/lejanía).
+class LocalidadPunto {
+  const LocalidadPunto({
+    required this.id,
+    required this.localidad,
+    this.lat,
+    this.lng,
+  });
+
+  final String id;
+  final String localidad;
+  final double? lat;
+  final double? lng;
+
+  bool get tieneUbicacion => lat != null && lng != null;
 }
 
 /// Borrador de extra calculado (antes de aprobación).

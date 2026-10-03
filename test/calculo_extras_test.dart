@@ -77,4 +77,42 @@ void main() {
       expect(d, lessThan(70));
     });
   });
+
+  group('CalculoExtras.localidadMasCercana', () {
+    const locales = [
+      LocalidadPunto(id: '1', localidad: 'A', lat: 10.24, lng: -67.59),
+      LocalidadPunto(id: '2', localidad: 'B', lat: 10.16, lng: -68.00),
+    ];
+    test('elige la más cercana', () {
+      final r = CalculoExtras.localidadMasCercana(10.25, -67.60, locales);
+      expect(r?.localidad, 'A');
+    });
+    test('null sin coords', () {
+      expect(CalculoExtras.localidadMasCercana(null, null, locales), isNull);
+    });
+  });
+
+  group('CalculoExtras.localidadMasLejana', () {
+    const locales = [
+      LocalidadPunto(id: '1', localidad: 'GUACARA', lat: 10.24, lng: -67.58),
+      LocalidadPunto(id: '2', localidad: 'VALENCIA', lat: 10.16, lng: -68.00),
+      LocalidadPunto(id: '3', localidad: 'SIN', lat: null, lng: null),
+    ];
+    test('elige la más lejana del origen', () {
+      final r = CalculoExtras.localidadMasLejana(
+        locales,
+        origenLat: 10.24,
+        origenLng: -67.59,
+      );
+      expect(r?.localidad, 'VALENCIA');
+    });
+    test('null si no hay coords', () {
+      final r = CalculoExtras.localidadMasLejana(
+        const [LocalidadPunto(id: 'x', localidad: 'X')],
+        origenLat: 10,
+        origenLng: -66,
+      );
+      expect(r, isNull);
+    });
+  });
 }
