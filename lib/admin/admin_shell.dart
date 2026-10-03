@@ -112,6 +112,18 @@ class AdminShell extends ConsumerWidget {
         ),
       ],
     ),
+    _Grupo(
+      titulo: 'Finanzas',
+      icono: Icons.account_balance_outlined,
+      opciones: [
+        _Opcion(
+          titulo: 'Facturación',
+          ruta: Rutas.adminFacturacion,
+          icono: Icons.receipt_long_outlined,
+          iconoActivo: Icons.receipt_long,
+        ),
+      ],
+    ),
   ];
 
   static List<_Opcion> get _todas =>

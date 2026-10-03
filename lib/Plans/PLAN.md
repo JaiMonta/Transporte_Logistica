@@ -608,6 +608,55 @@ chofer **avisa** (devolución/mora) y el **administrador aprueba/rechaza/edita**
 
 ---
 
+## Módulo: Facturación semanal  ✅ COMPLETADO
+
+Agrupa las entregas finalizadas (`estado = 'entregado'`) de una semana
+(lunes→domingo, por **fecha de entrega**) de **todos** los choferes y
+manifiestos. Calcula el flete base por manifiesto (localidad × capacidad) más
+los **extras aprobados**, y guarda **una factura por semana** con el detalle
+**por ítem** (y desglose por chofer). Visible solo para el administrador.
+
+### Esquema (Supabase)
+
+- Migración `20260930250000_facturacion_semanal.sql`:
+  - enum `factura_estado` (`emitida`, `pendiente`, `cancelada`).
+  - `public.facturas` (periodo_inicio/fin únicos, subtotales, total, estado,
+    notas, timestamps).
+  - `public.factura_items` (factura_id, manifiesto_id, usuario_id, concepto,
+    tipo, descripcion, base, porcentaje, monto, orden).
+  - RLS **solo admin** (select/insert/update/delete).
+
+### Flutter (feature `facturacion`)
+
+- `services/calculo_factura_semanal.dart` (puro): `SemanaRange`
+  (lunes→domingo, `vencida`), `ManifiestoFacturable`, y `calcular` que arma
+  ítems (flete + extras `aprobado`) y totales por chofer.
+- `models/factura.dart` (`Factura`, `FacturaItem`, `EstadoFactura`).
+- `data/facturacion_repository.dart`: `generarSemana` (selecciona manifiestos
+  con entregas entregadas del período, upsert de cabecera por semana y
+  **rehace** los ítems), `listarPorLapso`, `obtener`, `cambiarEstado`.
+- `presentation/facturacion_screen.dart` (búsqueda por **lapso**, generar
+  semana actual u otra, lista de facturas) y `factura_detalle_screen.dart`
+  (desglose por chofer e ítem; acciones **Rehacer / Marcar pendiente /
+  Anular**).
+- **Menú:** grupo nuevo **"Finanzas"** en `AdminShell` con la entrada
+  "Facturación" (preparado para pagos futuros).
+
+### Reglas de estado
+
+- Al generar: **emitida**. Transición a **pendiente** tras una semana (al vuelo
+  en UI) o manual. **Anular** = `cancelada` (no borra la fila).
+
+### Pruebas
+
+- `test/facturacion_test.dart` (SemanaRange, selección, ítems/totales,
+  desglose por chofer). Total del proyecto **115 en verde**.
+- E2E/RLS remoto: el admin gestiona facturas e ítems; el chofer **no** ve
+  facturas ni puede crearlas (403). Datos de prueba limpiados.
+- `flutter analyze` limpio; build web y APK (103.0 MB).
+
+---
+
 ## Módulos pendientes
 
 - **Módulo 6 — Pickups / Delivery**: asignados solo por admin con hora estimada;

@@ -21,7 +21,9 @@ import '../features/combustible/presentation/combustible_admin_screen.dart';
 import '../features/combustible/presentation/combustible_jornada_screen.dart';
 import '../features/entregas/presentation/chofer_mapa_selector_screen.dart';
 import '../features/fletes/presentation/flete_form_screen.dart';
-import '../features/fletes/presentation/fletes_screen.dart';import '../features/entregas/presentation/entrega_mapa_screen.dart';
+import '../features/fletes/presentation/fletes_screen.dart';
+import '../features/facturacion/presentation/factura_detalle_screen.dart';
+import '../features/facturacion/presentation/facturacion_screen.dart';import '../features/entregas/presentation/entrega_mapa_screen.dart';
 import '../features/entregas/presentation/entregas_admin_screen.dart';
 import '../features/entregas/presentation/entregas_dia_screen.dart';
 import '../features/entregas/presentation/entregas_mapa_agregado_screen.dart';
@@ -70,6 +72,9 @@ class Rutas {
 
   static const String adminFletes = '/admin/fletes';
   static String adminFleteEditar(String id) => '/admin/fletes/$id';
+
+  static const String adminFacturacion = '/admin/facturacion';
+  static String adminFacturaDetalle(String id) => '/admin/facturacion/$id';
 
   static const String choferHome = '/chofer/home';
   static const String choferManifiestos = '/chofer/manifiestos';
@@ -229,6 +234,18 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: ':id',
                 builder: (context, state) => FleteFormScreen(
                   fleteId: state.pathParameters['id']!,
+                ),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: Rutas.adminFacturacion,
+            builder: (context, state) => const FacturacionScreen(),
+            routes: [
+              GoRoute(
+                path: ':id',
+                builder: (context, state) => FacturaDetalleScreen(
+                  facturaId: state.pathParameters['id']!,
                 ),
               ),
             ],
