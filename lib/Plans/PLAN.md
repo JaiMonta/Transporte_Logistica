@@ -698,6 +698,14 @@ los **extras aprobados**, y guarda **una factura por semana** con el detalle
   facturas ni puede crearlas (403). Datos de prueba limpiados.
 - `flutter analyze` limpio; build web y APK (103.0 MB).
 
+### Referencia del Excel de liquidación
+
+Ver **`lib/Plans/FACTURACION_REFERENCIA.md`**. Resumen de decisiones: no facturar
+por cliente (un solo producto por ahora); **"flete secundario" = caleta**;
+prorrateo multi-producto (pasta principal) **diferido** (fórmulas en la columna
+"flete" del Excel); peaje y facturación por cliente quedan como posibles futuros;
+CALETAS EXT no necesario.
+
 ---
 
 ## Módulos pendientes
