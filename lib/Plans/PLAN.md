@@ -645,7 +645,8 @@ los **extras aprobados**, y guarda **una factura por semana** con el detalle
 ### Reglas de estado
 
 - Al generar: **emitida**. Transición a **pendiente** tras una semana (al vuelo
-  en UI) o manual. **Anular** = `cancelada` (no borra la fila).
+  en UI) o manual. **Pagada** = la factura quedó saldada. **Anulada** = no
+  válida (no se elimina por trazabilidad).
 
 ### Pruebas
 

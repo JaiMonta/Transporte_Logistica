@@ -16,7 +16,7 @@ begin
     select 1 from pg_type t join pg_namespace n on n.oid = t.typnamespace
     where t.typname = 'factura_estado' and n.nspname = 'public'
   ) then
-    create type public.factura_estado as enum ('emitida', 'pendiente', 'cancelada');
+    create type public.factura_estado as enum ('emitida', 'pendiente', 'pagada', 'anulada');
   end if;
 end$$;
 

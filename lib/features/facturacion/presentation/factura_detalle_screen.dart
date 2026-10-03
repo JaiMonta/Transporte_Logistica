@@ -148,11 +148,21 @@ class _FacturaDetalleScreenState extends ConsumerState<FacturaDetalleScreen> {
             OutlinedButton.icon(
               onPressed: _ocupado
                   ? null
-                  : () => _cambiarEstado(EstadoFactura.cancelada),
+                  : () => _cambiarEstado(EstadoFactura.pagada),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.exito,
+              ),
+              icon: const Icon(Icons.payments_outlined, size: 18),
+              label: const Text('Marcar pagada'),
+            ),
+            OutlinedButton.icon(
+              onPressed: _ocupado
+                  ? null
+                  : () => _cambiarEstado(EstadoFactura.anulada),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.peligro,
               ),
-              icon: const Icon(Icons.cancel_outlined, size: 18),
+              icon: const Icon(Icons.block, size: 18),
               label: const Text('Anular'),
             ),
           ],

@@ -194,7 +194,8 @@ class _FacturaCard extends StatelessWidget {
     final color = switch (factura.estado) {
       EstadoFactura.emitida => AppColors.primary,
       EstadoFactura.pendiente => AppColors.secondary,
-      EstadoFactura.cancelada => AppColors.peligro,
+      EstadoFactura.pagada => AppColors.exito,
+      EstadoFactura.anulada => AppColors.peligro,
     };
     return Card(
       child: ListTile(

@@ -4,11 +4,13 @@ import '../../fletes/models/extra.dart';
 enum EstadoFactura {
   emitida,
   pendiente,
-  cancelada;
+  pagada,
+  anulada;
 
   static EstadoFactura desde(String? valor) => switch (valor) {
         'pendiente' => EstadoFactura.pendiente,
-        'cancelada' => EstadoFactura.cancelada,
+        'pagada' => EstadoFactura.pagada,
+        'anulada' => EstadoFactura.anulada,
         _ => EstadoFactura.emitida,
       };
 
@@ -17,7 +19,8 @@ enum EstadoFactura {
   String get etiqueta => switch (this) {
         EstadoFactura.emitida => 'Emitida',
         EstadoFactura.pendiente => 'Pendiente',
-        EstadoFactura.cancelada => 'Cancelada',
+        EstadoFactura.pagada => 'Pagada',
+        EstadoFactura.anulada => 'Anulada',
       };
 }
 
