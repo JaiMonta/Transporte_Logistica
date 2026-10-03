@@ -193,10 +193,21 @@ class _ContenidoState extends ConsumerState<_Contenido> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        OutlinedButton.icon(
-          onPressed: () => _editarLocalidad(m),
-          icon: const Icon(Icons.place_outlined),
-          label: const Text('Editar localidad más lejana'),
+        Wrap(
+          spacing: AppSpacing.sm,
+          runSpacing: AppSpacing.xs,
+          children: [
+            OutlinedButton.icon(
+              onPressed: () => _editarLocalidad(m),
+              icon: const Icon(Icons.place_outlined),
+              label: const Text('Editar localidad más lejana'),
+            ),
+            OutlinedButton.icon(
+              onPressed: () => _editarCamion(m),
+              icon: const Icon(Icons.local_shipping_outlined),
+              label: const Text('Editar camión'),
+            ),
+          ],
         ),
         SwitchListTile(
           value: m.esFinSemana,
@@ -286,6 +297,99 @@ class _ContenidoState extends ConsumerState<_Contenido> {
             costo == null
                 ? 'Localidad actualizada (sin camión/capacidad para calcular el flete).'
                 : 'Localidad actualizada. Flete: \$${costo.toStringAsFixed(2)}',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(mensajeError(e))));
+      }
+    }
+  }
+
+  /// Abre un diálogo para asignar el camión del manifiesto (admin).
+  ///
+  /// Al guardar, recalcula el flete base con la localidad ya elegida (si hay).
+  Future<void> _editarCamion(Manifiesto m) async {
+    final camiones = await ref.read(camionesActivosProvider.future);
+    if (!mounted) return;
+    if (camiones.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No hay camiones activos.')),
+      );
+      return;
+    }
+    String? elegido = m.camionId;
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Camión del manifiesto'),
+        content: SizedBox(
+          width: 420,
+          child: StatefulBuilder(
+            builder: (context, setEstado) => DropdownButtonFormField<String>(
+              initialValue: camiones.any((c) => c.id == elegido) ? elegido : null,
+              isExpanded: true,
+              decoration: const InputDecoration(labelText: 'Camión'),
+              items: [
+                for (final c in camiones)
+                  DropdownMenuItem(
+                    value: c.id,
+                    child: Text(
+                      '${c.marcaVisible} · ${c.placa}'
+                      '${c.capacidadKg == null ? '' : ' · ${(c.capacidadKg! / 1000).toStringAsFixed(1)} t'}',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+              ],
+              onChanged: (v) => setEstado(() => elegido = v),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+    if (confirmar != true || elegido == null) return;
+
+    try {
+      // Recalcular flete si ya hay localidad del tabulador.
+      double? costo = m.costoFlete;
+      if (m.fletesTabuladorId != null) {
+        final tab = await ref
+            .read(fletesRepositoryProvider)
+            .obtener(m.fletesTabuladorId!);
+        final camion =
+            await ref.read(camionesRepositoryProvider).obtener(elegido!);
+        costo = CalculoFlete.precioFlete(
+          tabulador: tab,
+          capacidadKg: camion?.capacidadKg,
+        );
+      }
+      await ref.read(manifiestosRepositoryProvider).actualizarCabecera(
+            id: m.id,
+            camionId: elegido,
+            localidadMasLejana: m.localidadMasLejana,
+            fletesTabuladorId: m.fletesTabuladorId,
+            costoFlete: costo,
+          );
+      if (!mounted) return;
+      ref.invalidate(manifiestoProvider(m.id));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            costo == null
+                ? 'Camión actualizado. Elige la localidad para calcular el flete.'
+                : 'Camión actualizado. Flete: \$${costo.toStringAsFixed(2)}',
           ),
         ),
       );

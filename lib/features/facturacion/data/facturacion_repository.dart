@@ -1,6 +1,8 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../fletes/models/extra.dart';
+import '../../fletes/models/tabulador_flete.dart';
+import '../../fletes/services/calculo_flete.dart';
 import '../services/calculo_factura_semanal.dart';
 import '../models/factura.dart';
 
@@ -99,10 +101,12 @@ class FacturacionRepository {
     if (ids.isEmpty) {
       return CalculoFacturaSemanal.calcular(const []);
     }
-    // Manifiestos con flete y chofer.
+    // Manifiestos con flete, chofer, camión y localidad del tabulador.
     final manis = await _client
         .from('manifiestos')
-        .select('id, capturado_por, costo_flete')
+        .select(
+          'id, capturado_por, costo_flete, camion_id, fletes_tabulador_id',
+        )
         .inFilter('id', ids) as List<dynamic>;
     // Extras aprobados de esos manifiestos.
     final extras = await _client
@@ -116,18 +120,67 @@ class FacturacionRepository {
       extrasPorManifiesto.putIfAbsent(extra.manifiestoId, () => []).add(extra);
     }
 
+    // Cachés para calcular el flete base cuando esté vacío.
+    final tabuladores = <String, TabuladorFlete?>{};
+    final capacidadesCamion = <String, double?>{};
+
     final facturables = <ManifiestoFacturable>[];
     for (final m in manis) {
       final map = Map<String, dynamic>.from(m as Map);
       final id = map['id'] as String;
+
+      var fleteBase = (map['costo_flete'] as num?)?.toDouble();
+      if (fleteBase == null || fleteBase <= 0) {
+        // Recalcular: tabulador (localidad) × capacidad del camión.
+        final tabId = map['fletes_tabulador_id'] as String?;
+        final camId = map['camion_id'] as String?;
+        TabuladorFlete? tab;
+        if (tabId != null) {
+          tab = tabuladores.containsKey(tabId)
+              ? tabuladores[tabId]
+              : tabuladores[tabId] = await _obtenerTabulador(tabId);
+        }
+        double? capacidad;
+        if (camId != null) {
+          capacidad = capacidadesCamion.containsKey(camId)
+              ? capacidadesCamion[camId]
+              : capacidadesCamion[camId] = await _capacidadCamion(camId);
+        }
+        fleteBase = CalculoFlete.precioFlete(
+              tabulador: tab,
+              capacidadKg: capacidad,
+            ) ??
+            0;
+      }
+
       facturables.add(ManifiestoFacturable(
         manifiestoId: id,
         usuarioId: map['capturado_por'] as String?,
-        fleteBase: (map['costo_flete'] as num?)?.toDouble() ?? 0,
+        fleteBase: fleteBase,
         extras: extrasPorManifiesto[id] ?? const [],
       ));
     }
     return CalculoFacturaSemanal.calcular(facturables);
+  }
+
+  Future<TabuladorFlete?> _obtenerTabulador(String id) async {
+    final data = await _client
+        .from('fletes_tabulador')
+        .select()
+        .eq('id', id)
+        .maybeSingle();
+    if (data == null) return null;
+    return TabuladorFlete.fromMap(Map<String, dynamic>.from(data));
+  }
+
+  Future<double?> _capacidadCamion(String id) async {
+    final data = await _client
+        .from('camiones')
+        .select('capacidad_kg')
+        .eq('id', id)
+        .maybeSingle();
+    if (data == null) return null;
+    return (data['capacidad_kg'] as num?)?.toDouble();
   }
 
   Future<void> cambiarEstado({

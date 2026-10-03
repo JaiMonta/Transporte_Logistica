@@ -605,6 +605,17 @@ chofer **avisa** (devolución/mora) y el **administrador aprueba/rechaza/edita**
 
 - Panel de **Facturación semanal** (Módulo 9) que consolide flete + extras.
 
+### Correcciones posteriores (jornada)
+
+- **Facturación en cero:** un manifiesto sin `costo_flete`, sin `camion_id` y sin
+  `localidad_mas_lejana` daba total 0. La facturación ahora **recalcula el flete**
+  (tabulador × capacidad del camión) cuando `costo_flete` está vacío.
+- **Detalle del manifiesto (admin):** nuevo botón **"Editar camión"** que asigna
+  el camión y recalcula el flete con la localidad ya elegida. Permite completar
+  manifiestos antiguos para poder facturarlos.
+- Dato de prueba preparado: manifiesto `21c6af79` con camión 7.5 t + CARACAS →
+  flete 260.05 USD (factura del 28-09 al 04-10 verificada con monto).
+
 ---
 
 ## Módulo: Facturación semanal  ✅ COMPLETADO
