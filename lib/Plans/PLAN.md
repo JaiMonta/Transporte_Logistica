@@ -637,6 +637,17 @@ chofer **avisa** (devolución/mora) y el **administrador aprueba/rechaza/edita**
 - Pruebas: 119 en verde. Escenario de prueba: Guacara(38)–Valencia(49)–Flor
   Amarillo(43) con origen Maracay → más lejana = VALENCIA.
 
+### Ajustes finales (facturación)
+
+- **Más lejana manual:** migración `20260930270000_entrega_mas_lejana.sql`
+  (`entregas.es_mas_lejana`). El admin puede designar **qué entrega** define el
+  flete (exclusivo por manifiesto); la facturación la usa y, si no hay ninguna
+  marcada, cae al cálculo automático (mayor km). Al marcarla se refleja en
+  `manifiestos.localidad_mas_lejana`.
+- **Lapso automático por semanas:** la pantalla de Facturación inicia en la
+  **semana actual** (lunes→domingo) y permite navegar **‹ Semana ant. / Semana
+  actual / Semana sig. ›**, además del **rango libre** de fechas.
+
 ---
 
 ## Módulo: Facturación semanal  ✅ COMPLETADO

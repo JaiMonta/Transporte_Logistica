@@ -24,14 +24,31 @@ class _FacturacionScreenState extends ConsumerState<FacturacionScreen> {
   @override
   void initState() {
     super.initState();
-    final hoy = DateTime.now();
+    final semana = SemanaRange.deFecha(DateTime.now());
     _filtro = FiltroFacturacion(
-      desde: DateTime(hoy.year, hoy.month, 1),
-      hasta: DateTime(hoy.year, hoy.month, 28),
+      desde: semana.inicio,
+      hasta: semana.fin,
     );
   }
 
   void _refrescar() => ref.invalidate(facturasProvider(_filtro));
+
+  /// Mueve el lapso [semanas] (positivo siguiente, negativo anterior).
+  void _moverSemana(int semanas) {
+    setState(() {
+      _filtro = FiltroFacturacion(
+        desde: _filtro.desde.add(Duration(days: 7 * semanas)),
+        hasta: _filtro.hasta.add(Duration(days: 7 * semanas)),
+      );
+    });
+  }
+
+  void _semanaActual() {
+    final semana = SemanaRange.deFecha(DateTime.now());
+    setState(() {
+      _filtro = FiltroFacturacion(desde: semana.inicio, hasta: semana.fin);
+    });
+  }
 
   Future<void> _elegirLapso() async {
     final rango = await showDateRangePicker(
@@ -51,8 +68,8 @@ class _FacturacionScreenState extends ConsumerState<FacturacionScreen> {
     });
   }
 
-  Future<void> _generarSemana() async {
-    final semana = SemanaRange.deFecha(DateTime.now());
+  Future<void> _generarSemanaDe(DateTime dia) async {
+    final semana = SemanaRange.deFecha(dia);
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -77,7 +94,7 @@ class _FacturacionScreenState extends ConsumerState<FacturacionScreen> {
     if (confirmar != true) return;
     setState(() => _ocupado = true);
     try {
-      await ref.read(facturacionRepositoryProvider).generarSemana(DateTime.now());
+      await ref.read(facturacionRepositoryProvider).generarSemana(dia);
       if (!mounted) return;
       _refrescar();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -129,14 +146,29 @@ class _FacturacionScreenState extends ConsumerState<FacturacionScreen> {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               OutlinedButton.icon(
+                onPressed: () => _moverSemana(-1),
+                icon: const Icon(Icons.chevron_left, size: 18),
+                label: const Text('Semana ant.'),
+              ),
+              OutlinedButton.icon(
+                onPressed: _semanaActual,
+                icon: const Icon(Icons.today, size: 18),
+                label: const Text('Semana actual'),
+              ),
+              OutlinedButton.icon(
+                onPressed: () => _moverSemana(1),
+                icon: const Icon(Icons.chevron_right, size: 18),
+                label: const Text('Semana sig.'),
+              ),
+              OutlinedButton.icon(
                 onPressed: _elegirLapso,
                 icon: const Icon(Icons.date_range_outlined, size: 18),
                 label: Text('${_f(_filtro.desde)} – ${_f(_filtro.hasta)}'),
               ),
               FilledButton.icon(
-                onPressed: _ocupado ? null : _generarSemana,
+                onPressed: _ocupado ? null : () => _generarSemanaDe(_filtro.desde),
                 icon: const Icon(Icons.receipt_long, size: 18),
-                label: const Text('Generar semana actual'),
+                label: const Text('Generar factura'),
               ),
               TextButton.icon(
                 onPressed: _ocupado ? null : _elegirFechaSemana,

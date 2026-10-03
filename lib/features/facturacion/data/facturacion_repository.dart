@@ -117,7 +117,9 @@ class FacturacionRepository {
     // Entregas de esos manifiestos (para reparto/desvío/localidad).
     final entregas = await _client
         .from('entregas')
-        .select('manifiesto_id, estado, entregado_en, lat, lng, localidad, es_otra_localidad')
+        .select(
+          'manifiesto_id, estado, entregado_en, lat, lng, localidad, es_otra_localidad, es_mas_lejana',
+        )
         .inFilter('manifiesto_id', ids) as List<dynamic>;
 
     final extrasPorManifiesto = <String, List<Extra>>{};
@@ -154,19 +156,26 @@ class FacturacionRepository {
 
       // Localidades de las entregas de este manifiesto.
       final ents = entregasPorManifiesto[id] ?? const [];
-      final localidades = <String>{
-        for (final e in ents)
-          if ((e['localidad'] as String?)?.trim().isNotEmpty ?? false)
-            (e['localidad'] as String).trim(),
-      };
 
-      // Localidad más lejana (mayor km en el tabulador).
+      // Localidad más lejana: la marcada por el admin, o la de mayor km.
       TabuladorFlete? masLejana;
-      for (final loc in localidades) {
-        final fila = tabuladorPorLocalidad[loc.toUpperCase()];
-        if (fila == null) continue;
-        if (masLejana == null || (fila.km ?? 0) > (masLejana.km ?? 0)) {
-          masLejana = fila;
+      final marcada = ents.firstWhere(
+        (e) => (e['es_mas_lejana'] as bool?) ?? false,
+        orElse: () => const {},
+      );
+      final localidadMarcada = (marcada['localidad'] as String?)?.trim();
+      if (localidadMarcada != null && localidadMarcada.isNotEmpty) {
+        masLejana = tabuladorPorLocalidad[localidadMarcada.toUpperCase()];
+      }
+      if (masLejana == null) {
+        for (final e in ents) {
+          final loc = (e['localidad'] as String?)?.trim();
+          if (loc == null || loc.isEmpty) continue;
+          final fila = tabuladorPorLocalidad[loc.toUpperCase()];
+          if (fila == null) continue;
+          if (masLejana == null || (fila.km ?? 0) > (masLejana.km ?? 0)) {
+            masLejana = fila;
+          }
         }
       }
 

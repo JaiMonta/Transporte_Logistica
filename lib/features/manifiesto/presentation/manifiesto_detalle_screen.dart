@@ -746,6 +746,44 @@ class _EntregasOtraLocalidad extends ConsumerWidget {
                         }
                       },
                     ),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                      leading: Icon(
+                        e.esMasLejana
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_unchecked,
+                        color: e.esMasLejana ? AppColors.primary : null,
+                      ),
+                      title: const Text('Más lejana (define el flete)'),
+                      onTap: () async {
+                        final messenger = ScaffoldMessenger.of(context);
+                        try {
+                          await ref
+                              .read(entregasRepositoryProvider)
+                              .marcarMasLejana(
+                                id: e.id,
+                                manifiestoId: manifiestoId,
+                                valor: true,
+                              );
+                          // Reflejar el nombre en el manifiesto.
+                          await ref
+                              .read(manifiestosRepositoryProvider)
+                              .actualizarCabecera(
+                                id: manifiestoId,
+                                camionId: null,
+                                localidadMasLejana: e.localidad,
+                              );
+                          ref.invalidate(
+                              entregasDeManifiestoProvider(manifiestoId));
+                          ref.invalidate(manifiestoProvider(manifiestoId));
+                        } catch (err) {
+                          messenger.showSnackBar(
+                            SnackBar(content: Text(mensajeError(err))),
+                          );
+                        }
+                      },
+                    ),
                   ],
                 ),
               ),

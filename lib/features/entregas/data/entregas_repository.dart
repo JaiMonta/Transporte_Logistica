@@ -133,6 +133,24 @@ class EntregasRepository {
     }).eq('id', id);
   }
 
+  /// Marca una entrega como "más lejana" (exclusiva por manifiesto).
+  Future<void> marcarMasLejana({
+    required String id,
+    required String manifiestoId,
+    required bool valor,
+  }) async {
+    if (valor) {
+      // Solo una por manifiesto: limpia las demás y marca esta.
+      await _client
+          .from('entregas')
+          .update({'es_mas_lejana': false})
+          .eq('manifiesto_id', manifiestoId);
+    }
+    await _client
+        .from('entregas')
+        .update({'es_mas_lejana': valor}).eq('id', id);
+  }
+
   Future<Entrega> marcarFallido({required String id, String? notas}) async {
     final data = await _client
         .from('entregas')
