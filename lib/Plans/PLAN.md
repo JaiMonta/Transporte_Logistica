@@ -800,9 +800,9 @@ Resumen de lo trabajado en la jornada (además del Módulo 4, detallado arriba):
 
 ---
 
-## Registro del día (jornada actual)  ✅ COMPLETADO
+## Registro del día (jornada anterior)  ✅ COMPLETADO
 
-Resumen de la jornada. Cada punto tiene su sección detallada arriba y su commit.
+Resumen de la jornada previa. Cada punto tiene su sección detallada arriba y su commit.
 
 ### Commits de la jornada
 
@@ -866,6 +866,81 @@ Resumen de la jornada. Cada punto tiene su sección detallada arriba y su commit
 - `flutter analyze` limpio y `flutter test` **95/95** al cierre de la jornada.
 - Web: **https://transporte-logistica-fabab.web.app** (redeploy al final).
 - APK: `build\app\outputs\flutter-apk\app-release.apk` (~101.9 MB).
+
+---
+
+## Registro del día (jornada actual)  ✅ COMPLETADO
+
+Resumen de lo trabajado hoy. Cada punto tiene su sección detallada arriba y su commit.
+
+### Commits de la jornada
+
+| Commit | Resumen |
+| --- | --- |
+| `25393b8` | Módulo fletes Fase 1: tabulador por localidad/capacidad + importador Excel |
+| `2d1e0dc` | Módulo fletes Fase 2: motor de extras con aprobación del admin |
+| `9abca35` | Facturación semanal: facturas e ítems por semana + grupo "Finanzas" |
+| `c1df1d5` | Facturación: estados corregidos (pagada = saldada, anulada = no válida) |
+| `3cba51e` | Entregas: botón "Entregado" visible (Wrap) + diálogo correcto; OCR retirado a modo manual |
+| `b07be38` | Facturación: recalcular flete si falta + editar camión del manifiesto (admin) |
+| `1aeada4` | Facturación: flete por localidad más lejana al origen + extras automáticos (caleta, reparto por radio, desvío) y localidad por entrega |
+| `e9cbfd2` | Facturación: admin elige entrega más lejana + lapso por semanas con navegación |
+
+### 1. Fletes — Fase 2 (motor de extras)
+
+- Extras **suman aparte** del flete base y se **desglosan por ítem**.
+- **Caleta** (2 × tarifa/manifiesto), **reparto** (grupos de entregas a ≤10 km),
+  **desvío** (tramos $6/$12/20% para entregas en otra localidad), **retorno**
+  (15%/60%), **fin de semana** (+5%), **mora** y **picking** ($119).
+- Esquema: `manifiesto_extras` (enums `extra_tipo`, `extra_estado`),
+  `manifiestos.es_fin_semana`, `entregas.es_otra_localidad`.
+- Flujo: el **chofer avisa** (devolución/mora → `sugerido`) y el **admin
+  aprueba/rechaza/edita** en `BloqueExtras` (con "Calcular sugeridos").
+
+### 2. Facturación semanal
+
+- **Una factura por semana** (lunes→domingo, por fecha de entrega) que agrupa
+  todos los manifiestos con ≥1 entrega `entregado`, desglosada por chofer e ítem.
+- Esquema: `facturas` + `factura_items`; enum `factura_estado`
+  (`emitida`, `pendiente`, **`pagada`**, **`anulada`**). RLS **solo admin**.
+- **Menú:** grupo nuevo **"Finanzas"** con la entrada "Facturación".
+- Estados: al generar `emitida`; tras una semana pasa a `pendiente` (al vuelo);
+  `pagada` = saldada; `anulada` = no válida (no se elimina por trazabilidad).
+
+### 3. Corrección del cálculo de factura (reglas del negocio)
+
+- **Origen de carga** configurable (Maracay: `origen_carga_nombre/lat/lng`).
+- **Localidad por entrega** (`entregas.localidad` + `localidad_distancia_km`);
+  selector en el detalle del manifiesto (admin).
+- **Flete base** = localidad **más lejana** (mayor `km` del tabulador) × capacidad
+  del camión; se recalcula al generar/rehacer.
+- **Extras automáticos** al generar: caleta, reparto (radio ≤10 km), desvío
+  (entregas marcadas "otra localidad") y fin de semana.
+- **Más lejana manual:** `entregas.es_mas_lejana` — el admin puede designar qué
+  entrega define el flete (exclusivo); si no hay ninguna, cae al automático.
+- **Lapso por semanas:** la pantalla inicia en la semana actual (hoy 03/10/26 →
+  28/09/26 a 04/10/26) y permite navegar ‹ Semana ant. / actual / sig. ›, más
+  rango libre de fechas.
+
+### 4. Entregas — fix del botón "Entregado"
+
+- El `Row`+`Spacer` de acciones de la tarjeta **desbordaba** en web-móvil y
+  recortaba el botón; se cambió a **`Wrap`**.
+- Diálogo de confirmación corregido: **Cancelar** aborta; "Sin foto" marca; "Con
+  foto" pide foto (en Web usa galería).
+
+### 5. OCR retirado → captura manual
+
+- Eliminada la llamada OCR en la captura del manifiesto (sube la foto y va a
+  revisión manual). Se borraron ML Kit y OpenAI, dependencia, config Android/iOS
+  y se **despublicó** la Edge Function `ocr-manifiesto`. Se conservó
+  `parser_manifiesto.dart` + tests (reutilizables). APK bajó a ~73 MB.
+
+### Verificación y despliegue
+
+- `flutter analyze` limpio y `flutter test` **119/119** al cierre.
+- Web: **https://transporte-logistica-fabab.web.app** (redeploy al final).
+- APK: `build\app\outputs\flutter-apk\app-release.apk` (~73.4 MB).
 
 ---
 
