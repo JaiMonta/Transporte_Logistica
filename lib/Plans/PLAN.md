@@ -251,15 +251,14 @@ La fuente de verdad de usuarios es `public.profiles` (Módulo 1).
 
 ### OCR — decisión (ver `lib/Plans/OCR_OPCIONES.md`)
 
-- **Móvil: Google ML Kit** (on-device, offline, sin costo; modelo *bundled*).
-  Requisitos: Android `minSdk` 24 + `com.google.mlkit:text-recognition:16.0.1` +
-  `proguard-rules.pro`; iOS `IPHONEOS_DEPLOYMENT_TARGET = 15.5` + `ios/Podfile`.
-- **Web: OpenAI** (Edge Function) o captura manual.
-- **Tesseract OCR: evaluado y descartado** para móvil (calidad y setup iOS
-  frágiles). Anotado como opción futura **solo si** se quiere OCR offline en Web.
-- **Extracción multi-línea:** ambos OCR intentan proponer **varias líneas**
-  (tipo/número/cliente). OpenAI (web) devuelve un array explícito; ML Kit (móvil)
-  usa el parser `parser_manifiesto.dart` (best-effort, revisión humana).
+**Estado: RETIRADO (jornada actual).** Se eliminó **Google ML Kit** y se
+**despublicó** la Edge Function `ocr-manifiesto`. La captura del manifiesto es
+ahora **manual** (nº PRO/FACTURA, fecha y cliente por líneas). Se conserva
+`parser_manifiesto.dart` (+ test) por si se retoma el OCR.
+
+- **(Histórico) Móvil: Google ML Kit** (on-device, offline, sin costo).
+- **(Histórico) Web: OpenAI** (Edge Function) o captura manual.
+- **Tesseract OCR: evaluado y descartado** para móvil.
 
 ### Login persistente (recordar usuario y contraseña)
 

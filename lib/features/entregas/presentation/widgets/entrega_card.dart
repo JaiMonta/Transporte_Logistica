@@ -104,7 +104,10 @@ class EntregaCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.xs),
-            Row(
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.xs,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 if (entrega.tieneUbicacion)
                   TextButton.icon(
@@ -112,7 +115,6 @@ class EntregaCard extends StatelessWidget {
                     icon: const Icon(Icons.map_outlined, size: 18),
                     label: const Text('Mapa'),
                   ),
-                const Spacer(),
                 if (onAvisar != null)
                   TextButton.icon(
                     onPressed: () => onAvisar!(entrega),

@@ -3,13 +3,25 @@
 Documento de decisión sobre el reconocimiento de texto (OCR) del manifiesto
 (nº PRO, fecha y cliente de la foto del BOL).
 
-## Resumen de la decisión
+## Estado actual (jornada): RETIRADO — captura manual
+
+- **El OCR queda FUERA por ahora.** Se retiró **Google ML Kit** (móvil) y se
+  **despublicó la Edge Function `ocr-manifiesto`** (OpenAI). La app usa
+  **captura manual** de los datos del manifiesto (nº PRO/FACTURA, fecha y
+  cliente por líneas).
+- Los archivos de OCR se eliminaron (recuperables vía git):
+  `data/ocr_mlkit*.dart`, `data/ocr_openai.dart`, `data/ocr_repository.dart`.
+  Se **conserva** `data/parser_manifiesto.dart` (+ su test) para retomarlo luego.
+- Dependencia `google_mlkit_text_recognition` eliminada del `pubspec.yaml`;
+  Android (`build.gradle.kts`, `proguard-rules.pro`) e iOS (`Podfile`) limpios.
+
+## Decisión histórica (referencia)
 
 - **Móvil (Android/iOS): Google ML Kit Text Recognition** (on-device).
 - **Web: Edge Function `ocr-manifiesto` (OpenAI `gpt-4o-mini`)** o captura manual.
 - **Tesseract OCR:** evaluado y **descartado** para móvil (ver análisis).
 
-El OCR es solo una **propuesta**: el chofer siempre revisa y corrige los campos
+El OCR era solo una **propuesta**: el chofer siempre revisa y corrige los campos
 antes de guardar (revisión humana obligatoria).
 
 ---

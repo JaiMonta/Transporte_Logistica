@@ -20,17 +20,16 @@ import '../../auth/providers/auth_providers.dart';
 import '../../camiones/providers/camiones_providers.dart';
 import '../../combustible/presentation/dialogo_combustible.dart';
 import '../../combustible/providers/combustible_providers.dart';
-import '../data/ocr_repository.dart';
 import '../models/manifiesto.dart';
 import '../providers/manifiestos_providers.dart';
 import 'widgets/lineas_editor.dart';
 
-/// Captura de un manifiesto.
+/// Captura de un manifiesto (modo manual).
 ///
 /// En móvil usa la cámara en vivo; en Web/escritorio permite **seleccionar
 /// un archivo de imagen** (útil para pruebas desde la web móvil).
 /// Flujo: foto del BOL -> compresión + subida al bucket `manifiestos`
-/// -> OCR (Edge Function) -> revisión humana de los campos -> guardar.
+/// -> captura manual de los datos (PRO/FACTURA, fecha, cliente) -> guardar.
 class CapturaManifiestoScreen extends ConsumerStatefulWidget {
   const CapturaManifiestoScreen({super.key});
 
@@ -49,7 +48,6 @@ class _CapturaManifiestoScreenState
 
   Uint8List? _foto;
   EvidenciaSubida? _evidencia;
-  ResultadoOcr? _ocr;
 
   final _formKey = GlobalKey<FormState>();
   final _fecha = TextEditingController();
@@ -134,7 +132,7 @@ class _CapturaManifiestoScreenState
 
   /// Selecciona una imagen desde el almacenamiento (Web/escritorio).
   ///
-  /// Permite probar el flujo completo (subida + OCR + guardado) desde la web
+  /// Permite probar el flujo completo (subida + guardado) desde la web
   /// móvil, donde no hay acceso a la cámara en vivo.
   Future<void> _seleccionarArchivo() async {
     if (_procesando) return;
@@ -154,7 +152,7 @@ class _CapturaManifiestoScreenState
     }
   }
 
-  /// Sube la imagen al bucket, ejecuta el OCR y pasa a la revisión.
+  /// Sube la imagen al bucket y pasa directo a la revisión manual.
   Future<void> _procesarBytes(Uint8List bytes) async {
     final almacen = ref.read(almacenamientoRepositoryProvider);
 
@@ -171,33 +169,13 @@ class _CapturaManifiestoScreenState
       tipo: TipoEvidencia.bol,
     );
 
-    // OCR (Edge Function; si falla, se permite continuar manualmente).
-    ResultadoOcr? ocr;
-    try {
-      ocr = await ref.read(ocrRepositoryProvider).extraer(
-            comprimida,
-            contentType: 'image/jpeg',
-          );
-    } catch (_) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'No se pudo reconocer el documento. Completa los datos manualmente.',
-            ),
-          ),
-        );
-      }
-    }
-
     if (!mounted) return;
     setState(() {
       _foto = comprimida;
       _evidencia = evidencia;
-      _ocr = ocr;
       _procesando = false;
-      _fecha.text = _fechaTexto(ocr?.fecha ?? DateTime.now());
-      _lineas = ocr?.aLineas() ?? [];
+      _fecha.text = _fechaTexto(DateTime.now());
+      _lineas = [];
     });
   }
 
@@ -206,7 +184,6 @@ class _CapturaManifiestoScreenState
     setState(() {
       _foto = null;
       _evidencia = null;
-      _ocr = null;
       _fecha.clear();
       _lineas = [];
     });
@@ -262,7 +239,6 @@ class _CapturaManifiestoScreenState
         bucket: _evidencia?.bucket,
         path: _evidencia?.path,
         hashSha256: _evidencia?.hashSha256,
-        ocrConfianza: _ocr?.confianza,
         cotejo: CotejoEstado.pendiente,
       );
       if (!mounted) return;
@@ -348,8 +324,8 @@ class _CapturaManifiestoScreenState
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                'Selecciona una imagen del BOL. Se subirá, se leerá con OCR '
-                'y podrás revisar los datos antes de guardar.',
+                'Selecciona una imagen del BOL. Se subirá y podrás capturar '
+                'los datos del manifiesto antes de guardar.',
                 textAlign: TextAlign.center,
                 style: tema.textTheme.bodyMedium,
               ),
@@ -481,8 +457,6 @@ class _CapturaManifiestoScreenState
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                if (_ocr != null && _ocr!.confianzaPorcentaje != null)
-                  _bannerConfianza(context, _ocr!.confianzaPorcentaje!),
                 const SizedBox(height: AppSpacing.sm),
                 AppTextField(
                   controller: _fecha,
@@ -527,32 +501,6 @@ class _CapturaManifiestoScreenState
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _bannerConfianza(BuildContext context, int porcentaje) {
-    final color = porcentaje >= 80
-        ? AppColors.exito
-        : (porcentaje >= 50 ? AppColors.secondary : AppColors.peligro);
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(AppRadius.base),
-        border: Border.all(color: color.withValues(alpha: 0.4)),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.auto_awesome, color: color, size: 20),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Text(
-              'Datos reconocidos automáticamente (confianza $porcentaje%).',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ),
-        ],
       ),
     );
   }

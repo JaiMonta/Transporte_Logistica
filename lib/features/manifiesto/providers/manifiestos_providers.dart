@@ -2,15 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/supabase_client.dart';
 import '../data/manifiestos_repository.dart';
-import '../data/ocr_repository.dart';
 import '../models/manifiesto.dart';
 
 final manifiestosRepositoryProvider = Provider<ManifiestosRepository>(
   (ref) => ManifiestosRepository(ref.watch(supabaseProvider)),
-);
-
-final ocrRepositoryProvider = Provider<OcrRepository>(
-  (ref) => OcrRepository(ref.watch(supabaseProvider)),
 );
 
 /// Filtro de búsqueda de manifiestos (nº PRO y rango de fechas).

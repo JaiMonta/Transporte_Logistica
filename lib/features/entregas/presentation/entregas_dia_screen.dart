@@ -1,5 +1,6 @@
 ﻿import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -105,36 +106,39 @@ class _EntregasDiaScreenState extends ConsumerState<EntregasDiaScreen> {
   }
 
   Future<void> _entregar(Entrega entrega) async {
-    // La foto del recibo es opcional.
-    final quiereFoto = await showDialog<bool>(
+    // Resultado: 'cancelar' (aborta), 'foto' (con foto) o 'sin' (sin foto).
+    final opcion = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Confirmar entrega'),
         content: Text(
-          'Â¿Marcar como entregado a "${entrega.clienteVisible}"?\n\n'
+          '¿Marcar como entregado a "${entrega.clienteVisible}"?\n\n'
           'Puedes adjuntar la foto del recibo firmado (opcional).',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(context, 'cancelar'),
             child: const Text('Cancelar'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, true),
+            onPressed: () => Navigator.pop(context, 'foto'),
             child: const Text('Con foto'),
           ),
           FilledButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(context, 'sin'),
             child: const Text('Sin foto'),
           ),
         ],
       ),
     );
 
+    // Tocar fuera (null) o Cancelar: no se marca nada.
+    if (opcion == null || opcion == 'cancelar') return;
+
     EvidenciaSubida? evidencia;
-    if (quiereFoto == true) {
+    if (opcion == 'foto') {
       evidencia = await _tomarFotoRecibo(entrega);
-      if (evidencia == null) return; // cancelÃ³
+      if (evidencia == null) return; // canceló o falló la foto
     }
 
     try {
@@ -159,8 +163,10 @@ class _EntregasDiaScreenState extends ConsumerState<EntregasDiaScreen> {
 
   Future<EvidenciaSubida?> _tomarFotoRecibo(Entrega entrega) async {
     try {
-      final archivo =
-          await ImagePicker().pickImage(source: ImageSource.camera);
+      // En móvil cámara; en Web no hay cámara en vivo → galería/archivo.
+      final archivo = await ImagePicker().pickImage(
+        source: kIsWeb ? ImageSource.gallery : ImageSource.camera,
+      );
       if (archivo == null) return null;
       final Uint8List bytes = await archivo.readAsBytes();
       final almacen = ref.read(almacenamientoRepositoryProvider);
