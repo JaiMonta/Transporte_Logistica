@@ -128,6 +128,12 @@ class AdminShell extends ConsumerWidget {
           icono: Icons.receipt_long_outlined,
           iconoActivo: Icons.receipt_long,
         ),
+        _Opcion(
+          titulo: 'Bitácora',
+          ruta: Rutas.adminBitacora,
+          icono: Icons.menu_book_outlined,
+          iconoActivo: Icons.menu_book,
+        ),
       ],
     ),
   ];

@@ -804,10 +804,60 @@ estimadas**. El chofer ve los suyos y marca **"En camino"** / **"Completado"**
 
 ---
 
+## Módulo 7 — Jornadas / Bitácora (administrador)  ✅ COMPLETADO
+
+Vista de **solo lectura** que recopila las **entregas por manifiesto de cada
+chofer por día** en un lapso (tipo hoja "RELACIÓN" del Excel), con encabezado
+**DESDE/HASTA** y **exportación a PDF y CSV**. **Sin tablas nuevas**: reutiliza
+lo existente.
+
+### Agregación (puro y testeable)
+
+- `lib/features/bitacora/services/calculo_bitacora.dart`:
+  - `regionDe(localidad, tabulador)` → región (del tabulador de fletes).
+  - `fleteBaseDeEntregas(...)`: flete base por la **localidad más lejana desde
+    Maracay** (la marcada `es_mas_lejana`, o la de mayor km) × capacidad;
+    respaldo con el `costo_flete` guardado.
+  - `agrupar(...)`: **Día → Chofer → Manifiesto → Entregas**, con totales por
+    día y global (manifiestos, entregas, flete).
+- `models/bitacora.dart`: `EntregaBitacora`, `ManifiestoBitacora` (con `guias`,
+  chofer, camión/capacidad, `fleteBase`), `DiaBitacora`, `BitacoraResumen`.
+
+### Datos
+
+- `data/bitacora_repository.dart`: `cargar(desde, hasta, choferId?)` (manifiestos
+  con líneas/chofer/camión + entregas + tabulador) y `choferesDelLapso(...)`.
+- `providers/bitacora_providers.dart`: `FiltroBitacora`, `bitacoraProvider`,
+  `choferesBitacoraProvider`.
+
+### Pantalla y exportación
+
+- `presentation/bitacora_screen.dart`: navegación de semanas **‹ ant / actual /
+  sig ›** (reutiliza `SemanaRange`), **rango libre**, filtro por **chofer**;
+  encabezado DESDE/HASTA; agrupada por día (tarjetas) / tabla plana en ancho;
+  barra de totales. Entrada **"Bitácora"** en el grupo **"Finanzas"** del panel
+  (ruta `adminBitacora`).
+- `services/export_bitacora.dart`: **PDF** con `printing` (+ `pdf` como
+  dependencia directa) y **CSV** (`;`, UTF-8) con **descarga en Web**
+  (import condicional). En móvil, el CSV se limita a PDF (descartado añadir
+  `share_plus`/`path_provider`).
+
+### Pruebas
+
+- `test/bitacora_test.dart`: `regionDe`, `fleteBaseDeEntregas` (marcada / mayor
+  km / respaldo guardado), `agrupar` (orden y totales), `filas`/`filasCsv`
+  (escape de `;` y comillas). Total **139 en verde**.
+- `flutter analyze` limpio; `flutter test` 139/139; `flutter build web` OK.
+
+### Pendiente (futuro)
+
+- **Cálculos por manifiesto-guía** (Pasta / Nuciven / Harina), pesos y peaje del
+  Excel; y exportación CSV también en móvil (requiere `share_plus`/`path_provider`).
+
+---
+
 ## Módulos pendientes
 
-- **Módulo 7 — Jornadas y vista semanal**: tabla de jornadas, pestaña Semana,
-  vistas por semana reutilizables en pagos y reportes.
 - **Módulo 8 — Extras**: tipo, monto, evidencia opcional; el chofer reporta, el
   admin aprueba/rechaza; solo aprobados cuentan para pago.
 - **Módulo 9 — Pagos semanales y acumulados**: `pagos_semanales` con columna

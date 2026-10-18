@@ -12,6 +12,7 @@ import '../features/auth/presentation/restablecer_password_screen.dart';
 import '../features/auth/presentation/usuario_form_screen.dart';
 import '../features/auth/presentation/usuarios_screen.dart';
 import '../features/auth/providers/auth_providers.dart';
+import '../features/bitacora/presentation/bitacora_screen.dart';
 import '../features/clientes/presentation/cliente_form_screen.dart';
 import '../features/clientes/presentation/clientes_screen.dart';
 import '../features/camiones/presentation/camion_form_screen.dart';
@@ -83,6 +84,8 @@ class Rutas {
   static const String adminPickups = '/admin/pickups';
   static const String adminPickupNuevo = '/admin/pickups/nuevo';
   static String adminPickupEditar(String id) => '/admin/pickups/$id';
+
+  static const String adminBitacora = '/admin/bitacora';
 
   static const String choferHome = '/chofer/home';
   static const String choferManifiestos = '/chofer/manifiestos';
@@ -269,6 +272,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                     PickupFormScreen(pickupId: state.pathParameters['id']),
               ),
             ],
+          ),
+          GoRoute(
+            path: Rutas.adminBitacora,
+            builder: (context, state) => const BitacoraScreen(),
           ),
         ],
       ),
