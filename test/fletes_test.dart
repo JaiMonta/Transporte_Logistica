@@ -1,3 +1,4 @@
+import 'package:app_logistica/features/fletes/models/extra.dart';
 import 'package:app_logistica/features/fletes/models/tabulador_flete.dart';
 import 'package:app_logistica/features/fletes/services/calculo_flete.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -87,6 +88,22 @@ void main() {
       expect(c['localidad'], 'CAGUA');
       expect(c['precio_6'], 130.75);
       expect(c['km'], 15);
+    });
+  });
+
+  group('TipoExtra', () {
+    test('incluye peaje con su valor y etiqueta', () {
+      expect(TipoExtra.desde('peaje'), TipoExtra.peaje);
+      expect(TipoExtra.peaje.valor, 'peaje');
+      expect(TipoExtra.peaje.etiqueta, 'Peaje');
+    });
+
+    test('cada tipo tiene valor y etiqueta no vacíos', () {
+      for (final t in TipoExtra.values) {
+        expect(t.valor, isNotEmpty);
+        expect(t.etiqueta, isNotEmpty);
+        expect(TipoExtra.desde(t.valor), t);
+      }
     });
   });
 }

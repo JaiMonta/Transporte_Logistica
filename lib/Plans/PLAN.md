@@ -913,10 +913,10 @@ producto** según el peso de cada producto del manifiesto.
 
 - `test/facturacion_test.dart`: `SemanaRange`, `repartir` (lleno / no lleno /
   sin capacidad) y `calcular` (un producto, dos, tres, sin pesos, extras por
-  kg/Σkg y **regresión del caso del Excel**). Total **147 en verde**.
+  kg/Σkg y **regresión del caso del Excel**). Total **149 en verde**.
 - RLS/E2E remoto (verificado): el admin crea empresa (201); el chofer lee
   empresas y productos (200) pero **no** puede crear empresa (403) ni pesos (403).
-- `flutter analyze` limpio; `flutter test` 147/147.
+- `flutter analyze` limpio; `flutter test` 149/149.
 
 ### Validación contra el Excel (`LIQUIDACION ELIAGNYS.xlsm`)
 
@@ -941,6 +941,19 @@ Desvío / Peaje / Mora / Fin de semana, prorrateados por producto).
   | **Total** | 630.00 | 30.00 | **660.00** |
 
 - El ítem **"Flete secundario"** del Excel corresponde a la **caleta**.
+
+### Refinamientos
+
+- **Peaje**: nuevo `TipoExtra.peaje` (valor `peaje`, etiqueta "Peaje"); el admin lo
+  agrega como extra manual (`BloqueExtras` → "Agregar extra") y se prorratea como
+  los demás extras. Migración `20260930300000_facturacion_refinamientos.sql`.
+- **PDF de la factura**: `services/export_factura.dart` (`Printing.sharePdf`) con
+  desglose por producto y concepto, subtotales y **USD + Bs**; botón **"PDF"** en
+  el detalle de la factura.
+- **Pesos desde el chofer**: la sección "Pesos por producto" del detalle del
+  manifiesto ahora es visible/editable **también por el chofer dueño** (RLS:
+  `manifiesto_pesos` permite insert/update al admin **o** al `capturado_por`).
+- Etiqueta **"Flete secundario"** para la caleta en el detalle y en el PDF.
 
 ### Notas
 

@@ -6,6 +6,7 @@ import '../../../shared/errors/mensajes_error.dart';
 import '../../fletes/models/extra.dart';
 import '../models/factura.dart';
 import '../providers/facturacion_providers.dart';
+import '../services/export_factura.dart';
 
 /// Detalle de una factura por empresa con desglose por producto y concepto.
 class FacturaDetalleScreen extends ConsumerStatefulWidget {
@@ -68,6 +69,17 @@ class _FacturaDetalleScreenState extends ConsumerState<FacturaDetalleScreen> {
     }
   }
 
+  Future<void> _pdf(Factura f, double tasa) async {
+    try {
+      await ExportFactura.compartirPdf(f, tasaBs: tasa);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(mensajeError(e))));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final async = ref.watch(facturaProvider(widget.facturaId));
@@ -127,6 +139,11 @@ class _FacturaDetalleScreenState extends ConsumerState<FacturaDetalleScreen> {
         Wrap(
           spacing: AppSpacing.sm,
           children: [
+            OutlinedButton.icon(
+              onPressed: _ocupado ? null : () => _pdf(f, tasa),
+              icon: const Icon(Icons.picture_as_pdf_outlined, size: 18),
+              label: const Text('PDF'),
+            ),
             OutlinedButton.icon(
               onPressed: _ocupado ? null : () => _rehacer(f),
               icon: const Icon(Icons.refresh, size: 18),

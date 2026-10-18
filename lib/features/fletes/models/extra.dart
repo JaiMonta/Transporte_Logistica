@@ -6,7 +6,8 @@ enum TipoExtra {
   retorno,
   mora,
   finSemana,
-  picking;
+  picking,
+  peaje;
 
   static TipoExtra desde(String? valor) => switch (valor) {
         'caleta' => TipoExtra.caleta,
@@ -16,6 +17,7 @@ enum TipoExtra {
         'mora' => TipoExtra.mora,
         'fin_semana' => TipoExtra.finSemana,
         'picking' => TipoExtra.picking,
+        'peaje' => TipoExtra.peaje,
         _ => TipoExtra.caleta,
       };
 
@@ -27,6 +29,7 @@ enum TipoExtra {
         TipoExtra.mora => 'mora',
         TipoExtra.finSemana => 'fin_semana',
         TipoExtra.picking => 'picking',
+        TipoExtra.peaje => 'peaje',
       };
 
   String get etiqueta => switch (this) {
@@ -37,6 +40,7 @@ enum TipoExtra {
         TipoExtra.mora => 'Mora',
         TipoExtra.finSemana => 'Fin de semana',
         TipoExtra.picking => 'Picking',
+        TipoExtra.peaje => 'Peaje',
       };
 }
 

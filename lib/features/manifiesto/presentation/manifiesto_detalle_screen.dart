@@ -170,14 +170,14 @@ class _ContenidoState extends ConsumerState<_Contenido> {
               const SizedBox(height: AppSpacing.lg),
               _accionesAdmin(context, m),
               const SizedBox(height: AppSpacing.lg),
+              _PesosProductos(manifiestoId: m.id, camionId: m.camionId),
               if (ref.watch(currentProfileProvider).value?.rol == Rol.admin) ...[
+                const SizedBox(height: AppSpacing.lg),
                 BloqueExtras(
                   manifiestoId: m.id,
                   fleteBase: m.costoFlete,
                   onCalcularSugeridos: () => _calcularExtrasSugeridos(m),
                 ),
-                const SizedBox(height: AppSpacing.lg),
-                _PesosProductos(manifiestoId: m.id, camionId: m.camionId),
               ],
               const SizedBox(height: AppSpacing.lg),
               Text(

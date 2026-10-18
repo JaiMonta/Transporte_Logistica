@@ -124,6 +124,86 @@ class _BloqueExtrasState extends ConsumerState<BloqueExtras> {
     }
   }
 
+  Future<void> _agregarExtra() async {
+    var tipo = TipoExtra.peaje;
+    final montoCtrl = TextEditingController();
+    final descCtrl = TextEditingController();
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialog) => AlertDialog(
+          title: const Text('Agregar extra'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<TipoExtra>(
+                initialValue: tipo,
+                isExpanded: true,
+                decoration: const InputDecoration(labelText: 'Concepto'),
+                items: [
+                  for (final t in TipoExtra.values)
+                    DropdownMenuItem(value: t, child: Text(t.etiqueta)),
+                ],
+                onChanged: (v) => setDialog(() => tipo = v ?? TipoExtra.peaje),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              TextField(
+                controller: montoCtrl,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(labelText: 'Monto (USD)'),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              TextField(
+                controller: descCtrl,
+                decoration:
+                    const InputDecoration(labelText: 'Descripción (opcional)'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Agregar'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (ok != true) {
+      montoCtrl.dispose();
+      descCtrl.dispose();
+      return;
+    }
+    final monto = double.tryParse(montoCtrl.text.replaceAll(',', '.')) ?? 0;
+    final descripcion = descCtrl.text.trim();
+    try {
+      await ref.read(extrasRepositoryProvider).crear(Extra(
+            id: '',
+            manifiestoId: widget.manifiestoId,
+            tipo: tipo,
+            descripcion: descripcion.isEmpty ? null : descripcion,
+            monto: monto,
+            estado: EstadoExtra.aprobado,
+            origen: 'manual',
+          ));
+      if (!mounted) return;
+      _refrescar();
+    } catch (err) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(mensajeError(err))));
+      }
+    } finally {
+      montoCtrl.dispose();
+      descCtrl.dispose();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final tema = Theme.of(context);
@@ -151,6 +231,11 @@ class _BloqueExtrasState extends ConsumerState<BloqueExtras> {
                   onPressed: _ocupado ? null : _calcular,
                   icon: const Icon(Icons.auto_awesome, size: 18),
                   label: const Text('Calcular sugeridos'),
+                ),
+                TextButton.icon(
+                  onPressed: _ocupado ? null : _agregarExtra,
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Agregar extra'),
                 ),
               ],
             ),
