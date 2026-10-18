@@ -116,6 +116,12 @@ class AdminShell extends ConsumerWidget {
           icono: Icons.local_gas_station_outlined,
           iconoActivo: Icons.local_gas_station,
         ),
+        _Opcion(
+          titulo: 'Empresas y productos',
+          ruta: Rutas.adminEmpresas,
+          icono: Icons.storefront_outlined,
+          iconoActivo: Icons.storefront,
+        ),
       ],
     ),
     _Grupo(

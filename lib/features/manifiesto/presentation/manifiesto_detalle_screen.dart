@@ -11,6 +11,7 @@ import '../../auth/models/profile.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../camiones/providers/camiones_providers.dart';
 import '../../entregas/providers/entregas_providers.dart';
+import '../../empresas/providers/empresas_providers.dart';
 import '../../fletes/models/extra.dart';
 import '../../fletes/models/tabulador_flete.dart';
 import '../../fletes/presentation/widgets/bloque_extras.dart';
@@ -169,12 +170,15 @@ class _ContenidoState extends ConsumerState<_Contenido> {
               const SizedBox(height: AppSpacing.lg),
               _accionesAdmin(context, m),
               const SizedBox(height: AppSpacing.lg),
-              if (ref.watch(currentProfileProvider).value?.rol == Rol.admin)
+              if (ref.watch(currentProfileProvider).value?.rol == Rol.admin) ...[
                 BloqueExtras(
                   manifiestoId: m.id,
                   fleteBase: m.costoFlete,
                   onCalcularSugeridos: () => _calcularExtrasSugeridos(m),
                 ),
+                const SizedBox(height: AppSpacing.lg),
+                _PesosProductos(manifiestoId: m.id, camionId: m.camionId),
+              ],
               const SizedBox(height: AppSpacing.lg),
               Text(
                 'Registrado: ${_fechaHora(m.creadoEn)}',
@@ -790,6 +794,184 @@ class _EntregasOtraLocalidad extends ConsumerWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+/// Pesos (kg) por producto del manifiesto, base del prorrateo del flete.
+class _PesosProductos extends ConsumerStatefulWidget {
+  const _PesosProductos({required this.manifiestoId, this.camionId});
+
+  final String manifiestoId;
+  final String? camionId;
+
+  @override
+  ConsumerState<_PesosProductos> createState() => _PesosProductosState();
+}
+
+class _PesosProductosState extends ConsumerState<_PesosProductos> {
+  final Map<String, TextEditingController> _ctrl = {};
+  Map<String, double> _guardados = const {};
+  double? _capacidadKg;
+  bool _cargando = true;
+  bool _guardando = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _cargar();
+  }
+
+  @override
+  void dispose() {
+    for (final c in _ctrl.values) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  Future<void> _cargar() async {
+    try {
+      final pesos = await ref
+          .read(manifiestosRepositoryProvider)
+          .pesosDeManifiesto(widget.manifiestoId);
+      double? cap;
+      if (widget.camionId != null) {
+        final c = await ref
+            .read(camionesRepositoryProvider)
+            .obtener(widget.camionId!);
+        cap = c?.capacidadKg;
+      }
+      if (!mounted) return;
+      setState(() {
+        _guardados = pesos;
+        _capacidadKg = cap;
+        _cargando = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() => _cargando = false);
+    }
+  }
+
+  double get _totalKg => _ctrl.values.fold(
+        0.0,
+        (a, c) => a + (double.tryParse(c.text.replaceAll(',', '.')) ?? 0),
+      );
+
+  Future<void> _guardar(List<dynamic> productos) async {
+    final mapa = <String, double>{
+      for (final p in productos)
+        (p.id as String): double.tryParse(
+              (_ctrl[p.id]?.text ?? '').replaceAll(',', '.'),
+            ) ??
+            0,
+    };
+    setState(() => _guardando = true);
+    try {
+      await ref.read(manifiestosRepositoryProvider).guardarPesos(
+            manifiestoId: widget.manifiestoId,
+            pesos: mapa,
+          );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Pesos guardados.')),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(mensajeError(e))));
+      }
+    } finally {
+      if (mounted) setState(() => _guardando = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    final async = ref.watch(productosActivosProvider);
+    return async.when(
+      loading: () => const Padding(
+        padding: EdgeInsets.all(AppSpacing.sm),
+        child: LinearProgressIndicator(),
+      ),
+      error: (e, _) => Text(mensajeError(e)),
+      data: (productos) {
+        for (final p in productos) {
+          _ctrl.putIfAbsent(
+            p.id,
+            () => TextEditingController(
+              text: (_guardados[p.id] == null || _guardados[p.id] == 0)
+                  ? ''
+                  : _guardados[p.id]!.toString(),
+            ),
+          );
+        }
+        final total = _totalKg;
+        final excede = _capacidadKg != null &&
+            _capacidadKg! > 0 &&
+            total > _capacidadKg!;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Pesos por producto (kg)', style: tema.textTheme.labelLarge),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              'Se usan para prorratear el flete base y los extras entre empresas.',
+              style: tema.textTheme.bodySmall,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            if (_cargando)
+              const LinearProgressIndicator()
+            else if (productos.isEmpty)
+              const Text(
+                  'No hay productos activos. Créalos en "Empresas y productos".')
+            else ...[
+              for (final p in productos)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                  child: TextField(
+                    controller: _ctrl[p.id],
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    onChanged: (_) => setState(() {}),
+                    decoration: InputDecoration(
+                      labelText: p.nombreVisible,
+                      suffixText: 'kg',
+                    ),
+                  ),
+                ),
+              Text(
+                (_capacidadKg == null || _capacidadKg! <= 0)
+                    ? 'Total: ${total.toStringAsFixed(2)} kg '
+                        '(el camión no tiene capacidad definida)'
+                    : 'Total: ${total.toStringAsFixed(2)} kg de '
+                        '${_capacidadKg!.toStringAsFixed(0)} kg',
+                style: tema.textTheme.bodyMedium?.copyWith(
+                  color: excede ? AppColors.peligro : null,
+                  fontWeight: excede ? FontWeight.w700 : null,
+                ),
+              ),
+              if (excede)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.xs),
+                  child: Text(
+                    'El total supera la capacidad del camión.',
+                    style: tema.textTheme.bodySmall
+                        ?.copyWith(color: AppColors.peligro),
+                  ),
+                ),
+              const SizedBox(height: AppSpacing.sm),
+              FilledButton.icon(
+                onPressed:
+                    (_guardando || excede) ? null : () => _guardar(productos),
+                icon: const Icon(Icons.save_outlined, size: 18),
+                label: const Text('Guardar pesos'),
+              ),
+            ],
+          ],
+        );
+      },
     );
   }
 }

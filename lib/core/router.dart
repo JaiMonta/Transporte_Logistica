@@ -20,6 +20,7 @@ import '../features/camiones/presentation/camiones_screen.dart';
 import '../features/combustible/presentation/chofer_combustible_selector_screen.dart';
 import '../features/combustible/presentation/combustible_admin_screen.dart';
 import '../features/combustible/presentation/combustible_jornada_screen.dart';
+import '../features/empresas/presentation/empresas_screen.dart';
 import '../features/entregas/presentation/chofer_mapa_selector_screen.dart';
 import '../features/fletes/presentation/flete_form_screen.dart';
 import '../features/fletes/presentation/fletes_screen.dart';
@@ -86,6 +87,8 @@ class Rutas {
   static String adminPickupEditar(String id) => '/admin/pickups/$id';
 
   static const String adminBitacora = '/admin/bitacora';
+
+  static const String adminEmpresas = '/admin/empresas';
 
   static const String choferHome = '/chofer/home';
   static const String choferManifiestos = '/chofer/manifiestos';
@@ -276,6 +279,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: Rutas.adminBitacora,
             builder: (context, state) => const BitacoraScreen(),
+          ),
+          GoRoute(
+            path: Rutas.adminEmpresas,
+            builder: (context, state) => const EmpresasScreen(),
           ),
         ],
       ),

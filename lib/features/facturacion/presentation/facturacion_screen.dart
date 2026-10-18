@@ -7,9 +7,9 @@ import '../../../core/theme.dart';
 import '../../../shared/errors/mensajes_error.dart';
 import '../models/factura.dart';
 import '../providers/facturacion_providers.dart';
-import '../services/calculo_factura_semanal.dart';
+import '../services/semana_range.dart';
 
-/// Facturación semanal (panel admin): búsqueda por lapso y generación.
+/// Facturación por empresa (panel admin): búsqueda por lapso y generación.
 class FacturacionScreen extends ConsumerStatefulWidget {
   const FacturacionScreen({super.key});
 
@@ -68,15 +68,18 @@ class _FacturacionScreenState extends ConsumerState<FacturacionScreen> {
     });
   }
 
-  Future<void> _generarSemanaDe(DateTime dia) async {
-    final semana = SemanaRange.deFecha(dia);
+  Future<void> _generar({DateTime? otraSemana}) async {
+    if (otraSemana != null) {
+      final s = SemanaRange.deFecha(otraSemana);
+      setState(() => _filtro = FiltroFacturacion(desde: s.inicio, hasta: s.fin));
+    }
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Generar factura de la semana'),
+        title: const Text('Generar facturas del período'),
         content: Text(
-          'Se generará (o rehará) la factura del período '
-          '${_f(semana.inicio)} – ${_f(semana.fin)} con los manifiestos '
+          'Se generarán (o reharán) las facturas por empresa del período '
+          '${_f(_filtro.desde)} – ${_f(_filtro.hasta)} con los manifiestos '
           'que tengan entregas finalizadas.',
         ),
         actions: [
@@ -94,11 +97,19 @@ class _FacturacionScreenState extends ConsumerState<FacturacionScreen> {
     if (confirmar != true) return;
     setState(() => _ocupado = true);
     try {
-      await ref.read(facturacionRepositoryProvider).generarSemana(dia);
+      final facturas = await ref
+          .read(facturacionRepositoryProvider)
+          .generar(_filtro.desde, _filtro.hasta);
       if (!mounted) return;
       _refrescar();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Factura de la semana generada.')),
+        SnackBar(
+          content: Text(
+            facturas.isEmpty
+                ? 'No hay entregas finalizadas en el período.'
+                : 'Facturas generadas: ${facturas.length} empresa(s).',
+          ),
+        ),
       );
     } catch (e) {
       if (mounted) {
@@ -110,7 +121,7 @@ class _FacturacionScreenState extends ConsumerState<FacturacionScreen> {
     }
   }
 
-  Future<void> _elegirFechaSemana() async {
+  Future<void> _elegirOtraSemana() async {
     final fecha = await showDatePicker(
       context: context,
       firstDate: DateTime(2024),
@@ -118,19 +129,7 @@ class _FacturacionScreenState extends ConsumerState<FacturacionScreen> {
       helpText: 'Elige un día de la semana a facturar',
     );
     if (fecha == null) return;
-    setState(() => _ocupado = true);
-    try {
-      await ref.read(facturacionRepositoryProvider).generarSemana(fecha);
-      if (!mounted) return;
-      _refrescar();
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(mensajeError(e))));
-      }
-    } finally {
-      if (mounted) setState(() => _ocupado = false);
-    }
+    await _generar(otraSemana: fecha);
   }
 
   @override
@@ -166,12 +165,12 @@ class _FacturacionScreenState extends ConsumerState<FacturacionScreen> {
                 label: Text('${_f(_filtro.desde)} – ${_f(_filtro.hasta)}'),
               ),
               FilledButton.icon(
-                onPressed: _ocupado ? null : () => _generarSemanaDe(_filtro.desde),
+                onPressed: _ocupado ? null : () => _generar(),
                 icon: const Icon(Icons.receipt_long, size: 18),
-                label: const Text('Generar factura'),
+                label: const Text('Generar facturas'),
               ),
               TextButton.icon(
-                onPressed: _ocupado ? null : _elegirFechaSemana,
+                onPressed: _ocupado ? null : _elegirOtraSemana,
                 icon: const Icon(Icons.event, size: 18),
                 label: const Text('Otra semana…'),
               ),
@@ -232,12 +231,14 @@ class _FacturaCard extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: const Icon(Icons.receipt_long_outlined),
-        title: Text('Semana ${factura.periodoTexto}'),
+        title: Text(factura.empresaVisible),
         subtitle: Text(
+          'Periodo ${factura.periodoTexto}\n'
           'Flete \$${factura.subtotalFlete.toStringAsFixed(2)} · '
           'Extras \$${factura.subtotalExtras.toStringAsFixed(2)}',
           style: tema.textTheme.bodySmall,
         ),
+        isThreeLine: true,
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -272,7 +273,7 @@ class _VacioVista extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.xs),
         Center(
-          child: Text('Genera la factura semanal para verla aquí.',
+          child: Text('Genera las facturas por empresa para verlas aquí.',
               style: Theme.of(context).textTheme.bodySmall),
         ),
       ],

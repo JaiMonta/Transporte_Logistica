@@ -3,10 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme.dart';
 import '../../../shared/errors/mensajes_error.dart';
+import '../../fletes/models/extra.dart';
 import '../models/factura.dart';
 import '../providers/facturacion_providers.dart';
 
-/// Detalle de una factura semanal con desglose por chofer e ítem.
+/// Detalle de una factura por empresa con desglose por producto y concepto.
 class FacturaDetalleScreen extends ConsumerStatefulWidget {
   const FacturaDetalleScreen({super.key, required this.facturaId});
 
@@ -20,7 +21,10 @@ class FacturaDetalleScreen extends ConsumerStatefulWidget {
 class _FacturaDetalleScreenState extends ConsumerState<FacturaDetalleScreen> {
   bool _ocupado = false;
 
-  void _refrescar() => ref.invalidate(facturaProvider(widget.facturaId));
+  void _refrescar() {
+    ref.invalidate(facturaProvider(widget.facturaId));
+    ref.invalidate(tasaUsdBsProvider);
+  }
 
   Future<void> _cambiarEstado(EstadoFactura estado) async {
     setState(() => _ocupado = true);
@@ -48,7 +52,7 @@ class _FacturaDetalleScreenState extends ConsumerState<FacturaDetalleScreen> {
     try {
       await ref
           .read(facturacionRepositoryProvider)
-          .generarSemana(f.periodoInicio);
+          .generar(f.periodoInicio, f.periodoFin);
       if (!mounted) return;
       _refrescar();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -86,49 +90,40 @@ class _FacturaDetalleScreenState extends ConsumerState<FacturaDetalleScreen> {
 
   Widget _contenido(BuildContext context, Factura f) {
     final tema = Theme.of(context);
-    // Desglose por chofer a partir de los ítems.
-    final porChofer = <String, double>{};
+    final tasa = ref.watch(tasaUsdBsProvider).value ?? 0;
+
+    // Agrupa ítems por producto.
+    final porProducto = <String, List<FacturaItem>>{};
     for (final it in f.items) {
-      final k = it.usuarioId ?? 'sin-chofer';
-      porChofer[k] = (porChofer[k] ?? 0) + it.monto;
+      final k = (it.productoNombre?.trim().isNotEmpty ?? false)
+          ? it.productoNombre!.trim()
+          : 'Sin producto';
+      porProducto.putIfAbsent(k, () => []).add(it);
     }
 
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.md),
       children: [
-        Text('Semana ${f.periodoTexto}', style: tema.textTheme.titleLarge),
+        Text(f.empresaVisible, style: tema.textTheme.titleLarge),
         const SizedBox(height: AppSpacing.xs),
+        Text('Periodo ${f.periodoTexto}', style: tema.textTheme.bodyMedium),
         Text('Estado: ${f.estado.etiqueta}', style: tema.textTheme.bodyMedium),
         const SizedBox(height: AppSpacing.md),
-        _resumen('Flete base', f.subtotalFlete),
-        _resumen('Extras', f.subtotalExtras),
-        _resumen('Total', f.total, destacar: true),
+        _resumen('Flete base', f.subtotalFlete, tasa: tasa),
+        _resumen('Extras', f.subtotalExtras, tasa: tasa),
+        _resumen('Total', f.total, destacar: true, tasa: tasa),
         const SizedBox(height: AppSpacing.lg),
-        Text('Desglose por chofer', style: tema.textTheme.labelLarge),
-        for (final e in porChofer.entries)
-          _resumen(e.key == 'sin-chofer' ? 'Sin chofer' : e.key, e.value),
-        const SizedBox(height: AppSpacing.lg),
-        Text('Ítems (${f.items.length})', style: tema.textTheme.labelLarge),
+        Text('Desglose por producto', style: tema.textTheme.labelLarge),
         const SizedBox(height: AppSpacing.sm),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            columns: const [
-              DataColumn(label: Text('Concepto')),
-              DataColumn(label: Text('Descripción')),
-              DataColumn(label: Text('Monto')),
-            ],
-            rows: [
-              for (final it in f.items)
-                DataRow(cells: [
-                  DataCell(Text(it.tipo?.etiqueta ?? _cap(it.concepto))),
-                  DataCell(Text(it.descripcion ?? '—')),
-                  DataCell(Text('\$${it.monto.toStringAsFixed(2)}')),
-                ]),
-            ],
+        for (final entrada in porProducto.entries) ...[
+          _ProductoBloque(
+            producto: entrada.key,
+            items: entrada.value,
+            tasa: tasa,
           ),
-        ),
-        const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.sm),
+        ],
+        const SizedBox(height: AppSpacing.md),
         Wrap(
           spacing: AppSpacing.sm,
           children: [
@@ -171,7 +166,8 @@ class _FacturaDetalleScreenState extends ConsumerState<FacturaDetalleScreen> {
     );
   }
 
-  Widget _resumen(String etiqueta, double valor, {bool destacar = false}) =>
+  Widget _resumen(String etiqueta, double valor,
+          {bool destacar = false, double tasa = 0}) =>
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 2),
         child: Row(
@@ -182,13 +178,92 @@ class _FacturaDetalleScreenState extends ConsumerState<FacturaDetalleScreen> {
                     fontWeight: destacar ? FontWeight.w700 : FontWeight.w500,
                   )),
             ),
-            Text('\$${valor.toStringAsFixed(2)}',
-                style: TextStyle(
-                  fontWeight: destacar ? FontWeight.w700 : FontWeight.w500,
-                )),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text('\$${valor.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      fontWeight: destacar ? FontWeight.w700 : FontWeight.w500,
+                    )),
+                if (tasa > 0)
+                  Text('Bs ${(valor * tasa).toStringAsFixed(2)}',
+                      style: Theme.of(context).textTheme.bodySmall),
+              ],
+            ),
           ],
         ),
       );
+}
+
+class _ProductoBloque extends StatelessWidget {
+  const _ProductoBloque({
+    required this.producto,
+    required this.items,
+    required this.tasa,
+  });
+
+  final String producto;
+  final List<FacturaItem> items;
+  final double tasa;
+
+  @override
+  Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    final total = items.fold<double>(0, (a, b) => a + b.monto);
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(producto,
+                      style: tema.textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700)),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('\$${total.toStringAsFixed(2)}',
+                        style: tema.textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700)),
+                    if (tasa > 0)
+                      Text('Bs ${(total * tasa).toStringAsFixed(2)}',
+                          style: tema.textTheme.bodySmall),
+                  ],
+                ),
+              ],
+            ),
+            const Divider(height: AppSpacing.md),
+            for (final it in items)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _concepto(it),
+                        style: tema.textTheme.bodyMedium,
+                      ),
+                    ),
+                    Text('\$${it.monto.toStringAsFixed(2)}',
+                        style: tema.textTheme.bodyMedium),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static String _concepto(FacturaItem it) {
+    if (it.tipo == TipoExtra.caleta) return 'Flete secundario';
+    return it.tipo?.etiqueta ?? _cap(it.concepto);
+  }
 
   static String _cap(String s) =>
       s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);

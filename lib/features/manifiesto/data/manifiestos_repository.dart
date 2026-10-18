@@ -232,6 +232,44 @@ class ManifiestosRepository {
         .update({'es_fin_semana': valor}).eq('id', id);
   }
 
+  /// Pesos (kg) por producto de un manifiesto, en `{producto_id: kg}`.
+  Future<Map<String, double>> pesosDeManifiesto(String manifiestoId) async {
+    final data = await _client
+        .from('manifiesto_pesos')
+        .select('producto_id, kg')
+        .eq('manifiesto_id', manifiestoId) as List<dynamic>;
+    final mapa = <String, double>{};
+    for (final e in data) {
+      final m = Map<String, dynamic>.from(e as Map);
+      final kg = m['kg'];
+      mapa[m['producto_id'] as String] =
+          kg is num ? kg.toDouble() : double.tryParse('$kg') ?? 0;
+    }
+    return mapa;
+  }
+
+  /// Guarda (upsert) los pesos por producto de un manifiesto.
+  ///
+  /// Solo escribe los productos presentes en [pesos]; los que lleguen con kg 0
+  /// se guardan igual (permite dejar constancia de que se revisó).
+  Future<void> guardarPesos({
+    required String manifiestoId,
+    required Map<String, double> pesos,
+  }) async {
+    if (pesos.isEmpty) return;
+    final filas = [
+      for (final e in pesos.entries)
+        {
+          'manifiesto_id': manifiestoId,
+          'producto_id': e.key,
+          'kg': e.value,
+        },
+    ];
+    await _client
+        .from('manifiesto_pesos')
+        .upsert(filas, onConflict: 'manifiesto_id,producto_id');
+  }
+
   /// Purga manifiestos validados más antiguos que la retención.
   ///
   /// `dryRun = true` solo cuenta. Devuelve cuántos (se) borrarían.

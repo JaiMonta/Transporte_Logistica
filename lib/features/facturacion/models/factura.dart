@@ -32,6 +32,8 @@ class FacturaItem {
     required this.concepto,
     this.manifiestoId,
     this.usuarioId,
+    this.productoId,
+    this.productoNombre,
     this.tipo,
     this.descripcion,
     this.base,
@@ -45,6 +47,8 @@ class FacturaItem {
   final String concepto;
   final String? manifiestoId;
   final String? usuarioId;
+  final String? productoId;
+  final String? productoNombre;
   final TipoExtra? tipo;
   final String? descripcion;
   final double? base;
@@ -52,19 +56,28 @@ class FacturaItem {
   final double monto;
   final int orden;
 
-  factory FacturaItem.fromMap(Map<String, dynamic> m) => FacturaItem(
-        id: m['id'] as String,
-        facturaId: m['factura_id'] as String,
-        concepto: (m['concepto'] as String?) ?? '',
-        manifiestoId: m['manifiesto_id'] as String?,
-        usuarioId: m['usuario_id'] as String?,
-        tipo: m['tipo'] == null ? null : TipoExtra.desde(m['tipo'] as String?),
-        descripcion: m['descripcion'] as String?,
-        base: _d(m['base']),
-        porcentaje: _d(m['porcentaje']),
-        monto: _d(m['monto']) ?? 0,
-        orden: (m['orden'] as num?)?.toInt() ?? 0,
-      );
+  factory FacturaItem.fromMap(Map<String, dynamic> m) {
+    final prodMap = m['productos'];
+    String? productoNombre;
+    if (prodMap is Map) {
+      productoNombre = prodMap['nombre'] as String?;
+    }
+    return FacturaItem(
+      id: m['id'] as String,
+      facturaId: m['factura_id'] as String,
+      concepto: (m['concepto'] as String?) ?? '',
+      manifiestoId: m['manifiesto_id'] as String?,
+      usuarioId: m['usuario_id'] as String?,
+      productoId: m['producto_id'] as String?,
+      productoNombre: productoNombre,
+      tipo: m['tipo'] == null ? null : TipoExtra.desde(m['tipo'] as String?),
+      descripcion: m['descripcion'] as String?,
+      base: _d(m['base']),
+      porcentaje: _d(m['porcentaje']),
+      monto: _d(m['monto']) ?? 0,
+      orden: (m['orden'] as num?)?.toInt() ?? 0,
+    );
+  }
 
   static double? _d(Object? v) {
     if (v == null) return null;
@@ -79,6 +92,8 @@ class Factura {
     required this.id,
     required this.periodoInicio,
     required this.periodoFin,
+    this.empresaId,
+    this.empresaNombre,
     this.subtotalFlete = 0,
     this.subtotalExtras = 0,
     this.total = 0,
@@ -90,12 +105,19 @@ class Factura {
   final String id;
   final DateTime periodoInicio;
   final DateTime periodoFin;
+  final String? empresaId;
+  final String? empresaNombre;
   final double subtotalFlete;
   final double subtotalExtras;
   final double total;
   final EstadoFactura estado;
   final String? notas;
   final List<FacturaItem> items;
+
+  String get empresaVisible =>
+      (empresaNombre?.trim().isNotEmpty ?? false)
+          ? empresaNombre!.trim()
+          : 'Sin empresa';
 
   String get periodoTexto {
     String f(DateTime x) =>
@@ -118,6 +140,8 @@ class Factura {
       id: m['id'] as String,
       periodoInicio: DateTime.parse(m['periodo_inicio'].toString()),
       periodoFin: DateTime.parse(m['periodo_fin'].toString()),
+      empresaId: m['empresa_id'] as String?,
+      empresaNombre: _empresaNombre(m['empresas']),
       subtotalFlete: _d(m['subtotal_flete']) ?? 0,
       subtotalExtras: _d(m['subtotal_extras']) ?? 0,
       total: _d(m['total']) ?? 0,
@@ -125,6 +149,11 @@ class Factura {
       notas: m['notas'] as String?,
       items: items,
     );
+  }
+
+  static String? _empresaNombre(Object? valor) {
+    if (valor is Map) return valor['nombre'] as String?;
+    return null;
   }
 
   static double? _d(Object? v) {

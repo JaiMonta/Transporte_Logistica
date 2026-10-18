@@ -856,6 +856,100 @@ lo existente.
 
 ---
 
+## Módulo: Facturación por empresa (prorrateo por producto)  ✅ COMPLETADO
+
+**Reemplaza** la facturación semanal: ahora se emite **una factura por empresa**
+facturada (por período), y el **flete base y los extras se prorratean por
+producto** según el peso de cada producto del manifiesto.
+
+### Reglas (decisiones del usuario)
+
+- **Pesos por manifiesto**: el admin carga Kg por producto (Pasta / Confite /
+  Harina). El **total ≤ capacidad** del camión.
+- `USD/kg = flete base ÷ capacidad del camión`.
+- Prorrateo: cada producto toma `USD/kg × kg`; el de **menor peso absorbe el
+  resto** (`flete base − Σ`), como `FLETE BASE − FLETE PASTAS` del Excel. Con el
+  camión lleno coincide con los kg exactos.
+- **Un solo peso** → todo el flete y los extras se cargan a la empresa de ese
+  producto.
+- Los **extras** (caleta/**"flete secundario"**, reparto, desvío, mora, fin de
+  semana, picking) se prorratean por **kg sobre el total de carga** (`kg ÷ Σkg`),
+  con el de menor peso absorbiendo el resto — igual que el Excel (que usa
+  `KG CARGA`).
+- **Varios productos por empresa**; cada producto pertenece a una empresa.
+- Se muestra **USD y Bs** (tasa configurable `configuracion.tasa_usd_bs`).
+
+### Esquema (Supabase)
+
+- Migración `20260930290000_facturacion_empresas.sql` aplicada:
+  - `public.empresas` (nombre único, rif, activo).
+  - `public.productos` (nombre único, `empresa_id`, orden, activo); semilla
+    **Pasta / Confite / Harina** (la empresa la asigna el admin).
+  - `public.manifiesto_pesos` (manifiesto_id, producto_id, kg; único por par).
+  - `facturas` **+`empresa_id`** (único `(periodo_inicio, periodo_fin, empresa_id)`);
+    `factura_items` **+`producto_id`**.
+  - `configuracion.tasa_usd_bs`.
+  - RLS: empresas/productos (lectura autenticada, escritura admin); pesos (admin
+    escribe, chofer lee los suyos); facturas solo admin.
+
+### Flutter
+
+- `lib/features/empresas/`: `models/{empresa,producto}.dart`,
+  `data/empresas_repository.dart`, `providers/empresas_providers.dart`,
+  `presentation/empresas_screen.dart` (pestañas **Empresas** y **Productos**).
+- **Pesos**: `ManifiestosRepository.pesosDeManifiesto`/`guardarPesos`; sección
+  **"Pesos por producto"** en `manifiesto_detalle_screen.dart` (admin), con total
+  y aviso si supera la capacidad.
+- `CalculoFacturacionEmpresas` (puro): `usdPorKg`, `repartir` (el menor peso
+  absorbe) y `calcular` → facturas por empresa.
+- `FacturacionRepository.generar(desde, hasta)` (una factura por empresa y
+  período; rehace ítems), `listarPorLapso`, `obtener`, `cambiarEstado`,
+  `tasaUsdBs`.
+- Pantallas: `facturacion_screen.dart` (lista por empresa, "Generar facturas") y
+  `factura_detalle_screen.dart` (desglose **producto → concepto**, USD/Bs).
+- Navegación: entrada **"Empresas y productos"** en el grupo **Configuración**.
+
+### Pruebas
+
+- `test/facturacion_test.dart`: `SemanaRange`, `repartir` (lleno / no lleno /
+  sin capacidad) y `calcular` (un producto, dos, tres, sin pesos, extras por
+  kg/Σkg y **regresión del caso del Excel**). Total **147 en verde**.
+- RLS/E2E remoto (verificado): el admin crea empresa (201); el chofer lee
+  empresas y productos (200) pero **no** puede crear empresa (403) ni pesos (403).
+- `flutter analyze` limpio; `flutter test` 147/147.
+
+### Validación contra el Excel (`LIQUIDACION ELIAGNYS.xlsm`)
+
+Se analizaron las hojas **RELACIÓN** y **FACTURAS**: confirman el diseño
+(una factura por empresa con los ítems Flete / Flete secundario / Reparto /
+Desvío / Peaje / Mora / Fin de semana, prorrateados por producto).
+
+- **Flete**: el Excel usa `kg × (base ÷ capacidad)` y el de **menor peso**
+  absorbe el resto (`Nuciven = base − pastas − harina`) → coincide con el
+  proyecto.
+- **Extras**: el Excel prorratea por **kg ÷ total de carga** (`KG CARGA`), no por
+  las fracciones del flete. Se **alineó** el proyecto a esta regla.
+- **Manifiesto de prueba (único con Harina):** guías 51085/51086/51087 →
+  **GUANARE**, cap. 10000 kg, base 630, Pasta 8490 / Confite 434.76 / Harina 600.
+  Resultado del proyecto (coincide 100% con el Excel):
+
+  | Empresa | Flete | Flete secundario (caleta) | Total |
+  | --- | --- | --- | --- |
+  | Pasta | 534.87 | 26.74 | 561.61 |
+  | Confite (Nuciven) | 57.33 | 1.37 | 58.70 |
+  | Harina (Molvenca) | 37.80 | 1.89 | 39.69 |
+  | **Total** | 630.00 | 30.00 | **660.00** |
+
+- El ítem **"Flete secundario"** del Excel corresponde a la **caleta**.
+
+### Notas
+
+- Se separó `SemanaRange` en `facturacion/services/semana_range.dart`
+  (reutilizada por la Bitácora).
+- **Pendiente futuro**: peaje como concepto y exportación de la factura a PDF.
+
+---
+
 ## Módulos pendientes
 
 - **Módulo 8 — Extras**: tipo, monto, evidencia opcional; el chofer reporta, el

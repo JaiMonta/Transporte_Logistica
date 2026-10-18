@@ -40,3 +40,8 @@ final facturaProvider =
     FutureProvider.autoDispose.family<Factura?, String>((ref, id) {
   return ref.watch(facturacionRepositoryProvider).obtener(id);
 });
+
+/// Tasa configurada USD -> Bs (0 = sin tasa).
+final tasaUsdBsProvider = FutureProvider.autoDispose<double>(
+  (ref) => ref.watch(facturacionRepositoryProvider).tasaUsdBs(),
+);

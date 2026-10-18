@@ -4,8 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme.dart';
 import '../../../shared/errors/mensajes_error.dart';
 import '../../../shared/widgets/responsive_layout.dart';
-import '../../facturacion/services/calculo_factura_semanal.dart'
-    show SemanaRange;
+import '../../facturacion/services/semana_range.dart' show SemanaRange;
 import '../models/bitacora.dart';
 import '../providers/bitacora_providers.dart';
 import '../services/export_bitacora.dart';

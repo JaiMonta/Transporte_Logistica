@@ -4,16 +4,21 @@ import '../../fletes/models/extra.dart';
 import '../../fletes/models/tabulador_flete.dart';
 import '../../fletes/services/calculo_flete.dart';
 import '../../fletes/services/calculo_extras.dart';
-import '../services/calculo_factura_semanal.dart';
 import '../models/factura.dart';
+import '../services/calculo_facturacion_empresas.dart';
 
-/// Acceso y generación de la facturación semanal (PostgREST, RLS solo admin).
+/// Acceso y generación de la facturación por empresa (PostgREST, RLS admin).
+///
+/// Cada factura corresponde a un período (semana o rango) y a una empresa
+/// facturada. El flete base y los extras se prorratean por producto según el
+/// peso capturado en el manifiesto.
 class FacturacionRepository {
   FacturacionRepository(this._client);
 
   final SupabaseClient _client;
 
-  static const String _seleccion = '*, factura_items(*)';
+  static const String _seleccion =
+      '*, empresas(nombre), factura_items(*, productos(nombre))';
 
   Future<List<Factura>> listarPorLapso(DateTime desde, DateTime hasta) async {
     final data = await _client
@@ -21,7 +26,8 @@ class FacturacionRepository {
         .select(_seleccion)
         .gte('periodo_inicio', _fechaTexto(desde))
         .lte('periodo_inicio', _fechaTexto(hasta))
-        .order('periodo_inicio', ascending: false) as List<dynamic>;
+        .order('periodo_inicio', ascending: false)
+        .order('empresa_id', ascending: true) as List<dynamic>;
     return data
         .map((e) => Factura.fromMap(Map<String, dynamic>.from(e as Map)))
         .toList();
@@ -37,18 +43,29 @@ class FacturacionRepository {
     return Factura.fromMap(Map<String, dynamic>.from(data));
   }
 
-  /// Genera (o rehace) la factura de la semana que contiene [dia].
-  Future<Factura> generarSemana(DateTime dia) async {
-    final semana = SemanaRange.deFecha(dia);
+  /// Tasa configurada USD -> Bs (0 si no está definida).
+  Future<double> tasaUsdBs() async {
+    final data = await _client
+        .from('configuracion')
+        .select('valor')
+        .eq('clave', 'tasa_usd_bs')
+        .maybeSingle();
+    if (data == null) return 0;
+    return double.tryParse('${data['valor']}') ?? 0;
+  }
 
+  /// Genera (o rehace) las facturas por empresa del período [desde]-[hasta].
+  ///
+  /// Devuelve las facturas resultantes (una por empresa con ítems).
+  Future<List<Factura>> generar(DateTime desde, DateTime hasta) async {
     // Manifiestos con al menos una entrega 'entregado' en el período,
     // identificados por la fecha de entrega.
     final entregas = await _client
         .from('entregas')
         .select('manifiesto_id, entregado_en')
         .eq('estado', 'entregado')
-        .gte('entregado_en', '${_fechaTexto(semana.inicio)}T00:00:00')
-        .lte('entregado_en', '${_fechaTexto(semana.fin)}T23:59:59') as List<dynamic>;
+        .gte('entregado_en', '${_fechaTexto(desde)}T00:00:00')
+        .lte('entregado_en', '${_fechaTexto(hasta)}T23:59:59') as List<dynamic>;
 
     final idsManifiestos = <String>{};
     for (final e in entregas) {
@@ -56,34 +73,74 @@ class FacturacionRepository {
       if (mid != null) idsManifiestos.add(mid);
     }
 
-    final resumen = await _resumenDeManifiestos(idsManifiestos.toList());
+    final calculadas = await _calcularFacturas(idsManifiestos.toList());
 
-    // Upsert de la cabecera del período.
-    final facturaRow = await _client
+    final resultado = <Factura>[];
+    for (final fc in calculadas) {
+      resultado.add(await _guardarFactura(desde, hasta, fc));
+    }
+    return resultado;
+  }
+
+  Future<Factura> _guardarFactura(
+    DateTime desde,
+    DateTime hasta,
+    FacturaEmpresaCalculada fc,
+  ) async {
+    // `empresa_id` nulo no es único en Postgres: limpia la factura sin empresa
+    // del período antes de recrearla (evita duplicados al regenerar).
+    if (fc.empresaId == null) {
+      await _client
+          .from('facturas')
+          .delete()
+          .eq('periodo_inicio', _fechaTexto(desde))
+          .eq('periodo_fin', _fechaTexto(hasta))
+          .isFilter('empresa_id', null);
+    }
+
+    dynamic q = _client
         .from('facturas')
-        .upsert({
-          'periodo_inicio': _fechaTexto(semana.inicio),
-          'periodo_fin': _fechaTexto(semana.fin),
-          'subtotal_flete': resumen.subtotalFlete,
-          'subtotal_extras': resumen.subtotalExtras,
-          'total': resumen.total,
-          'estado': 'emitida',
-        }, onConflict: 'periodo_inicio,periodo_fin')
         .select('id')
-        .single();
+        .eq('periodo_inicio', _fechaTexto(desde))
+        .eq('periodo_fin', _fechaTexto(hasta));
+    q = fc.empresaId == null
+        ? q.isFilter('empresa_id', null)
+        : q.eq('empresa_id', fc.empresaId!);
+    final existente = await q.maybeSingle();
 
-    final facturaId = facturaRow['id'] as String;
+    final cabecera = {
+      'periodo_inicio': _fechaTexto(desde),
+      'periodo_fin': _fechaTexto(hasta),
+      'empresa_id': fc.empresaId,
+      'subtotal_flete': fc.subtotalFlete,
+      'subtotal_extras': fc.subtotalExtras,
+      'total': fc.total,
+    };
 
-    // Rehacer: eliminar los ítems previos y volver a insertarlos.
-    await _client.from('factura_items').delete().eq('factura_id', facturaId);
+    final String facturaId;
+    final existenteId = existente == null ? null : existente['id'] as String?;
+    if (existenteId == null) {
+      final row = await _client
+          .from('facturas')
+          .insert({...cabecera, 'estado': 'emitida'})
+          .select('id')
+          .single();
+      facturaId = row['id'] as String;
+    } else {
+      facturaId = existenteId;
+      await _client.from('facturas').update(cabecera).eq('id', facturaId);
+      // Rehacer los ítems.
+      await _client.from('factura_items').delete().eq('factura_id', facturaId);
+    }
 
-    if (resumen.items.isNotEmpty) {
+    if (fc.items.isNotEmpty) {
       await _client.from('factura_items').insert([
-        for (final it in resumen.items)
+        for (final it in fc.items)
           {
             'factura_id': facturaId,
             'manifiesto_id': it.manifiestoId,
             'usuario_id': it.usuarioId,
+            'producto_id': it.productoId,
             'concepto': it.concepto,
             'tipo': it.tipo?.valor,
             'descripcion': it.descripcion,
@@ -98,29 +155,67 @@ class FacturacionRepository {
     return (await obtener(facturaId))!;
   }
 
-  Future<ResumenFactura> _resumenDeManifiestos(List<String> ids) async {
-    if (ids.isEmpty) {
-      return CalculoFacturaSemanal.calcular(const []);
-    }
-    // Manifiestos con chofer, camión, localidad y flete guardado.
+  Future<List<FacturaEmpresaCalculada>> _calcularFacturas(
+    List<String> ids,
+  ) async {
+    if (ids.isEmpty) return const [];
+
     final manis = await _client
         .from('manifiestos')
         .select(
-          'id, capturado_por, costo_flete, camion_id, fletes_tabulador_id, es_fin_semana',
+          'id, capturado_por, costo_flete, camion_id, fletes_tabulador_id, '
+          'es_fin_semana',
         )
         .inFilter('id', ids) as List<dynamic>;
-    // Extras ya aprobados de esos manifiestos.
+
     final extras = await _client
         .from('manifiesto_extras')
         .select()
         .inFilter('manifiesto_id', ids) as List<dynamic>;
-    // Entregas de esos manifiestos (para reparto/desvío/localidad).
+
     final entregas = await _client
         .from('entregas')
         .select(
-          'manifiesto_id, estado, entregado_en, lat, lng, localidad, es_otra_localidad, es_mas_lejana',
+          'id, manifiesto_id, estado, entregado_en, lat, lng, localidad, '
+          'es_otra_localidad, es_mas_lejana',
         )
         .inFilter('manifiesto_id', ids) as List<dynamic>;
+
+    // Pesos capturados y catálogo de productos (con su empresa).
+    final pesosFilas = await _client
+        .from('manifiesto_pesos')
+        .select('manifiesto_id, producto_id, kg')
+        .inFilter('manifiesto_id', ids) as List<dynamic>;
+    final productos = await _client
+        .from('productos')
+        .select('id, nombre, empresa_id, empresas(nombre)') as List<dynamic>;
+    final productoInfo = <String, ({String nombre, String? empresaId, String? empresaNombre})>{};
+    for (final p in productos) {
+      final m = Map<String, dynamic>.from(p as Map);
+      final emp = m['empresas'];
+      productoInfo[m['id'] as String] = (
+        nombre: (m['nombre'] as String?) ?? '',
+        empresaId: m['empresa_id'] as String?,
+        empresaNombre: emp is Map ? emp['nombre'] as String? : null,
+      );
+    }
+
+    final pesosPorManifiesto = <String, List<PesoProducto>>{};
+    for (final p in pesosFilas) {
+      final m = Map<String, dynamic>.from(p as Map);
+      final mid = m['manifiesto_id'] as String?;
+      final pid = m['producto_id'] as String?;
+      if (mid == null || pid == null) continue;
+      final info = productoInfo[pid];
+      final kg = m['kg'];
+      pesosPorManifiesto.putIfAbsent(mid, () => []).add(PesoProducto(
+            productoId: pid,
+            productoNombre: info?.nombre ?? '',
+            empresaId: info?.empresaId,
+            empresaNombre: info?.empresaNombre,
+            kg: kg is num ? kg.toDouble() : double.tryParse('$kg') ?? 0,
+          ));
+    }
 
     final extrasPorManifiesto = <String, List<Extra>>{};
     for (final e in extras) {
@@ -154,7 +249,6 @@ class FacturacionRepository {
             : capacidadesCamion[camId] = await _capacidadCamion(camId);
       }
 
-      // Localidades de las entregas de este manifiesto.
       final ents = entregasPorManifiesto[id] ?? const [];
 
       // Localidad más lejana: la marcada por el admin, o la de mayor km.
@@ -215,14 +309,30 @@ class FacturacionRepository {
           if (!tiposGuardados.contains(a.tipo)) a,
       ];
 
+      final conceptos = [
+        for (final e in extrasFinal)
+          if (e.estado == EstadoExtra.aprobado)
+            ConceptoExtra(
+              concepto: e.tipo.valor,
+              monto: e.monto,
+              tipo: e.tipo,
+              descripcion: e.descripcion,
+              base: e.base,
+              porcentaje: e.porcentaje,
+            ),
+      ];
+
       facturables.add(ManifiestoFacturable(
         manifiestoId: id,
         usuarioId: map['capturado_por'] as String?,
         fleteBase: fleteBase,
-        extras: extrasFinal,
+        capacidadKg: capacidad,
+        pesos: pesosPorManifiesto[id] ?? const [],
+        extras: conceptos,
       ));
     }
-    return CalculoFacturaSemanal.calcular(facturables);
+
+    return CalculoFacturacionEmpresas.calcular(facturables);
   }
 
   /// Genera extras automáticos (aprobados) a partir de las reglas del negocio:
