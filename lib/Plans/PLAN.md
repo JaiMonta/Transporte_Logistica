@@ -747,10 +747,65 @@ CALETAS EXT no necesario.
 
 ---
 
+## Módulo 6 — Pickups (Delivery)  ✅ COMPLETADO
+
+Pickups **asignados solo por el administrador** a un chofer, con **fecha y hora
+estimadas**. El chofer ve los suyos y marca **"En camino"** / **"Completado"**
+(la hora la registra el **servidor**). Notificación **in-app** con Realtime.
+
+### Esquema (Supabase)
+
+- Migración `20260930280000_module6_pickups.sql`:
+  - enum `pickup_estado` (`pendiente`, `en_camino`, `completado`, `cancelado`).
+  - `public.pickups`: `chofer_id→profiles`, `cliente_id→clientes`/`cliente_texto`,
+    `direccion`, `lat/lng`, `camion_id→camiones` (opcional), **`fecha_estimada
+    date`** + **`hora_estimada time`**, `notas`, `estado`, `asignado_por`/`asignado_en`,
+    `en_camino_en`/`completado_en`/`cancelado_en`, timestamps.
+  - Trigger `pickups_tiempos_servidor`: fija `en_camino_en`/`completado_en`/
+    `cancelado_en` con `now()` al cambiar de estado.
+  - Trigger `pickups_proteger_campos`: el chofer **solo** cambia el estado; los
+    demás campos se fuerzan a los anteriores, y se validan las transiciones
+    (`pendiente→en_camino→completado/cancelado`).
+  - Trigger `updated_at` (reutiliza `set_updated_at`).
+  - RLS: el chofer ve/actualiza solo los suyos (`chofer_id = auth.uid()`); el
+    admin gestiona todo; insert/delete solo admin.
+  - `pickups` añadida a la publicación `supabase_realtime`.
+
+### Flutter (feature `pickups`)
+
+- `models/pickup.dart` (`Pickup`, `EstadoPickup` con `valor`/`etiqueta`/`desde`,
+  `clienteVisible`, `tieneUbicacion`, `cuandoTexto`/`horaTexto`).
+- `data/pickups_repository.dart` (listar con filtros, obtener, crear, actualizar,
+  `cambiarEstado` y **`stream()`** de Realtime).
+- `providers/pickups_providers.dart` (`FiltroPickups`, `pickupsProvider`,
+  `pickupProvider`, `pickupsRealtimeProvider`).
+- Admin: `pickups_admin_screen.dart` (chips por estado + "Solo hoy", tarjetas/
+  tabla, cancelar) y `pickup_form_screen.dart` (chofer obligatorio, cliente con
+  `SelectorClienteHibrido` que hereda dirección/coordenadas, fecha y hora
+  estimadas, camión opcional, notas).
+- Chofer: `mis_pickups_screen.dart` ("Pickups"): lista en vivo, marcar **"En
+  camino"** / **"Completado"**, aviso por SnackBar de pickups nuevos.
+- Notificación **in-app (Realtime)**: el chofer recibe "Nuevo pickup asignado" y
+  el admin "marcó En camino / fue completado" (sin push FCM; pendiente futuro).
+- Navegación: rutas `adminPickups`/`adminPickupNuevo`/`adminPickupEditar(id)` y
+  `choferPickups`; entrada **"Pickups"** en el grupo **"Despachos"** del
+  `AdminShell` y tarjeta **"Pickups"** en el home del chofer.
+
+### Pruebas
+
+- Unitarias: `test/pickups_test.dart` (EstadoPickup, joins del cliente/chofer/
+  camión, `cuandoTexto`, `tieneUbicacion`, `copyWith`). Total **131 en verde**.
+- RLS/E2E remoto (todas en verde): el admin crea (estado `pendiente`,
+  `asignado_en` del servidor); el chofer ve solo los suyos; marca `en_camino`
+  (hora del servidor) e **intenta** editar la dirección → se revierte (protección
+  de campos); el chofer **no** puede crear (403); el admin ve todo. Datos de
+  prueba eliminados.
+- `flutter analyze` limpio; `flutter test` 131/131.
+
+---
+
 ## Módulos pendientes
 
-- **Módulo 6 — Pickups / Delivery**: asignados solo por admin con hora estimada;
-  el chofer marca "En camino" con hora del servidor; notificaciones.
 - **Módulo 7 — Jornadas y vista semanal**: tabla de jornadas, pestaña Semana,
   vistas por semana reutilizables en pagos y reportes.
 - **Módulo 8 — Extras**: tipo, monto, evidencia opcional; el chofer reporta, el

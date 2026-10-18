@@ -23,7 +23,8 @@ import '../features/entregas/presentation/chofer_mapa_selector_screen.dart';
 import '../features/fletes/presentation/flete_form_screen.dart';
 import '../features/fletes/presentation/fletes_screen.dart';
 import '../features/facturacion/presentation/factura_detalle_screen.dart';
-import '../features/facturacion/presentation/facturacion_screen.dart';import '../features/entregas/presentation/entrega_mapa_screen.dart';
+import '../features/facturacion/presentation/facturacion_screen.dart';
+import '../features/entregas/presentation/entrega_mapa_screen.dart';
 import '../features/entregas/presentation/entregas_admin_screen.dart';
 import '../features/entregas/presentation/entregas_dia_screen.dart';
 import '../features/entregas/presentation/entregas_mapa_agregado_screen.dart';
@@ -32,6 +33,9 @@ import '../features/manifiesto/presentation/captura_manifiesto_screen.dart';
 import '../features/manifiesto/presentation/manifiesto_detalle_screen.dart';
 import '../features/manifiesto/presentation/manifiestos_screen.dart';
 import '../features/manifiesto/presentation/mis_manifiestos_screen.dart';
+import '../features/pickups/presentation/mis_pickups_screen.dart';
+import '../features/pickups/presentation/pickup_form_screen.dart';
+import '../features/pickups/presentation/pickups_admin_screen.dart';
 import 'supabase_client.dart';
 
 /// Rutas de la aplicación.
@@ -76,11 +80,16 @@ class Rutas {
   static const String adminFacturacion = '/admin/facturacion';
   static String adminFacturaDetalle(String id) => '/admin/facturacion/$id';
 
+  static const String adminPickups = '/admin/pickups';
+  static const String adminPickupNuevo = '/admin/pickups/nuevo';
+  static String adminPickupEditar(String id) => '/admin/pickups/$id';
+
   static const String choferHome = '/chofer/home';
   static const String choferManifiestos = '/chofer/manifiestos';
   static const String choferCapturaManifiesto = '/chofer/manifiestos/capturar';
   static String choferManifiestoDetalle(String id) => '/chofer/manifiestos/$id';
   static const String choferEntregas = '/chofer/entregas';
+  static const String choferPickups = '/chofer/pickups';
   static const String choferMapa = '/chofer/mapa';
   static String choferEntregaMapa(String manifiestoId) =>
       '/chofer/mapa/$manifiestoId';
@@ -140,9 +149,8 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
               GoRoute(
                 path: ':id',
-                builder: (context, state) => UsuarioFormScreen(
-                  usuarioId: state.pathParameters['id'],
-                ),
+                builder: (context, state) =>
+                    UsuarioFormScreen(usuarioId: state.pathParameters['id']),
               ),
             ],
           ),
@@ -156,9 +164,8 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
               GoRoute(
                 path: ':id',
-                builder: (context, state) => ClienteFormScreen(
-                  clienteId: state.pathParameters['id'],
-                ),
+                builder: (context, state) =>
+                    ClienteFormScreen(clienteId: state.pathParameters['id']),
               ),
             ],
           ),
@@ -220,9 +227,8 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
               GoRoute(
                 path: ':id',
-                builder: (context, state) => CamionFormScreen(
-                  camionId: state.pathParameters['id'],
-                ),
+                builder: (context, state) =>
+                    CamionFormScreen(camionId: state.pathParameters['id']),
               ),
             ],
           ),
@@ -232,9 +238,8 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: ':id',
-                builder: (context, state) => FleteFormScreen(
-                  fleteId: state.pathParameters['id']!,
-                ),
+                builder: (context, state) =>
+                    FleteFormScreen(fleteId: state.pathParameters['id']!),
               ),
             ],
           ),
@@ -247,6 +252,21 @@ final routerProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) => FacturaDetalleScreen(
                   facturaId: state.pathParameters['id']!,
                 ),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: Rutas.adminPickups,
+            builder: (context, state) => const PickupsAdminScreen(),
+            routes: [
+              GoRoute(
+                path: 'nuevo',
+                builder: (context, state) => const PickupFormScreen(),
+              ),
+              GoRoute(
+                path: ':id',
+                builder: (context, state) =>
+                    PickupFormScreen(pickupId: state.pathParameters['id']),
               ),
             ],
           ),
@@ -277,6 +297,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const EntregasDiaScreen(),
       ),
       GoRoute(
+        path: Rutas.choferPickups,
+        builder: (context, state) => const MisPickupsScreen(),
+      ),
+      GoRoute(
         path: '/chofer/combustible',
         builder: (context, state) => const ChoferCombustibleSelectorScreen(),
         routes: [
@@ -294,9 +318,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: ':id',
-            builder: (context, state) => EntregaMapaScreen(
-              manifiestoId: state.pathParameters['id']!,
-            ),
+            builder: (context, state) =>
+                EntregaMapaScreen(manifiestoId: state.pathParameters['id']!),
           ),
         ],
       ),
@@ -356,7 +379,8 @@ class _ChoferHomeScreen extends ConsumerWidget {
           IconButton(
             tooltip: 'Cerrar sesión',
             icon: const Icon(Icons.logout),
-            onPressed: () => ref.read(authControllerProvider.notifier).cerrarSesion(),
+            onPressed: () =>
+                ref.read(authControllerProvider.notifier).cerrarSesion(),
           ),
         ],
       ),
@@ -395,6 +419,15 @@ class _ChoferHomeScreen extends ConsumerWidget {
               subtitle: const Text('Marca entregas y activa el GPS'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.go(Rutas.choferEntregas),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.inventory_2_outlined),
+              title: const Text('Pickups'),
+              subtitle: const Text('Tus pickups asignados'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.go(Rutas.choferPickups),
             ),
           ),
           Card(

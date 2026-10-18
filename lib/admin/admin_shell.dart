@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -74,6 +74,12 @@ class AdminShell extends ConsumerWidget {
           icono: Icons.gps_fixed,
           iconoActivo: Icons.gps_fixed,
         ),
+        _Opcion(
+          titulo: 'Pickups',
+          ruta: Rutas.adminPickups,
+          icono: Icons.inventory_2_outlined,
+          iconoActivo: Icons.inventory_2,
+        ),
       ],
     ),
     _Grupo(
@@ -126,8 +132,10 @@ class AdminShell extends ConsumerWidget {
     ),
   ];
 
-  static List<_Opcion> get _todas =>
-      [_panel, for (final g in _grupos) ...g.opciones];
+  static List<_Opcion> get _todas => [
+    _panel,
+    for (final g in _grupos) ...g.opciones,
+  ];
 
   _Opcion? get _actual {
     for (final o in _todas) {
@@ -139,7 +147,9 @@ class AdminShell extends ConsumerWidget {
   /// Índice del grupo que contiene la ubicación actual (o -1 si es Panel).
   int get _grupoActual {
     for (var i = 0; i < _grupos.length; i++) {
-      if (_grupos[i].opciones.any((o) => ubicacion.startsWith(o.ruta))) return i;
+      if (_grupos[i].opciones.any((o) => ubicacion.startsWith(o.ruta))) {
+        return i;
+      }
     }
     return -1;
   }
@@ -150,6 +160,7 @@ class AdminShell extends ConsumerWidget {
   bool get _enListaClientes => ubicacion == Rutas.adminClientes;
   bool get _enListaManifiestos => ubicacion == Rutas.adminManifiestos;
   bool get _enListaCamiones => ubicacion == Rutas.adminCamiones;
+  bool get _enListaPickups => ubicacion == Rutas.adminPickups;
 
   Future<void> _salir(BuildContext context, WidgetRef ref) =>
       ref.read(authControllerProvider.notifier).cerrarSesion();
@@ -185,6 +196,12 @@ class AdminShell extends ConsumerWidget {
               icon: const Icon(Icons.add_box_outlined),
               onPressed: () => context.push(Rutas.adminCamionNuevo),
             ),
+          if (_enListaPickups)
+            IconButton(
+              tooltip: 'Nuevo pickup',
+              icon: const Icon(Icons.add_task),
+              onPressed: () => context.push(Rutas.adminPickupNuevo),
+            ),
           IconButton(
             tooltip: 'Cerrar sesión',
             icon: const Icon(Icons.logout),
@@ -212,8 +229,7 @@ class AdminShell extends ConsumerWidget {
           ),
         ],
       ),
-      bottomNavigationBar:
-          ancho ? null : _barraInferior(context, ref),
+      bottomNavigationBar: ancho ? null : _barraInferior(context, ref),
     );
   }
 
@@ -338,14 +354,12 @@ class _Rail extends StatelessWidget {
       child: TextButton.icon(
         onPressed: () => onIr(o.ruta),
         icon: Icon(seleccionado ? o.iconoActivo : o.icono, size: 20),
-        label: Align(
-          alignment: Alignment.centerLeft,
-          child: Text(o.titulo),
-        ),
+        label: Align(alignment: Alignment.centerLeft, child: Text(o.titulo)),
         style: TextButton.styleFrom(
           alignment: Alignment.centerLeft,
-          foregroundColor:
-              seleccionado ? Theme.of(context).colorScheme.primary : null,
+          foregroundColor: seleccionado
+              ? Theme.of(context).colorScheme.primary
+              : null,
           backgroundColor: seleccionado
               ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.10)
               : null,
