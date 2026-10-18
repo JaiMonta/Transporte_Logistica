@@ -158,14 +158,14 @@ class CombustibleJornada {
       v == null ? null : DateTime.tryParse(v.toString());
 }
 
-/// CÃ¡lculo de kilÃ³metros y consumo (puro y testeable).
+/// Cálculo de kilómetros y consumo (puro y testeable).
 class CalculoCombustible {
   const CalculoCombustible._();
 
-  /// Rendimiento por defecto en litros por kilÃ³metro.
+  /// Rendimiento por defecto en litros por kilómetro.
   static const double rendimientoPorDefecto = 0.32;
 
-  /// Distancia en km entre dos coordenadas (fÃ³rmula de Haversine).
+  /// Distancia en km entre dos coordenadas (fórmula de Haversine).
   static double distanciaKm(
     double lat1,
     double lng1,
@@ -199,14 +199,14 @@ class CalculoCombustible {
     return total;
   }
 
-  /// Consumo teÃ³rico: km Ã— rendimiento.
+  /// Consumo teórico: km Ã— rendimiento.
   static double consumoTeorico(
     double km, {
     double rendimiento = rendimientoPorDefecto,
   }) =>
       km * rendimiento;
 
-  /// Consumo real: litros iniciales + recargas âˆ’ litros finales.
+  /// Consumo real: litros iniciales + recargas − litros finales.
   static double consumoReal({
     required double litrosIniciales,
     required double recargas,

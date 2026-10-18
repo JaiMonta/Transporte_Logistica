@@ -1,7 +1,31 @@
+import 'package:app_logistica/features/entregas/data/entregas_repository.dart';
 import 'package:app_logistica/features/entregas/models/entrega.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  group('EntregasRepository.inicioVentana', () {
+    test('sin límite devuelve null', () {
+      expect(
+        EntregasRepository.inicioVentana(DateTime(2026, 10, 18), null),
+        isNull,
+      );
+    });
+
+    test('con 4 días resta cuatro días', () {
+      expect(
+        EntregasRepository.inicioVentana(DateTime(2026, 10, 18), 4),
+        DateTime(2026, 10, 14),
+      );
+    });
+
+    test('normaliza la hora a medianoche', () {
+      expect(
+        EntregasRepository.inicioVentana(DateTime(2026, 10, 18, 15, 30), 2),
+        DateTime(2026, 10, 16),
+      );
+    });
+  });
+
   group('Entrega', () {
     test('fromMap interpreta campos y cliente del catálogo', () {
       final e = Entrega.fromMap({

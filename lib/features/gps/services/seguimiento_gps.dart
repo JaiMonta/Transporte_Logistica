@@ -9,7 +9,7 @@ import '../../../core/supabase_client.dart';
 
 /// Envío periódico de ubicación (primer plano).
 ///
-/// Cada [intervalo] (20 min por defecto) toma una posición con [GpsTracker]
+/// Cada [intervalo] (2 min por defecto) toma una posición con [GpsTracker]
 /// y la envía a `ubicaciones_gps`. Si falla (sin red), se agenda el siguiente
 /// ciclo (el búfer local del Módulo 3 queda disponible para reintentos).
 class SeguimientoGps {
@@ -18,7 +18,7 @@ class SeguimientoGps {
   final GpsTracker _tracker;
   final UbicacionesRepository _repo;
 
-  static const Duration intervalo = Duration(minutes: 20);
+  static const Duration intervalo = Duration(minutes: 2);
 
   Timer? _temporizador;
   bool _activo = false;
@@ -27,25 +27,25 @@ class SeguimientoGps {
   bool get activo => _activo;
 
   /// Inicia el seguimiento. Envía una posición de inmediato y luego cada
-  /// [intervalo].
-  Future<bool> iniciar({String? manifiestoId}) async {
-    if (_activo) return true;
+  /// [intervalo]. Devuelve el estado de la primera captura.
+  Future<EstadoCaptura> iniciar({String? manifiestoId}) async {
+    if (_activo) return EstadoCaptura.ok;
     _manifiestoId = manifiestoId;
 
-    // Primer envío inmediato (si hay permiso).
-    final ok = await _tracker.capturarUnaVez();
-    if (ok == null) return false;
-    await _enviar(ok);
+    // Primer envío inmediato (pide permiso y valida el servicio).
+    final resultado = await _tracker.capturar();
+    if (!resultado.ok) return resultado.estado;
+    await _enviar(resultado.punto!);
 
     _temporizador?.cancel();
     _temporizador = Timer.periodic(intervalo, (_) => _ciclo());
     _activo = true;
-    return true;
+    return EstadoCaptura.ok;
   }
 
   Future<void> _ciclo() async {
-    final punto = await _tracker.capturarUnaVez();
-    if (punto != null) await _enviar(punto);
+    final resultado = await _tracker.capturar();
+    if (resultado.ok) await _enviar(resultado.punto!);
   }
 
   Future<void> _enviar(PuntoGps punto) async {

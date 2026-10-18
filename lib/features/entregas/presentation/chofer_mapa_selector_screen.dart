@@ -7,7 +7,7 @@ import '../../../core/theme.dart';
 import '../../../shared/errors/mensajes_error.dart';
 import '../../manifiesto/providers/manifiestos_providers.dart';
 
-/// Selector de manifiesto del dÃ­a para ver su mapa de entregas (chofer).
+/// Selector de manifiesto del día para ver su mapa de entregas (chofer).
 class ChoferMapaSelectorScreen extends ConsumerWidget {
   const ChoferMapaSelectorScreen({super.key});
 

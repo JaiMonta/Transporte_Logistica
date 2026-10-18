@@ -11,6 +11,7 @@ import '../../../core/theme.dart';
 import '../../../shared/errors/mensajes_error.dart';
 import '../../../shared/services/almacenamiento_providers.dart';
 import '../../../shared/services/almacenamiento_repository.dart';
+import '../../../shared/services/gps_tracker.dart' show EstadoCaptura;
 import '../../../shared/widgets/offline_banner.dart';
 import '../../../shared/widgets/responsive_layout.dart';
 import '../../fletes/models/extra.dart';
@@ -20,7 +21,7 @@ import '../models/entrega.dart';
 import '../providers/entregas_providers.dart';
 import 'widgets/entrega_card.dart';
 
-/// Entregas del dÃ­a (chofer). Arranca el seguimiento GPS al abrir.
+/// Entregas (chofer). Arranca el seguimiento GPS al abrir.
 class EntregasDiaScreen extends ConsumerStatefulWidget {
   const EntregasDiaScreen({super.key});
 
@@ -41,15 +42,33 @@ class _EntregasDiaScreenState extends ConsumerState<EntregasDiaScreen> {
   }
 
   Future<void> _iniciarGps() async {
-    final ok = await ref.read(seguimientoGpsProvider).iniciar();
-    if (!mounted) return;
-    setState(() {
-      _gpsActivo = ok;
-      _avisoGps = ok
-          ? null
-          : 'No se pudo activar el GPS. Revisa los permisos de ubicaciÃ³n.';
-    });
+    try {
+      final estado = await ref.read(seguimientoGpsProvider).iniciar();
+      if (!mounted) return;
+      setState(() {
+        _gpsActivo = estado == EstadoCaptura.ok;
+        _avisoGps = _mensajeGps(estado);
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _gpsActivo = false;
+        _avisoGps = 'No se pudo activar el GPS. Revisa los permisos.';
+      });
+    }
   }
+
+  String? _mensajeGps(EstadoCaptura estado) => switch (estado) {
+        EstadoCaptura.ok => null,
+        EstadoCaptura.sinPermiso =>
+          'El GPS necesita permiso de ubicación. Concédelo y reintenta.',
+        EstadoCaptura.servicioApagado =>
+          'Activa la ubicación del teléfono para registrar el trayecto.',
+        EstadoCaptura.noDisponible =>
+          'El GPS no está disponible en esta plataforma.',
+        EstadoCaptura.error =>
+          'No se pudo obtener la ubicación. Se reintentará en el próximo ciclo.',
+      };
 
   /// El chofer avisa (sugiere) una devolución o mora; el admin aprueba.
   Future<void> _avisar(Entrega entrega) async {
@@ -205,7 +224,7 @@ class _EntregasDiaScreenState extends ConsumerState<EntregasDiaScreen> {
       appBar: AppBar(
         title: const Text('Entregas'),
         leading: IconButton(
-          tooltip: 'AtrÃ¡s',
+          tooltip: 'Atrás',
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.canPop()
               ? context.pop()
@@ -229,7 +248,7 @@ class _EntregasDiaScreenState extends ConsumerState<EntregasDiaScreen> {
               spacing: AppSpacing.sm,
               children: [
                 _chipModo('Pendientes', ModoEntregas.pendientes),
-                _chipModo('Hoy', ModoEntregas.hoy),
+                _chipModo('Últimos días', ModoEntregas.hoy),
                 _chipModo('Todas', ModoEntregas.todas),
               ],
             ),
@@ -238,9 +257,20 @@ class _EntregasDiaScreenState extends ConsumerState<EntregasDiaScreen> {
             Container(
               width: double.infinity,
               color: AppColors.errorContainer,
-              padding: const EdgeInsets.all(AppSpacing.sm),
-              child: Text(_avisoGps!,
-                  style: const TextStyle(color: AppColors.onSurface)),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(_avisoGps!,
+                        style: const TextStyle(color: AppColors.onSurface)),
+                  ),
+                  TextButton(
+                    onPressed: _iniciarGps,
+                    child: const Text('Reintentar'),
+                  ),
+                ],
+              ),
             ),
           if (_gpsActivo)
             Container(
@@ -252,7 +282,7 @@ class _EntregasDiaScreenState extends ConsumerState<EntregasDiaScreen> {
                   const Icon(Icons.gps_fixed,
                       size: 16, color: AppColors.tertiary),
                   const SizedBox(width: AppSpacing.sm),
-                  Text('UbicaciÃ³n activa (reporta cada 20 min).',
+                  Text('Ubicación activa (reporta cada 2 min).',
                       style: Theme.of(context).textTheme.bodySmall),
                 ],
               ),
@@ -319,7 +349,7 @@ class _VacioVista extends StatelessWidget {
             size: 56, color: AppColors.onSurfaceVariant),
         const SizedBox(height: AppSpacing.md),
         Center(
-          child: Text('No hay entregas para hoy.',
+          child: Text('No hay entregas en este lapso.',
               style: Theme.of(context).textTheme.titleMedium),
         ),
         const SizedBox(height: AppSpacing.xs),

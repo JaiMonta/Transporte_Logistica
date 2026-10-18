@@ -10,6 +10,20 @@ class EntregasRepository {
 
   static const String _seleccion = '*, clientes(nombre)';
 
+  /// Antigüedad máxima (en días) de los manifiestos que muestra el chip
+  /// "Últimos días". `null` = sin límite inferior (modo prueba); con `4`
+  /// quedaría como ventana de cuatro días.
+  static const int? diasVentana = null;
+
+  /// Inicio (inclusive) de la ventana para [dia] con [dias] de antigüedad.
+  ///
+  /// Con [dias] nulo no hay límite inferior; el tope superior siempre es [dia].
+  static DateTime? inicioVentana(DateTime dia, int? dias) {
+    if (dias == null) return null;
+    final d = DateTime(dia.year, dia.month, dia.day);
+    return d.subtract(Duration(days: dias));
+  }
+
   /// Entregas de un manifiesto, ordenadas por secuencia.
   Future<List<Entrega>> porManifiesto(String manifiestoId) async {
     final data = await _client
@@ -22,13 +36,16 @@ class EntregasRepository {
         .toList();
   }
 
-  /// Entregas del día (por fecha del manifiesto).
+  /// Entregas de la ventana de días: desde [fecha] hacia atrás [diasVentana]
+  /// días (sin límite inferior si es `null`). Por fecha del manifiesto, sin
+  /// incluir manifiestos con fecha futura.
   Future<List<Entrega>> delDia(DateTime fecha) async {
     final dia = _fechaTexto(fecha);
-    final manis = await _client
-        .from('manifiestos')
-        .select('id')
-        .eq('fecha', dia) as List<dynamic>;
+    final inicio = inicioVentana(fecha, diasVentana);
+    final consulta = _client.from('manifiestos').select('id').lte('fecha', dia);
+    final filtrada =
+        inicio == null ? consulta : consulta.gte('fecha', _fechaTexto(inicio));
+    final manis = await filtrada as List<dynamic>;
     final ids = manis.map((e) => (e as Map)['id'] as String).toList();
     if (ids.isEmpty) return [];
     return _porManifiestos(ids);

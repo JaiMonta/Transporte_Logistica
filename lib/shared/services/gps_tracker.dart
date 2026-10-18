@@ -6,6 +6,19 @@ import 'package:geolocator/geolocator.dart';
 import 'offline_manager.dart';
 import 'sync_engine.dart';
 
+/// Resultado de intentar capturar una posición.
+enum EstadoCaptura { ok, sinPermiso, servicioApagado, noDisponible, error }
+
+/// Captura de una posición con su estado (motivo si no se pudo).
+class ResultadoCaptura {
+  const ResultadoCaptura(this.estado, [this.punto]);
+
+  final EstadoCaptura estado;
+  final PuntoGps? punto;
+
+  bool get ok => estado == EstadoCaptura.ok && punto != null;
+}
+
 /// Servicio de geolocalización con búfer local.
 ///
 /// Captura posiciones y las guarda en el búfer local (solo móvil) para
@@ -61,22 +74,53 @@ class GpsTracker {
   }
 
   /// Toma una única posición y la guarda en el búfer.
-  Future<PuntoGps?> capturarUnaVez() async {
-    if (!disponible) return null;
-    final permiso = await Geolocator.checkPermission();
-    if (permiso == LocationPermission.denied ||
-        permiso == LocationPermission.deniedForever) {
-      return null;
+  ///
+  /// Verifica el servicio de ubicación y **pide el permiso** si hace falta;
+  /// ante un timeout usa la última posición conocida.
+  Future<ResultadoCaptura> capturar() async {
+    if (!disponible) {
+      return const ResultadoCaptura(EstadoCaptura.noDisponible);
     }
-    final posicion = await Geolocator.getCurrentPosition();
-    final punto = PuntoGps(
-      lat: posicion.latitude,
-      lng: posicion.longitude,
-      precision: posicion.accuracy,
-      capturadoEn: posicion.timestamp,
-    );
-    await _manager.guardarPunto(punto);
-    return punto;
+    try {
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        return const ResultadoCaptura(EstadoCaptura.servicioApagado);
+      }
+
+      var permiso = await Geolocator.checkPermission();
+      if (permiso == LocationPermission.denied) {
+        permiso = await Geolocator.requestPermission();
+      }
+      if (permiso == LocationPermission.denied ||
+          permiso == LocationPermission.deniedForever) {
+        return const ResultadoCaptura(EstadoCaptura.sinPermiso);
+      }
+
+      Position? posicion;
+      try {
+        posicion = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.high,
+            timeLimit: Duration(seconds: 30),
+          ),
+        );
+      } on TimeoutException {
+        posicion = await Geolocator.getLastKnownPosition();
+      }
+      if (posicion == null) {
+        return const ResultadoCaptura(EstadoCaptura.error);
+      }
+
+      final punto = PuntoGps(
+        lat: posicion.latitude,
+        lng: posicion.longitude,
+        precision: posicion.accuracy,
+        capturadoEn: posicion.timestamp,
+      );
+      await _manager.guardarPunto(punto);
+      return ResultadoCaptura(EstadoCaptura.ok, punto);
+    } catch (_) {
+      return const ResultadoCaptura(EstadoCaptura.error);
+    }
   }
 
   void detener() {

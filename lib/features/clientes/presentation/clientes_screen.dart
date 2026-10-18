@@ -14,8 +14,8 @@ import '../providers/clientes_providers.dart';
 import 'widgets/cliente_card.dart';
 import 'widgets/cliente_tabla.dart';
 
-/// CatÃ¡logo de clientes con bÃºsqueda y filtro por estado.
-/// Muestra tarjetas en telÃ©fono y tabla en pantalla ancha.
+/// Catálogo de clientes con búsqueda y filtro por estado.
+/// Muestra tarjetas en teléfono y tabla en pantalla ancha.
 class ClientesScreen extends ConsumerStatefulWidget {
   const ClientesScreen({super.key});
 
@@ -52,11 +52,11 @@ class _ClientesScreenState extends ConsumerState<ClientesScreen> {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Â¿${accion[0].toUpperCase()}${accion.substring(1)} cliente?'),
+        title: Text('¿${accion[0].toUpperCase()}${accion.substring(1)} cliente?'),
         content: Text(
           cliente.activo
-              ? 'El cliente dejarÃ¡ de aparecer para los choferes, pero se conserva su historial.'
-              : 'El cliente volverÃ¡ a estar disponible para los choferes.',
+              ? 'El cliente dejará de aparecer para los choferes, pero se conserva su historial.'
+              : 'El cliente volverá a estar disponible para los choferes.',
         ),
         actions: [
           TextButton(
@@ -65,7 +65,7 @@ class _ClientesScreenState extends ConsumerState<ClientesScreen> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('SÃ­, $accion'),
+            child: Text('Sí, $accion'),
           ),
         ],
       ),
@@ -108,7 +108,7 @@ class _ClientesScreenState extends ConsumerState<ClientesScreen> {
               AppTextField(
                 controller: _busqueda,
                 label: 'Buscar',
-                hint: 'Nombre, contacto, correo o direcciÃ³n',
+                hint: 'Nombre, contacto, correo o dirección',
                 icono: Icons.search,
                 onChanged: _onBuscar,
               ),
@@ -191,7 +191,7 @@ class _VacioVista extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.xs),
         Center(
-          child: Text('Ajusta la bÃºsqueda o los filtros.',
+          child: Text('Ajusta la búsqueda o los filtros.',
               style: Theme.of(context).textTheme.bodySmall),
         ),
       ],

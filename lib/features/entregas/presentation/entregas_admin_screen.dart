@@ -40,7 +40,7 @@ class _EntregasAdminScreenState extends ConsumerState<EntregasAdminScreen> {
                   spacing: AppSpacing.sm,
                   children: [
                     _chipModo('Pendientes', ModoEntregas.pendientes),
-                    _chipModo('Hoy', ModoEntregas.hoy),
+                    _chipModo('Últimos días', ModoEntregas.hoy),
                     _chipModo('Todas', ModoEntregas.todas),
                   ],
                 ),

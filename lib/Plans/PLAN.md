@@ -708,6 +708,45 @@ CALETAS EXT no necesario.
 
 ---
 
+## Ajustes recientes — Entregas y GPS  ✅ COMPLETADO
+
+### 1. Entregas de días anteriores (ventana "Últimos días")
+
+- **Antes:** el chip **"Hoy"** filtraba por igualdad exacta
+  (`manifiestos.fecha == hoy`), así que un pedido de días previos no aparecía
+  ahí. `pendientes()`/`todas()` no filtran fecha (el chip por defecto es
+  Pendientes); `marcarEntregado` nunca validó fecha, el bloqueo era de
+  visibilidad.
+- **Ahora:** `EntregasRepository.delDia` consulta por **rango**
+  (`lte('fecha', dia)` + `gte` opcional) con el helper puro
+  `inicioVentana(dia, dias)` y la constante `diasVentana = null`
+  (**sin límite** para prueba; se pondrá en `4` para la ventana de cuatro
+  días). El chip pasa a llamarse **"Últimos días"** (chofer y admin) y el
+  texto de vacío es genérico.
+- Pruebas: `test/modulo5_test.dart` cubre `inicioVentana` (sin límite,
+  4 días, normalización a medianoche). Total del proyecto **122 en verde**.
+
+### 2. GPS — permisos y envío cada 2 minutos (Android)
+
+- **Causa raíz:** `GpsTracker.capturarUnaVez` **nunca pedía permiso** (solo
+  `checkPermission`); en instalación nueva el permiso no se concedía → el GPS
+  no arrancaba y solo se veía "No se pudo activar". Además no comprobaba
+  `isLocationServiceEnabled()` (excepción no capturada si el GPS del teléfono
+  estaba apagado) y `getCurrentPosition()` iba sin timeout.
+- **Ahora:** `GpsTracker.capturar()` (nuevo) verifica el servicio, **pide el
+  permiso** si hace falta, usa
+  `LocationSettings(accuracy: high, timeLimit: 30s)` con respaldo en
+  `getLastKnownPosition()` y devuelve un `ResultadoCaptura` con motivo
+  (`EstadoCaptura`: ok / sinPermiso / servicioApagado / noDisponible / error).
+- **Intervalo:** `SeguimientoGps.intervalo` pasó de **20 min a 2 min**. La
+  pantalla de Entregas muestra el motivo concreto y un botón **"Reintentar"**;
+  el texto es "Ubicación activa (reporta cada 2 min)".
+- **Notas (pendiente):** sigue siendo primer plano (sin background real); el
+  búfer `gps_buffer` se escribe pero no se vacía; el mapa admin limita a 200
+  filas y puede omitir la última posición de un chofer.
+
+---
+
 ## Módulos pendientes
 
 - **Módulo 6 — Pickups / Delivery**: asignados solo por admin con hora estimada;

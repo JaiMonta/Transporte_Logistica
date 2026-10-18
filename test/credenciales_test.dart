@@ -2,7 +2,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// ImplementaciÃ³n en memoria para probar la lÃ³gica sin el plugin nativo.
+/// Implementación en memoria para probar la lógica sin el plugin nativo.
 class _StorageFalso extends FlutterSecureStorage {
   _StorageFalso();
 
