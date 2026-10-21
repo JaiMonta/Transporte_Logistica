@@ -19,6 +19,7 @@ import '../../auth/models/profile.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../../camiones/providers/camiones_providers.dart';
 import '../../combustible/presentation/dialogo_combustible.dart';
+import '../../empresas/providers/empresas_providers.dart';
 import '../../combustible/providers/combustible_providers.dart';
 import '../models/manifiesto.dart';
 import '../providers/manifiestos_providers.dart';
@@ -52,8 +53,10 @@ class _CapturaManifiestoScreenState
   final _formKey = GlobalKey<FormState>();
   final _fecha = TextEditingController();
   List<ManifiestoLinea> _lineas = [];
+  Map<String, double> _pesos = {};
   String? _camionId;
   bool _guardando = false;
+  bool _intentoGuardar = false;
 
   @override
   void initState() {
@@ -176,6 +179,8 @@ class _CapturaManifiestoScreenState
       _procesando = false;
       _fecha.text = _fechaTexto(DateTime.now());
       _lineas = [];
+      _pesos = {};
+      _intentoGuardar = false;
     });
   }
 
@@ -186,10 +191,13 @@ class _CapturaManifiestoScreenState
       _evidencia = null;
       _fecha.clear();
       _lineas = [];
+      _pesos = {};
+      _intentoGuardar = false;
     });
   }
 
   Future<void> _guardar() async {
+    setState(() => _intentoGuardar = true);
     if (!_formKey.currentState!.validate()) return;
     final fecha = _parseFecha(_fecha.text);
     if (fecha == null) {
@@ -198,14 +206,37 @@ class _CapturaManifiestoScreenState
       );
       return;
     }
-    final validas =
-        _lineas.where((l) => l.numero.trim().isNotEmpty).toList();
-    if (validas.isEmpty) {
+
+    // Solo factura: cada fila usada debe tener número y cliente.
+    final usadas = _lineas
+        .where((l) =>
+            l.numero.trim().isNotEmpty ||
+            l.clienteId != null ||
+            (l.clienteTexto?.trim().isNotEmpty ?? false))
+        .toList();
+    final incompletas = usadas.any((l) =>
+        l.numero.trim().isEmpty ||
+        (l.clienteId == null && (l.clienteTexto?.trim().isEmpty ?? true)));
+    if (usadas.isEmpty || incompletas) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Agrega al menos un documento.')),
+        const SnackBar(
+          content: Text('Cada factura necesita número y cliente.'),
+        ),
       );
       return;
     }
+
+    final totalKg =
+        _pesos.values.fold<double>(0, (a, kg) => a + (kg.isFinite ? kg : 0));
+    if (totalKg <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Ingresa la carga: al menos un producto con kg.'),
+        ),
+      );
+      return;
+    }
+
     final esAdmin = ref.read(currentProfileProvider).value?.rol == Rol.admin;
     if (!esAdmin && _camionId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -213,28 +244,50 @@ class _CapturaManifiestoScreenState
       );
       return;
     }
+
+    // La carga no puede superar la capacidad del camión.
+    if (_camionId != null) {
+      final camion =
+          await ref.read(camionesRepositoryProvider).obtener(_camionId!);
+      final capacidad = camion?.capacidadKg;
+      if (capacidad != null && capacidad > 0 && totalKg > capacidad) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'La carga ($totalKg kg) supera la capacidad del camión '
+              '(${capacidad.toStringAsFixed(0)} kg).',
+            ),
+          ),
+        );
+        return;
+      }
+    }
+
+    if (!mounted) return;
     FocusScope.of(context).unfocus();
     setState(() => _guardando = true);
     try {
       final repo = ref.read(manifiestosRepositoryProvider);
 
-      // Unicidad (tipo + número + fecha) validada en la app.
-      for (final l in validas) {
+      // Unicidad (factura + número + fecha) validada en la app.
+      for (final l in usadas) {
         final existe = await repo.existeDocumento(
-          tipo: l.tipo,
+          tipo: TipoDocumento.factura,
           numero: l.numero,
           fecha: fecha,
         );
         if (existe) {
           throw Exception(
-            'Ya existe un documento ${l.tipo.etiqueta} ${l.numero} con la fecha ${_fechaTexto(fecha)}.',
+            'Ya existe la factura ${l.numero} con la fecha ${_fechaTexto(fecha)}.',
           );
         }
       }
 
       final creado = await repo.crear(
         fecha: fecha,
-        lineas: validas,
+        lineas: usadas,
+        pesos: _pesos,
         camionId: _camionId,
         bucket: _evidencia?.bucket,
         path: _evidencia?.path,
@@ -473,9 +526,14 @@ class _CapturaManifiestoScreenState
                   onCambio: (v) => setState(() => _camionId = v),
                 ),
                 const SizedBox(height: AppSpacing.lg),
+                _PesosCarga(
+                  onCambio: (p) => setState(() => _pesos = p),
+                ),
+                const SizedBox(height: AppSpacing.lg),
                 LineasEditor(
                   lineas: _lineas,
                   onCambio: (l) => setState(() => _lineas = l),
+                  mostrarErrores: _intentoGuardar,
                 ),
                 const SizedBox(height: AppSpacing.md),
                 PrimaryButton(
@@ -612,6 +670,92 @@ class _SelectorCamion extends ConsumerWidget {
           validator: esAdmin
               ? null
               : (v) => (v == null || v.isEmpty) ? 'Selecciona el camión.' : null,
+        );
+      },
+    );
+  }
+}
+
+/// Captura del total (kg) por producto para el manifiesto.
+class _PesosCarga extends ConsumerStatefulWidget {
+  const _PesosCarga({required this.onCambio});
+
+  final ValueChanged<Map<String, double>> onCambio;
+
+  @override
+  ConsumerState<_PesosCarga> createState() => _PesosCargaState();
+}
+
+class _PesosCargaState extends ConsumerState<_PesosCarga> {
+  final Map<String, TextEditingController> _ctrl = {};
+
+  @override
+  void dispose() {
+    for (final c in _ctrl.values) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  static double _parse(String t) =>
+      double.tryParse(t.trim().replaceAll(',', '.')) ?? 0;
+
+  void _emitir() {
+    widget.onCambio({
+      for (final e in _ctrl.entries) e.key: _parse(e.value.text),
+    });
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    final async = ref.watch(productosActivosProvider);
+    return async.when(
+      loading: () => const LinearProgressIndicator(),
+      error: (e, _) => Text('No se pudieron cargar los productos: $e'),
+      data: (productos) {
+        for (final p in productos) {
+          _ctrl.putIfAbsent(p.id, () => TextEditingController());
+        }
+        final total = _ctrl.entries.fold<double>(
+          0,
+          (a, e) => a + _parse(e.value.text),
+        );
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Carga de productos (kg)', style: tema.textTheme.labelLarge),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              'Total por producto. La suma no puede superar la capacidad del camión.',
+              style: tema.textTheme.bodySmall,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            if (productos.isEmpty)
+              const Text(
+                  'No hay productos activos. Créalos en "Empresas y productos".')
+            else ...[
+              for (final p in productos)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                  child: TextField(
+                    controller: _ctrl[p.id],
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    onChanged: (_) => _emitir(),
+                    decoration: InputDecoration(
+                      labelText: p.nombreVisible,
+                      suffixText: 'kg',
+                    ),
+                  ),
+                ),
+              Text(
+                'Total: ${total.toStringAsFixed(2)} kg',
+                style: tema.textTheme.bodyMedium,
+              ),
+            ],
+          ],
         );
       },
     );

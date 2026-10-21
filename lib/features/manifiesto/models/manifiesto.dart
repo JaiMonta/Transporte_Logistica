@@ -36,6 +36,39 @@ enum CotejoEstado {
       };
 }
 
+/// Estado del destino calculado por geolocalización.
+enum DestinoEstado {
+  sinCalcular,
+  pendiente,
+  aprobado,
+  corregido;
+
+  static DestinoEstado desde(String? valor) => switch (valor) {
+        'aprobado' => DestinoEstado.aprobado,
+        'corregido' => DestinoEstado.corregido,
+        'pendiente' => DestinoEstado.pendiente,
+        _ => DestinoEstado.sinCalcular,
+      };
+
+  String get valor => switch (this) {
+        DestinoEstado.sinCalcular => 'sin_calcular',
+        DestinoEstado.pendiente => 'pendiente',
+        DestinoEstado.aprobado => 'aprobado',
+        DestinoEstado.corregido => 'corregido',
+      };
+
+  String get etiqueta => switch (this) {
+        DestinoEstado.sinCalcular => 'Sin calcular',
+        DestinoEstado.pendiente => 'Pendiente de aprobación',
+        DestinoEstado.aprobado => 'Aprobado',
+        DestinoEstado.corregido => 'Corregido',
+      };
+
+  /// Solo un destino aprobado o corregido es facturable.
+  bool get esFacturable =>
+      this == DestinoEstado.aprobado || this == DestinoEstado.corregido;
+}
+
 /// Línea del manifiesto (tabla `manifiesto_lineas`).
 class ManifiestoLinea {
   const ManifiestoLinea({
@@ -138,6 +171,12 @@ class Manifiesto {
     this.localidadMasLejana,
     this.fletesTabuladorId,
     this.costoFlete,
+    this.destinoCalculado,
+    this.destinoCalculadoKm,
+    this.destinoAprobado,
+    this.destinoEstado = DestinoEstado.sinCalcular,
+    this.destinoAprobadoPor,
+    this.destinoAprobadoEn,
     this.esFinSemana = false,
     this.lineas = const [],
     this.creadoEn,
@@ -158,6 +197,12 @@ class Manifiesto {
   final String? localidadMasLejana;
   final String? fletesTabuladorId;
   final double? costoFlete;
+  final String? destinoCalculado;
+  final double? destinoCalculadoKm;
+  final String? destinoAprobado;
+  final DestinoEstado destinoEstado;
+  final String? destinoAprobadoPor;
+  final DateTime? destinoAprobadoEn;
   final bool esFinSemana;
   final List<ManifiestoLinea> lineas;
   final DateTime? creadoEn;
@@ -167,6 +212,19 @@ class Manifiesto {
       (camionNombre?.trim().isNotEmpty ?? false)
           ? camionNombre!.trim()
           : 'Sin camión';
+
+  /// Destino aprobado (o, en su defecto, el calculado).
+  String? get destinoVisible {
+    final aprobado = destinoAprobado?.trim();
+    if (aprobado != null && aprobado.isNotEmpty) return aprobado;
+    final calculado = destinoCalculado?.trim();
+    if (calculado != null && calculado.isNotEmpty) return calculado;
+    final manual = localidadMasLejana?.trim();
+    return (manual != null && manual.isNotEmpty) ? manual : null;
+  }
+
+  /// Solo se factura con destino aprobado o corregido.
+  bool get esFacturable => destinoEstado.esFacturable;
 
   int get totalDocumentos => lineas.length;
 
@@ -227,6 +285,12 @@ class Manifiesto {
       localidadMasLejana: mapa['localidad_mas_lejana'] as String?,
       fletesTabuladorId: mapa['fletes_tabulador_id'] as String?,
       costoFlete: _doble(mapa['costo_flete']),
+      destinoCalculado: mapa['destino_calculado'] as String?,
+      destinoCalculadoKm: _doble(mapa['destino_calculado_km']),
+      destinoAprobado: mapa['destino_aprobado'] as String?,
+      destinoEstado: DestinoEstado.desde(mapa['destino_estado'] as String?),
+      destinoAprobadoPor: mapa['destino_aprobado_por'] as String?,
+      destinoAprobadoEn: _fecha(mapa['destino_aprobado_en']),
       esFinSemana: (mapa['es_fin_semana'] as bool?) ?? false,
       lineas: lineas,
       creadoEn: _fecha(mapa['created_at']),
@@ -245,6 +309,12 @@ class Manifiesto {
     String? localidadMasLejana,
     String? fletesTabuladorId,
     double? costoFlete,
+    String? destinoCalculado,
+    double? destinoCalculadoKm,
+    String? destinoAprobado,
+    DestinoEstado? destinoEstado,
+    String? destinoAprobadoPor,
+    DateTime? destinoAprobadoEn,
     bool? esFinSemana,
     List<ManifiestoLinea>? lineas,
   }) =>
@@ -263,6 +333,12 @@ class Manifiesto {
         localidadMasLejana: localidadMasLejana ?? this.localidadMasLejana,
         fletesTabuladorId: fletesTabuladorId ?? this.fletesTabuladorId,
         costoFlete: costoFlete ?? this.costoFlete,
+        destinoCalculado: destinoCalculado ?? this.destinoCalculado,
+        destinoCalculadoKm: destinoCalculadoKm ?? this.destinoCalculadoKm,
+        destinoAprobado: destinoAprobado ?? this.destinoAprobado,
+        destinoEstado: destinoEstado ?? this.destinoEstado,
+        destinoAprobadoPor: destinoAprobadoPor ?? this.destinoAprobadoPor,
+        destinoAprobadoEn: destinoAprobadoEn ?? this.destinoAprobadoEn,
         esFinSemana: esFinSemana ?? this.esFinSemana,
         lineas: lineas ?? this.lineas,
         creadoEn: creadoEn,

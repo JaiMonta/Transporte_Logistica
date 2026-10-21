@@ -16,12 +16,14 @@ class SelectorClienteBusqueda extends ConsumerStatefulWidget {
     required this.clienteTexto,
     required this.onCambio,
     this.habilitado = true,
+    this.errorText,
   });
 
   final String? clienteId;
   final String? clienteTexto;
   final void Function(String? clienteId, String? clienteTexto) onCambio;
   final bool habilitado;
+  final String? errorText;
 
   @override
   ConsumerState<SelectorClienteBusqueda> createState() =>
@@ -155,6 +157,16 @@ class _SelectorClienteBusquedaState
           Text(
             'Se usará el nombre escrito (sin enlazar al catálogo).',
             style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
+        if (widget.errorText != null) ...[
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            widget.errorText!,
+            style: Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.copyWith(color: Theme.of(context).colorScheme.error),
           ),
         ],
       ],

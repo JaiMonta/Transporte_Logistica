@@ -24,6 +24,8 @@ class TabuladorFlete {
     required this.localidad,
     this.region,
     this.km,
+    this.lat,
+    this.lng,
     this.precio1_2,
     this.precio2_5,
     this.precio3_5,
@@ -40,6 +42,8 @@ class TabuladorFlete {
   final String localidad;
   final String? region;
   final double? km;
+  final double? lat;
+  final double? lng;
   final double? precio1_2;
   final double? precio2_5;
   final double? precio3_5;
@@ -53,6 +57,15 @@ class TabuladorFlete {
 
   String get localidadVisible =>
       localidad.trim().isNotEmpty ? localidad.trim() : 'Sin localidad';
+
+  /// ¿Tiene coordenadas para geolocalización?
+  bool get tieneUbicacion =>
+      lat != null &&
+      lng != null &&
+      lat! >= -90 &&
+      lat! <= 90 &&
+      lng! >= -180 &&
+      lng! <= 180;
 
   /// Precio (USD) para un tier de capacidad, o null si no está definido.
   double? precioPara(TierCapacidad tier) => switch (tier) {
@@ -73,6 +86,8 @@ class TabuladorFlete {
         'region': region,
         'localidad': localidad.trim(),
         'km': km,
+        'lat': lat,
+        'lng': lng,
         'precio_1_2': precio1_2,
         'precio_2_5': precio2_5,
         'precio_3_5': precio3_5,
@@ -90,6 +105,8 @@ class TabuladorFlete {
         localidad: (m['localidad'] as String?) ?? '',
         region: m['region'] as String?,
         km: _d(m['km']),
+        lat: _d(m['lat']),
+        lng: _d(m['lng']),
         precio1_2: _d(m['precio_1_2']),
         precio2_5: _d(m['precio_2_5']),
         precio3_5: _d(m['precio_3_5']),

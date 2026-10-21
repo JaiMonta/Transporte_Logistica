@@ -16,6 +16,7 @@ class BitacoraRepository {
 
   static const String _seleccionManifiesto =
       'id, fecha, capturado_por, camion_id, localidad_mas_lejana, costo_flete, '
+      'destino_aprobado, destino_estado, '
       'profiles(nombre, email), camiones(marca, placa, capacidad_kg), '
       'manifiesto_lineas(numero, orden)';
 
@@ -131,6 +132,7 @@ class BitacoraRepository {
             capacidadKg: capacidad,
             tabulador: tabulador,
             costoFleteGuardado: _doble(map['costo_flete']),
+            destinoAprobado: map['destino_aprobado'] as String?,
           ),
           entregas: entregasBitacora,
         ),

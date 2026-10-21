@@ -20,8 +20,9 @@ class ManifiestoTabla extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: DataTable(
         columns: const [
-          DataColumn(label: Text('Documentos')),
-          DataColumn(label: Text('Primer doc.')),
+          DataColumn(label: Text('Facturas')),
+          DataColumn(label: Text('Primera factura')),
+          DataColumn(label: Text('Destino')),
           DataColumn(label: Text('Fecha')),
           DataColumn(label: Text('Capturó')),
           DataColumn(label: Text('OCR')),
@@ -33,6 +34,7 @@ class ManifiestoTabla extends StatelessWidget {
             cells: [
               DataCell(Text('${m.totalDocumentos}')),
               DataCell(Text(m.primerDocumento)),
+              DataCell(_EtiquetaDestino(estado: m.destinoEstado, destino: m.destinoVisible)),
               DataCell(Text(_fechaTexto(m.fecha))),
               DataCell(Text(
                 (m.capturadoPorNombre == null ||
@@ -78,6 +80,30 @@ class _EtiquetaCotejo extends StatelessWidget {
         Icon(Icons.circle, size: 10, color: color),
         const SizedBox(width: 6),
         Text(estado.etiqueta),
+      ],
+    );
+  }
+}
+
+class _EtiquetaDestino extends StatelessWidget {
+  const _EtiquetaDestino({required this.estado, this.destino});
+
+  final DestinoEstado estado;
+  final String? destino;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = switch (estado) {
+      DestinoEstado.aprobado => AppColors.exito,
+      DestinoEstado.corregido => AppColors.primary,
+      DestinoEstado.pendiente => AppColors.secondary,
+      DestinoEstado.sinCalcular => AppColors.onSurfaceVariant,
+    };
+    return Row(
+      children: [
+        Icon(Icons.circle, size: 10, color: color),
+        const SizedBox(width: 6),
+        Text(destino ?? estado.etiqueta),
       ],
     );
   }

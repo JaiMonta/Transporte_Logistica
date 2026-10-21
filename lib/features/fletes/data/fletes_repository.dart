@@ -28,6 +28,17 @@ class FletesRepository {
         .toList();
   }
 
+  /// Busca una localidad por nombre (sin distinguir mayúsculas).
+  Future<TabuladorFlete?> obtenerPorLocalidad(String localidad) async {
+    final data = await _client
+        .from('fletes_tabulador')
+        .select()
+        .ilike('localidad', localidad.trim())
+        .maybeSingle();
+    if (data == null) return null;
+    return TabuladorFlete.fromMap(Map<String, dynamic>.from(data));
+  }
+
   Future<TabuladorFlete?> obtener(String id) async {
     final data = await _client
         .from('fletes_tabulador')

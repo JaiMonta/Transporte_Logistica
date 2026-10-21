@@ -4,6 +4,7 @@ import '../../fletes/models/extra.dart';
 import '../../fletes/models/tabulador_flete.dart';
 import '../../fletes/services/calculo_flete.dart';
 import '../../fletes/services/calculo_extras.dart';
+import '../../manifiesto/models/manifiesto.dart';
 import '../models/factura.dart';
 import '../services/calculo_facturacion_empresas.dart';
 
@@ -78,6 +79,42 @@ class FacturacionRepository {
     final resultado = <Factura>[];
     for (final fc in calculadas) {
       resultado.add(await _guardarFactura(desde, hasta, fc));
+    }
+    return resultado;
+  }
+
+  /// Manifiestos del período con entregas finalizadas pero **sin destino
+  /// aprobado**, que por tanto no se facturan.
+  Future<List<({String id, DateTime fecha, String? localidad})>>
+      pendientesDestino(DateTime desde, DateTime hasta) async {
+    final entregas = await _client
+        .from('entregas')
+        .select('manifiesto_id')
+        .eq('estado', 'entregado')
+        .gte('entregado_en', '${_fechaTexto(desde)}T00:00:00')
+        .lte('entregado_en', '${_fechaTexto(hasta)}T23:59:59') as List<dynamic>;
+    final ids = <String>{};
+    for (final e in entregas) {
+      final mid = (e as Map)['manifiesto_id'] as String?;
+      if (mid != null) ids.add(mid);
+    }
+    if (ids.isEmpty) return const [];
+
+    final manis = await _client
+        .from('manifiestos')
+        .select('id, fecha, localidad_mas_lejana, destino_estado')
+        .inFilter('id', ids.toList())
+        .inFilter('destino_estado', ['pendiente', 'sin_calcular'])
+        .order('fecha', ascending: true) as List<dynamic>;
+    final resultado = <({String id, DateTime fecha, String? localidad})>[];
+    for (final m in manis) {
+      final map = Map<String, dynamic>.from(m as Map);
+      final loc = (map['localidad_mas_lejana'] as String?)?.trim();
+      resultado.add((
+        id: map['id'] as String,
+        fecha: DateTime.tryParse('${map['fecha']}') ?? desde,
+        localidad: (loc == null || loc.isEmpty) ? null : loc,
+      ));
     }
     return resultado;
   }
@@ -164,7 +201,7 @@ class FacturacionRepository {
         .from('manifiestos')
         .select(
           'id, capturado_por, costo_flete, camion_id, fletes_tabulador_id, '
-          'es_fin_semana',
+          'es_fin_semana, destino_aprobado, destino_estado',
         )
         .inFilter('id', ids) as List<dynamic>;
 
@@ -240,6 +277,12 @@ class FacturacionRepository {
     for (final m in manis) {
       final map = Map<String, dynamic>.from(m as Map);
       final id = map['id'] as String;
+
+      // Solo se factura con destino aprobado o corregido.
+      final destinoEstado =
+          DestinoEstado.desde(map['destino_estado'] as String?);
+      if (!destinoEstado.esFacturable) continue;
+
       final camId = map['camion_id'] as String?;
 
       double? capacidad;
@@ -251,15 +294,22 @@ class FacturacionRepository {
 
       final ents = entregasPorManifiesto[id] ?? const [];
 
-      // Localidad más lejana: la marcada por el admin, o la de mayor km.
+      // Destino aprobado/corregido por el admin.
       TabuladorFlete? masLejana;
-      final marcada = ents.firstWhere(
-        (e) => (e['es_mas_lejana'] as bool?) ?? false,
-        orElse: () => const {},
-      );
-      final localidadMarcada = (marcada['localidad'] as String?)?.trim();
-      if (localidadMarcada != null && localidadMarcada.isNotEmpty) {
-        masLejana = tabuladorPorLocalidad[localidadMarcada.toUpperCase()];
+      final aprobada = (map['destino_aprobado'] as String?)?.trim();
+      if (aprobada != null && aprobada.isNotEmpty) {
+        masLejana = tabuladorPorLocalidad[aprobada.toUpperCase()];
+      }
+      // Respaldo: la entrega marcada por el admin, o la de mayor km.
+      if (masLejana == null) {
+        final marcada = ents.firstWhere(
+          (e) => (e['es_mas_lejana'] as bool?) ?? false,
+          orElse: () => const {},
+        );
+        final localidadMarcada = (marcada['localidad'] as String?)?.trim();
+        if (localidadMarcada != null && localidadMarcada.isNotEmpty) {
+          masLejana = tabuladorPorLocalidad[localidadMarcada.toUpperCase()];
+        }
       }
       if (masLejana == null) {
         for (final e in ents) {

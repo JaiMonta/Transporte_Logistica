@@ -4,21 +4,23 @@ import '../../../../core/theme.dart';
 import '../../../clientes/presentation/widgets/selector_cliente_busqueda.dart';
 import '../../models/manifiesto.dart';
 
-/// Editor de las líneas (PRO/factura) de un manifiesto.
+/// Editor de las facturas/entregas de un manifiesto.
 ///
-/// Cada línea tiene tipo, número y cliente (de catálogo o texto libre).
-/// Sin límite de cantidad: se pueden agregar o quitar renglones.
+/// Cada línea tiene número de factura y cliente (de catálogo o texto libre),
+/// ambos obligatorios. Sin límite de cantidad: se pueden agregar o quitar.
 class LineasEditor extends StatefulWidget {
   const LineasEditor({
     super.key,
     required this.lineas,
     required this.onCambio,
     this.habilitado = true,
+    this.mostrarErrores = false,
   });
 
   final List<ManifiestoLinea> lineas;
   final ValueChanged<List<ManifiestoLinea>> onCambio;
   final bool habilitado;
+  final bool mostrarErrores;
 
   @override
   State<LineasEditor> createState() => _LineasEditorState();
@@ -57,8 +59,7 @@ class _LineasEditorState extends State<LineasEditor> {
       children: [
         Row(
           children: [
-            Text('Documentos (PRO o factura)',
-                style: tema.textTheme.labelLarge),
+            Text('Facturas y entregas', style: tema.textTheme.labelLarge),
             const Spacer(),
             TextButton.icon(
               onPressed: widget.habilitado ? _agregar : null,
@@ -91,7 +92,7 @@ class _LineasEditorState extends State<LineasEditor> {
         children: [
           Row(
             children: [
-              Text('Documento ${i + 1}', style: tema.textTheme.labelMedium),
+              Text('Factura ${i + 1}', style: tema.textTheme.labelMedium),
               const Spacer(),
               if (_items.length > 1)
                 IconButton(
@@ -101,29 +102,12 @@ class _LineasEditorState extends State<LineasEditor> {
                 ),
             ],
           ),
-          const SizedBox(height: AppSpacing.xs),
-          SegmentedButton<TipoDocumento>(
-            segments: const [
-              ButtonSegment(value: TipoDocumento.pro, label: Text('PRO')),
-              ButtonSegment(
-                  value: TipoDocumento.factura, label: Text('Factura')),
-            ],
-            selected: {item.tipo},
-            onSelectionChanged: widget.habilitado
-                ? (s) {
-                    setState(() => item.tipo = s.first);
-                    _emitir();
-                  }
-                : null,
-          ),
           const SizedBox(height: AppSpacing.md),
           TextFormField(
             controller: item.numero,
             enabled: widget.habilitado,
-            decoration: InputDecoration(
-              labelText: item.tipo == TipoDocumento.pro
-                  ? 'Número PRO'
-                  : 'Número de factura',
+            decoration: const InputDecoration(
+              labelText: 'Número de factura',
             ),
             validator: (v) =>
                 (v ?? '').trim().isEmpty ? 'Ingresa el número.' : null,
@@ -134,6 +118,11 @@ class _LineasEditorState extends State<LineasEditor> {
             clienteId: item.clienteId,
             clienteTexto: item.clienteTexto,
             habilitado: widget.habilitado,
+            errorText: widget.mostrarErrores &&
+                    item.clienteId == null &&
+                    (item.clienteTexto == null || item.clienteTexto!.isEmpty)
+                ? 'Selecciona el cliente.'
+                : null,
             onCambio: (id, texto) {
               setState(() {
                 item.clienteId = id;
@@ -151,7 +140,7 @@ class _LineasEditorState extends State<LineasEditor> {
 /// Estado mutable de una línea durante la edición.
 class _LineaEditable {
   _LineaEditable({
-    this.tipo = TipoDocumento.pro,
+    this.tipo = TipoDocumento.factura,
     required this.numero,
     this.clienteId,
     this.clienteTexto,
@@ -172,7 +161,7 @@ class _LineaEditable {
       );
 
   ManifiestoLinea aLinea(int orden) => ManifiestoLinea(
-        tipo: tipo,
+        tipo: TipoDocumento.factura,
         numero: numero.text.trim(),
         clienteId: clienteId,
         clienteTexto: clienteTexto,

@@ -35,6 +35,16 @@ final facturasProvider =
           ),
 );
 
+/// Manifiestos con entregas finalizadas pero sin destino aprobado.
+final pendientesDestinoProvider = FutureProvider.autoDispose
+    .family<List<({String id, DateTime fecha, String? localidad})>,
+        FiltroFacturacion>(
+  (ref, filtro) => ref.watch(facturacionRepositoryProvider).pendientesDestino(
+        filtro.desde,
+        filtro.hasta,
+      ),
+);
+
 /// Una factura por id.
 final facturaProvider =
     FutureProvider.autoDispose.family<Factura?, String>((ref, id) {

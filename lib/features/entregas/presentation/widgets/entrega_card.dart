@@ -58,6 +58,13 @@ class EntregaCard extends StatelessWidget {
                     children: [
                       Text(entrega.clienteVisible,
                           style: tema.textTheme.titleMedium),
+                      if (entrega.documentoVisible != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          'Factura ${entrega.documentoVisible}',
+                          style: tema.textTheme.bodySmall,
+                        ),
+                      ],
                       if (entrega.direccion != null &&
                           entrega.direccion!.isNotEmpty) ...[
                         const SizedBox(height: 4),

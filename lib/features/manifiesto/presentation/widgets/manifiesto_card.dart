@@ -39,12 +39,12 @@ class ManifiestoCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${manifiesto.totalDocumentos} documento(s)',
+                        '${manifiesto.totalDocumentos} factura(s)',
                         style: tema.textTheme.titleMedium,
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Primer doc.: ${manifiesto.primerDocumento}',
+                        'Primera factura: ${manifiesto.primerDocumento}',
                         style: tema.textTheme.bodySmall,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -82,6 +82,24 @@ class ManifiestoCard extends StatelessWidget {
                           ],
                         ),
                       ],
+                      if (manifiesto.destinoVisible != null) ...[
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(Icons.place_outlined,
+                                size: 14, color: AppColors.tertiary),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                'Destino: ${manifiesto.destinoVisible}',
+                                style: tema.textTheme.bodySmall,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -93,6 +111,7 @@ class ManifiestoCard extends StatelessWidget {
               runSpacing: AppSpacing.xs,
               children: [
                 _PillCotejo(estado: manifiesto.cotejo),
+                _PillDestino(estado: manifiesto.destinoEstado),
                 if (manifiesto.confianzaPorcentaje != null)
                   StatusPill(
                     texto: 'OCR ${manifiesto.confianzaPorcentaje}%',
@@ -129,6 +148,23 @@ class _PillCotejo extends StatelessWidget {
       CotejoEstado.pendiente => AppColors.secondary,
     };
     return StatusPill(texto: estado.etiqueta, color: color);
+  }
+}
+
+class _PillDestino extends StatelessWidget {
+  const _PillDestino({required this.estado});
+
+  final DestinoEstado estado;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = switch (estado) {
+      DestinoEstado.aprobado => AppColors.exito,
+      DestinoEstado.corregido => AppColors.primary,
+      DestinoEstado.pendiente => AppColors.secondary,
+      DestinoEstado.sinCalcular => AppColors.onSurfaceVariant,
+    };
+    return StatusPill(texto: 'Destino: ${estado.etiqueta}', color: color);
   }
 }
 

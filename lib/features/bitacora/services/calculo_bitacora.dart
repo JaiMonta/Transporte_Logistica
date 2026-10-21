@@ -24,7 +24,18 @@ class CalculoBitacora {
     required double? capacidadKg,
     required Map<String, TabuladorFlete> tabulador,
     double? costoFleteGuardado,
+    String? destinoAprobado,
   }) {
+    // Destino aprobado por el admin (fuente principal).
+    final aprobada = _fila(destinoAprobado, tabulador);
+    if (aprobada != null) {
+      final precio = CalculoFlete.precioFlete(
+        tabulador: aprobada,
+        capacidadKg: capacidadKg,
+      );
+      if (precio != null) return precio;
+    }
+
     TabuladorFlete? masLejana;
     for (final e in entregas) {
       if (!e.esMasLejana) continue;

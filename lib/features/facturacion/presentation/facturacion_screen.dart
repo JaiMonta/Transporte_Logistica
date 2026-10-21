@@ -80,7 +80,7 @@ class _FacturacionScreenState extends ConsumerState<FacturacionScreen> {
         content: Text(
           'Se generarán (o reharán) las facturas por empresa del período '
           '${_f(_filtro.desde)} – ${_f(_filtro.hasta)} con los manifiestos '
-          'que tengan entregas finalizadas.',
+          'que tengan entregas finalizadas y destino aprobado.',
         ),
         actions: [
           TextButton(
@@ -178,6 +178,7 @@ class _FacturacionScreenState extends ConsumerState<FacturacionScreen> {
           ),
         ),
         const Divider(height: 1),
+        _AvisoPendientes(filtro: _filtro),
         Expanded(
           child: async.when(
             loading: () => const Center(child: CircularProgressIndicator()),
@@ -254,6 +255,81 @@ class _FacturaCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Aviso de manifiestos sin destino aprobado (no se facturan).
+class _AvisoPendientes extends ConsumerWidget {
+  const _AvisoPendientes({required this.filtro});
+
+  final FiltroFacturacion filtro;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(pendientesDestinoProvider(filtro));
+    return async.maybeWhen(
+      data: (pendientes) {
+        if (pendientes.isEmpty) return const SizedBox.shrink();
+        final tema = Theme.of(context);
+        return Card(
+          margin: const EdgeInsets.fromLTRB(
+              AppSpacing.md, AppSpacing.sm, AppSpacing.md, 0),
+          color: AppColors.secondaryContainer,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.warning_amber_outlined,
+                        color: AppColors.secondary),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        '${pendientes.length} manifiesto(s) sin destino aprobado: '
+                        'no se facturan.',
+                        style: tema.textTheme.bodyMedium
+                            ?.copyWith(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  'Aprueba o corrige el destino en el detalle del manifiesto.',
+                  style: tema.textTheme.bodySmall,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                for (final p in pendientes.take(8))
+                  InkWell(
+                    onTap: () =>
+                        context.push(Rutas.adminManifiestoDetalle(p.id)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacing.xs),
+                      child: Text(
+                        '${_f(p.fecha)}'
+                        '${p.localidad == null ? '' : ' · ${p.localidad}'}'
+                        ' · ${p.id.substring(0, 8)}',
+                        style: tema.textTheme.bodySmall
+                            ?.copyWith(decoration: TextDecoration.underline),
+                      ),
+                    ),
+                  ),
+                if (pendientes.length > 8)
+                  Text('… y ${pendientes.length - 8} más.',
+                      style: tema.textTheme.bodySmall),
+              ],
+            ),
+          ),
+        );
+      },
+      orElse: () => const SizedBox.shrink(),
+    );
+  }
+
+  static String _f(DateTime x) =>
+      '${x.day.toString().padLeft(2, '0')}/${x.month.toString().padLeft(2, '0')}/${x.year}';
 }
 
 class _VacioVista extends StatelessWidget {

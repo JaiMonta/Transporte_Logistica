@@ -27,6 +27,8 @@ class Entrega {
     this.clienteId,
     this.clienteTexto,
     this.clienteNombre,
+    this.documentoTipo,
+    this.documentoNumero,
     this.direccion,
     this.lat,
     this.lng,
@@ -41,6 +43,7 @@ class Entrega {
     this.esOtraLocalidad = false,
     this.esMasLejana = false,
     this.localidad,
+    this.localidadCalculada,
     this.localidadDistanciaKm,
     this.creadoEn,
     this.actualizadoEn,
@@ -52,6 +55,8 @@ class Entrega {
   final String? clienteId;
   final String? clienteTexto;
   final String? clienteNombre;
+  final String? documentoTipo;
+  final String? documentoNumero;
   final String? direccion;
   final double? lat;
   final double? lng;
@@ -66,6 +71,7 @@ class Entrega {
   final bool esOtraLocalidad;
   final bool esMasLejana;
   final String? localidad;
+  final String? localidadCalculada;
   final double? localidadDistanciaKm;
   final DateTime? creadoEn;
   final DateTime? actualizadoEn;
@@ -78,6 +84,12 @@ class Entrega {
       return clienteTexto!.trim();
     }
     return 'Cliente sin nombre';
+  }
+
+  /// Número de factura (o documento) de la entrega.
+  String? get documentoVisible {
+    final n = documentoNumero?.trim();
+    return (n == null || n.isEmpty) ? null : n;
   }
 
   bool get tieneUbicacion =>
@@ -105,6 +117,8 @@ class Entrega {
       clienteId: mapa['cliente_id'] as String?,
       clienteTexto: mapa['cliente_texto'] as String?,
       clienteNombre: clienteNombre,
+      documentoTipo: mapa['documento_tipo'] as String?,
+      documentoNumero: mapa['documento_numero'] as String?,
       direccion: mapa['direccion'] as String?,
       lat: _doble(mapa['lat']),
       lng: _doble(mapa['lng']),
@@ -119,6 +133,7 @@ class Entrega {
       esOtraLocalidad: (mapa['es_otra_localidad'] as bool?) ?? false,
       esMasLejana: (mapa['es_mas_lejana'] as bool?) ?? false,
       localidad: mapa['localidad'] as String?,
+      localidadCalculada: mapa['localidad_calculada'] as String?,
       localidadDistanciaKm: _doble(mapa['localidad_distancia_km']),
       creadoEn: _fecha(mapa['created_at']),
       actualizadoEn: _fecha(mapa['updated_at']),
@@ -136,6 +151,7 @@ class Entrega {
     bool? esOtraLocalidad,
     bool? esMasLejana,
     String? localidad,
+    String? localidadCalculada,
     double? localidadDistanciaKm,
   }) =>
       Entrega(
@@ -145,6 +161,8 @@ class Entrega {
         clienteId: clienteId,
         clienteTexto: clienteTexto,
         clienteNombre: clienteNombre,
+        documentoTipo: documentoTipo,
+        documentoNumero: documentoNumero,
         direccion: direccion,
         lat: lat,
         lng: lng,
@@ -159,6 +177,7 @@ class Entrega {
         esOtraLocalidad: esOtraLocalidad ?? this.esOtraLocalidad,
         esMasLejana: esMasLejana ?? this.esMasLejana,
         localidad: localidad ?? this.localidad,
+        localidadCalculada: localidadCalculada ?? this.localidadCalculada,
         localidadDistanciaKm: localidadDistanciaKm ?? this.localidadDistanciaKm,
         creadoEn: creadoEn,
         actualizadoEn: actualizadoEn,

@@ -151,6 +151,13 @@ class _ContenidoState extends ConsumerState<_Contenido> {
                     : '\$${m.costoFlete!.toStringAsFixed(2)}',
               ),
               const SizedBox(height: AppSpacing.sm),
+              _DestinoBloque(
+                manifiesto: m,
+                onAprobar: () => _aprobarDestino(m),
+                onCorregir: () => _corregirDestino(m),
+                onRecalcular: () => _recalcularDestino(m),
+              ),
+              const SizedBox(height: AppSpacing.sm),
               Align(
                 alignment: Alignment.centerLeft,
                 child: StatusPill(
@@ -303,6 +310,147 @@ class _ContenidoState extends ConsumerState<_Contenido> {
                 : 'Localidad actualizada. Flete: \$${costo.toStringAsFixed(2)}',
           ),
         ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(mensajeError(e))));
+      }
+    }
+  }
+
+  Future<TabuladorFlete?> _fleteDeLocalidad(String localidad) =>
+      ref.read(fletesRepositoryProvider).obtenerPorLocalidad(localidad);
+
+  Future<double?> _costoPara(Manifiesto m, TabuladorFlete flete) async {
+    double? capacidad;
+    if (m.camionId != null) {
+      final camion =
+          await ref.read(camionesRepositoryProvider).obtener(m.camionId!);
+      capacidad = camion?.capacidadKg;
+    }
+    return CalculoFlete.precioFlete(
+      tabulador: flete,
+      capacidadKg: capacidad,
+    );
+  }
+
+  Future<void> _aprobarDestino(Manifiesto m) async {
+    final destino = m.destinoCalculado?.trim();
+    if (destino == null || destino.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No hay un destino calculado.')),
+      );
+      return;
+    }
+    try {
+      final flete = await _fleteDeLocalidad(destino);
+      if (flete == null) {
+        throw Exception('La localidad "$destino" no está en el tabulador.');
+      }
+      final costo = await _costoPara(m, flete);
+      await ref.read(manifiestosRepositoryProvider).fijarDestinoAprobado(
+            id: m.id,
+            flete: flete,
+            costoFlete: costo,
+          );
+      if (!mounted) return;
+      ref.invalidate(manifiestoProvider(m.id));
+      ref.invalidate(entregasDeManifiestoProvider(m.id));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            costo == null
+                ? 'Destino aprobado (sin capacidad para calcular el flete).'
+                : 'Destino aprobado. Flete: \$${costo.toStringAsFixed(2)}',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(mensajeError(e))));
+      }
+    }
+  }
+
+  Future<void> _corregirDestino(Manifiesto m) async {
+    TabuladorFlete? elegido;
+    if (m.fletesTabuladorId != null) {
+      elegido =
+          await ref.read(fletesRepositoryProvider).obtener(m.fletesTabuladorId!);
+    }
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Corregir destino'),
+        content: SizedBox(
+          width: 420,
+          child: SelectorLocalidadFlete(onSeleccion: (f) => elegido = f),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final f = elegido;
+              if (f == null) return;
+              Navigator.pop(context);
+              await _guardarDestinoCorregido(m, f);
+            },
+            child: const Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _guardarDestinoCorregido(
+    Manifiesto m,
+    TabuladorFlete flete,
+  ) async {
+    try {
+      final costo = await _costoPara(m, flete);
+      await ref.read(manifiestosRepositoryProvider).fijarDestinoAprobado(
+            id: m.id,
+            flete: flete,
+            costoFlete: costo,
+            corregido: true,
+          );
+      if (!mounted) return;
+      ref.invalidate(manifiestoProvider(m.id));
+      ref.invalidate(entregasDeManifiestoProvider(m.id));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            costo == null
+                ? 'Destino corregido (sin capacidad para calcular el flete).'
+                : 'Destino corregido. Flete: \$${costo.toStringAsFixed(2)}',
+          ),
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(mensajeError(e))));
+      }
+    }
+  }
+
+  Future<void> _recalcularDestino(Manifiesto m) async {
+    try {
+      await ref.read(manifiestosRepositoryProvider).calcularDestino(
+            manifiestoId: m.id,
+            sobrescribirAprobado: true,
+          );
+      if (!mounted) return;
+      ref.invalidate(manifiestoProvider(m.id));
+      ref.invalidate(entregasDeManifiestoProvider(m.id));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Destino recalculado.')),
       );
     } catch (e) {
       if (mounted) {
@@ -658,6 +806,94 @@ class _TituloSeccion extends StatelessWidget {
       Text(texto, style: Theme.of(context).textTheme.labelLarge);
 }
 
+/// Bloque de destino calculado, aprobación y corrección (admin).
+class _DestinoBloque extends StatelessWidget {
+  const _DestinoBloque({
+    required this.manifiesto,
+    required this.onAprobar,
+    required this.onCorregir,
+    required this.onRecalcular,
+  });
+
+  final Manifiesto manifiesto;
+  final VoidCallback onAprobar;
+  final VoidCallback onCorregir;
+  final VoidCallback onRecalcular;
+
+  @override
+  Widget build(BuildContext context) {
+    final tema = Theme.of(context);
+    final destino = manifiesto.destinoVisible;
+    final km = manifiesto.destinoCalculadoKm;
+    final color = switch (manifiesto.destinoEstado) {
+      DestinoEstado.aprobado => AppColors.exito,
+      DestinoEstado.corregido => AppColors.primary,
+      DestinoEstado.pendiente => AppColors.secondary,
+      DestinoEstado.sinCalcular => AppColors.onSurfaceVariant,
+    };
+    final puedeAprobar =
+        manifiesto.destinoCalculado != null && !manifiesto.esFacturable;
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainer,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: AppColors.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.place_outlined, size: 20),
+              const SizedBox(width: AppSpacing.sm),
+              Text('Destino', style: tema.textTheme.labelLarge),
+              const Spacer(),
+              StatusPill(
+                texto: manifiesto.destinoEstado.etiqueta,
+                color: color,
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            destino ?? 'Sin destino calculado.',
+            style: tema.textTheme.titleMedium,
+          ),
+          if (km != null)
+            Text(
+              '${km.toStringAsFixed(0)} km desde el origen',
+              style: tema.textTheme.bodySmall,
+            ),
+          const SizedBox(height: AppSpacing.sm),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.xs,
+            children: [
+              if (puedeAprobar)
+                FilledButton.icon(
+                  onPressed: onAprobar,
+                  icon: const Icon(Icons.check_circle_outline, size: 18),
+                  label: const Text('Aprobar destino'),
+                ),
+              OutlinedButton.icon(
+                onPressed: onCorregir,
+                icon: const Icon(Icons.edit_location_alt_outlined, size: 18),
+                label: const Text('Corregir destino'),
+              ),
+              TextButton.icon(
+                onPressed: onRecalcular,
+                icon: const Icon(Icons.refresh, size: 18),
+                label: const Text('Recalcular'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Lista de entregas: localidad (para el flete) y "otra localidad" (desvío).
 class _EntregasOtraLocalidad extends ConsumerWidget {
   const _EntregasOtraLocalidad({required this.manifiestoId});
@@ -685,8 +921,11 @@ class _EntregasOtraLocalidad extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('${e.orden + 1}. ${e.clienteVisible}',
-                        style: Theme.of(context).textTheme.titleSmall),
+                    Text(
+                      '${e.orden + 1}. ${e.clienteVisible}'
+                      '${e.documentoVisible == null ? '' : ' · Factura ${e.documentoVisible}'}',
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
                     const SizedBox(height: AppSpacing.xs),
                     DropdownButtonFormField<String>(
                       initialValue: localidades
@@ -770,12 +1009,12 @@ class _EntregasOtraLocalidad extends ConsumerWidget {
                                 manifiestoId: manifiestoId,
                                 valor: true,
                               );
-                          // Reflejar el nombre en el manifiesto.
+                          // Reflejar el nombre en el manifiesto (sin borrar
+                          // el camión ni el costo de flete ya definidos).
                           await ref
                               .read(manifiestosRepositoryProvider)
                               .actualizarCabecera(
                                 id: manifiestoId,
-                                camionId: null,
                                 localidadMasLejana: e.localidad,
                               );
                           ref.invalidate(

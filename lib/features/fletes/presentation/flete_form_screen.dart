@@ -7,6 +7,7 @@ import '../../../core/theme.dart';
 import '../../../shared/errors/mensajes_error.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../../../shared/widgets/selector_mapa.dart';
 import '../models/tabulador_flete.dart';
 import '../providers/fletes_providers.dart';
 
@@ -25,6 +26,8 @@ class _FleteFormScreenState extends ConsumerState<FleteFormScreen> {
   final _region = TextEditingController();
   final _localidad = TextEditingController();
   final _km = TextEditingController();
+  final _lat = TextEditingController();
+  final _lng = TextEditingController();
   final _precios = <TierCapacidad, TextEditingController>{
     for (final t in TierCapacidad.values) t: TextEditingController(),
   };
@@ -44,6 +47,8 @@ class _FleteFormScreenState extends ConsumerState<FleteFormScreen> {
     _region.dispose();
     _localidad.dispose();
     _km.dispose();
+    _lat.dispose();
+    _lng.dispose();
     for (final c in _precios.values) {
       c.dispose();
     }
@@ -66,6 +71,8 @@ class _FleteFormScreenState extends ConsumerState<FleteFormScreen> {
         _region.text = f.region ?? '';
         _localidad.text = f.localidad;
         _km.text = f.km?.toString() ?? '';
+        _lat.text = f.lat?.toString() ?? '';
+        _lng.text = f.lng?.toString() ?? '';
         for (final t in TierCapacidad.values) {
           final v = f.precioPara(t);
           _precios[t]!.text = v?.toString() ?? '';
@@ -80,6 +87,19 @@ class _FleteFormScreenState extends ConsumerState<FleteFormScreen> {
     }
   }
 
+  Future<void> _ubicarEnMapa() async {
+    final punto = await mostrarSelectorMapa(
+      context,
+      lat: _doble(_lat.text),
+      lng: _doble(_lng.text),
+    );
+    if (punto == null) return;
+    setState(() {
+      _lat.text = punto.lat.toStringAsFixed(6);
+      _lng.text = punto.lng.toStringAsFixed(6);
+    });
+  }
+
   Future<void> _guardar() async {
     if (!_formKey.currentState!.validate() || _original == null) return;
     FocusScope.of(context).unfocus();
@@ -90,6 +110,8 @@ class _FleteFormScreenState extends ConsumerState<FleteFormScreen> {
         localidad: _localidad.text,
         region: _region.text.trim().isEmpty ? null : _region.text,
         km: _doble(_km.text),
+        lat: _doble(_lat.text),
+        lng: _doble(_lng.text),
         precio1_2: _doble(_precios[TierCapacidad.t1_2]!.text),
         precio2_5: _doble(_precios[TierCapacidad.t2_5]!.text),
         precio3_5: _doble(_precios[TierCapacidad.t3_5]!.text),
@@ -167,6 +189,46 @@ class _FleteFormScreenState extends ConsumerState<FleteFormScreen> {
                               ),
                             ),
                           ],
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: AppTextField(
+                                controller: _lat,
+                                label: 'Latitud',
+                                icono: Icons.my_location_outlined,
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                        decimal: true, signed: true),
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: AppTextField(
+                                controller: _lng,
+                                label: 'Longitud',
+                                icono: Icons.my_location_outlined,
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                        decimal: true, signed: true),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextButton.icon(
+                            onPressed: _ubicarEnMapa,
+                            icon: const Icon(Icons.map_outlined, size: 18),
+                            label: const Text('Ubicar en el mapa'),
+                          ),
+                        ),
+                        Text(
+                          'Coordenadas del centro de la localidad; se usan para '
+                          'calcular el destino por geolocalización.',
+                          style: Theme.of(context).textTheme.bodySmall,
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         Text('Precios por capacidad (USD)',

@@ -129,6 +129,7 @@ class _Tabla extends StatelessWidget {
       child: DataTable(
         columns: const [
           DataColumn(label: Text('#')),
+          DataColumn(label: Text('Factura')),
           DataColumn(label: Text('Cliente')),
           DataColumn(label: Text('Dirección')),
           DataColumn(label: Text('Estado')),
@@ -138,6 +139,7 @@ class _Tabla extends StatelessWidget {
         rows: entregas.map((e) {
           return DataRow(cells: [
             DataCell(Text('${e.orden + 1}')),
+            DataCell(Text(e.documentoVisible ?? '—')),
             DataCell(Text(e.clienteVisible)),
             DataCell(Text(
               (e.direccion == null || e.direccion!.isEmpty) ? '—' : e.direccion!,

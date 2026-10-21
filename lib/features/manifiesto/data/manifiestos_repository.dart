@@ -1,6 +1,8 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../fletes/models/tabulador_flete.dart';
 import '../models/manifiesto.dart';
+import '../services/calculo_destino.dart';
 
 /// Acceso a los manifiestos (cabecera + líneas).
 ///
@@ -98,6 +100,7 @@ class ManifiestosRepository {
   Future<Manifiesto> crear({
     required DateTime fecha,
     required List<ManifiestoLinea> lineas,
+    Map<String, double> pesos = const {},
     String? camionId,
     String? bucket,
     String? path,
@@ -132,7 +135,8 @@ class ManifiestosRepository {
         final insertadas = await _client
             .from('manifiesto_lineas')
             .insert(filas)
-            .select('id, cliente_id, cliente_texto, orden') as List<dynamic>;
+            .select('id, tipo, numero, cliente_id, cliente_texto, orden')
+            as List<dynamic>;
 
         await _crearEntregas(
           manifiestoId: manifiestoId,
@@ -141,6 +145,11 @@ class ManifiestosRepository {
               .toList(),
         );
       }
+      if (pesos.isNotEmpty) {
+        await guardarPesos(manifiestoId: manifiestoId, pesos: pesos);
+      }
+      // Calcula el destino por geolocalización (queda pendiente de aprobación).
+      await calcularDestino(manifiestoId: manifiestoId);
     } catch (e) {
       // No dejar una cabecera huérfana si fallan las líneas/entregas.
       await _client.from('manifiestos').delete().eq('id', manifiestoId);
@@ -185,6 +194,8 @@ class ManifiestosRepository {
         'linea_id': l['id'],
         'cliente_id': clienteId,
         'cliente_texto': l['cliente_texto'],
+        'documento_tipo': (l['tipo'] as String?) ?? 'factura',
+        'documento_numero': l['numero'],
         'direccion': cliente?['direccion'],
         'lat': cliente?['lat'],
         'lng': cliente?['lng'],
@@ -199,6 +210,9 @@ class ManifiestosRepository {
   }
 
   /// Actualiza datos de cabecera que gestiona el administrador.
+  ///
+  /// Solo escribe los campos que se pasan con valor; así no se borran por
+  /// accidente el camión, la localidad o el costo de flete ya definidos.
   Future<Manifiesto> actualizarCabecera({
     required String id,
     String? camionId,
@@ -207,19 +221,165 @@ class ManifiestosRepository {
     double? costoFlete,
     CotejoEstado? cotejo,
   }) async {
+    final campos = <String, dynamic>{};
+    if (camionId != null) campos['camion_id'] = camionId;
+    if (localidadMasLejana != null) {
+      campos['localidad_mas_lejana'] = localidadMasLejana;
+    }
+    if (fletesTabuladorId != null) {
+      campos['fletes_tabulador_id'] = fletesTabuladorId;
+    }
+    if (costoFlete != null) campos['costo_flete'] = costoFlete;
+    if (cotejo != null) campos['cotejo'] = cotejo.valor;
+    if (campos.isEmpty) {
+      final actual = await obtener(id);
+      if (actual != null) return actual;
+    }
     final data = await _client
         .from('manifiestos')
-        .update({
-          'camion_id': camionId,
-          'localidad_mas_lejana': localidadMasLejana,
-          'fletes_tabulador_id': fletesTabuladorId,
-          'costo_flete': costoFlete,
-          if (cotejo != null) 'cotejo': cotejo.valor,
-        })
+        .update(campos)
         .eq('id', id)
         .select(_seleccion)
         .single();
     return Manifiesto.fromMap(Map<String, dynamic>.from(data));
+  }
+
+  /// Calcula el destino del manifiesto por geolocalización.
+  ///
+  /// Asigna a cada entrega su localidad más cercana, marca el desvío y deja
+  /// el destino calculado en estado `pendiente` (salvo que ya esté aprobado y
+  /// [sobrescribirAprobado] sea falso).
+  Future<ResultadoDestino> calcularDestino({
+    required String manifiestoId,
+    bool sobrescribirAprobado = false,
+  }) async {
+    final man = await _client
+        .from('manifiestos')
+        .select('destino_estado')
+        .eq('id', manifiestoId)
+        .maybeSingle();
+    final estado = DestinoEstado.desde(man?['destino_estado'] as String?);
+    if (!sobrescribirAprobado && estado.esFacturable) {
+      return const ResultadoDestino();
+    }
+
+    final entregasData = await _client
+        .from('entregas')
+        .select('id, lat, lng, orden')
+        .eq('manifiesto_id', manifiestoId)
+        .order('orden', ascending: true) as List<dynamic>;
+    final tabuladorData = await _client
+        .from('fletes_tabulador')
+        .select('id, localidad, km, lat, lng') as List<dynamic>;
+    final tabulador = [
+      for (final e in tabuladorData)
+        TabuladorFlete.fromMap(Map<String, dynamic>.from(e as Map)),
+    ];
+    final origen = await _origen();
+
+    final puntos = [
+      for (final e in entregasData)
+        PuntoCliente(
+          id: (e as Map)['id'] as String,
+          lat: _doble(e['lat']),
+          lng: _doble(e['lng']),
+        ),
+    ];
+    final resultado = CalculoDestino.calcular(
+      puntos: puntos,
+      tabulador: tabulador,
+      origenLat: origen.$1,
+      origenLng: origen.$2,
+    );
+
+    // Refleja el cálculo en cada entrega.
+    String? idMasLejana;
+    for (final de in resultado.entregas) {
+      await _client.from('entregas').update({
+        'localidad_calculada': de.localidad,
+        'localidad': de.localidad,
+        'localidad_distancia_km': de.distanciaKm,
+        'es_otra_localidad': de.esOtraLocalidad,
+      }).eq('id', de.id);
+      if (idMasLejana == null &&
+          de.localidad != null &&
+          de.localidad == resultado.destino) {
+        idMasLejana = de.id;
+      }
+    }
+    await _client
+        .from('entregas')
+        .update({'es_mas_lejana': false}).eq('manifiesto_id', manifiestoId);
+    if (idMasLejana != null) {
+      await _client
+          .from('entregas')
+          .update({'es_mas_lejana': true}).eq('id', idMasLejana);
+    }
+
+    await _client.from('manifiestos').update({
+      'destino_calculado': resultado.destino,
+      'destino_calculado_km': resultado.destinoKm,
+      'destino_estado':
+          resultado.calculado ? 'pendiente' : 'sin_calcular',
+    }).eq('id', manifiestoId);
+
+    return resultado;
+  }
+
+  /// Fija el destino aprobado (o corregido) por el administrador.
+  Future<void> fijarDestinoAprobado({
+    required String id,
+    required TabuladorFlete flete,
+    double? costoFlete,
+    bool corregido = false,
+  }) async {
+    final uid = _client.auth.currentUser?.id;
+    await _client.from('manifiestos').update({
+      'destino_aprobado': flete.localidad,
+      'destino_estado': corregido ? 'corregido' : 'aprobado',
+      'destino_aprobado_por': uid,
+      'destino_aprobado_en': DateTime.now().toUtc().toIso8601String(),
+      'localidad_mas_lejana': flete.localidad,
+      'fletes_tabulador_id': flete.id,
+      'costo_flete': costoFlete,
+    }).eq('id', id);
+
+    // La entrega que coincide con el destino define el flete.
+    await _client
+        .from('entregas')
+        .update({'es_mas_lejana': false}).eq('manifiesto_id', id);
+    final entregas = await _client
+        .from('entregas')
+        .select('id, localidad')
+        .eq('manifiesto_id', id) as List<dynamic>;
+    for (final e in entregas) {
+      final loc = ((e as Map)['localidad'] as String?)?.trim().toUpperCase();
+      if (loc == flete.localidad.trim().toUpperCase()) {
+        await _client
+            .from('entregas')
+            .update({'es_mas_lejana': true}).eq('id', e['id']);
+        break;
+      }
+    }
+  }
+
+  /// Coordenadas del origen de carga (configuración), con Maracay por defecto.
+  Future<(double, double)> _origen() async {
+    final data = await _client
+        .from('configuracion')
+        .select('clave, valor')
+        .inFilter('clave', ['origen_carga_lat', 'origen_carga_lng'])
+        as List<dynamic>;
+    var lat = 10.2469;
+    var lng = -67.5958;
+    for (final e in data) {
+      final m = Map<String, dynamic>.from(e as Map);
+      final v = double.tryParse('${m['valor']}');
+      if (v == null) continue;
+      if (m['clave'] == 'origen_carga_lat') lat = v;
+      if (m['clave'] == 'origen_carga_lng') lng = v;
+    }
+    return (lat, lng);
   }
 
   /// Marca el manifiesto como servicio de fin de semana.
@@ -279,6 +439,12 @@ class ManifiestosRepository {
       params: {'p_dias': dias, 'p_dry_run': dryRun},
     );
     return (r as num?)?.toInt() ?? 0;
+  }
+
+  static double? _doble(Object? valor) {
+    if (valor == null) return null;
+    if (valor is num) return valor.toDouble();
+    return double.tryParse(valor.toString());
   }
 
   static String _fechaTexto(DateTime fecha) {

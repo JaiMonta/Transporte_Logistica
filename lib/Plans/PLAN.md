@@ -1243,6 +1243,83 @@ flutter build apk --release --dart-define-from-file=env.json
 
 ---
 
+## Manifiesto: productos, facturas y destino geolocalizado  ✅ COMPLETADO
+
+El ingreso de un manifiesto ahora refleja la operación real: un camión con
+**varios productos** (kg por producto), **varias facturas** (una entrega por
+cliente + factura) y un **destino calculado por geolocalización** que el
+administrador **aprueba o corrige**. Solo se factura con destino aprobado.
+
+### Esquema (Supabase)
+
+- Migración `20261020000000_manifiesto_destino_geolocalizado.sql` aplicada:
+  - `fletes_tabulador.lat` / `lng` (coordenadas del centro de cada localidad).
+  - enum `destino_estado` (`sin_calcular`, `pendiente`, `aprobado`, `corregido`).
+  - `manifiestos.destino_calculado`, `destino_calculado_km`, `destino_aprobado`,
+    `destino_estado`, `destino_aprobado_por`, `destino_aprobado_en`.
+  - `entregas.documento_tipo` (por defecto `factura`), `documento_numero` y
+    `localidad_calculada`.
+  - `manifiesto_lineas.tipo` por defecto `factura` (flujo nuevo sin PRO; se
+    conserva el enum por compatibilidad histórica).
+  - Relleno de datos: las entregas heredan tipo/número de su línea y los
+    manifiestos con localidad manual quedan como destino aprobado.
+
+### Coordenadas de localidades
+
+- Script reutilizable `tool/importar_coordenadas_localidades_excel.ps1`: lee un
+  Excel con columnas **LOCALIDAD, LAT, LNG** y actualiza `fletes_tabulador`
+  (coincidencia por nombre, idempotente; reporta localidades inexistentes;
+  soporta `-DryRun`).
+- Archivo `Coordenadas_localidades.xlsx` (94 localidades, hoja `Localidades`)
+  generado a partir de la lista `Hoja1` del archivo de liquidación. Las
+  coordenadas son propuestas por geocodificación OpenStreetMap/Nominatim y
+  **deben revisarse**; el admin puede corregirlas desde el formulario de fletes
+  con el selector de mapa.
+- Carga realizada: **94/94 localidades** actualizadas.
+
+### Cálculo del destino (puro y testeable)
+
+- `lib/features/manifiesto/services/calculo_destino.dart`:
+  - Asigna a cada entrega la localidad del tabulador más cercana (Haversine).
+  - Destino = localidad más lejana al origen de carga configurado (Maracay).
+  - Entregas en otra localidad quedan marcadas como desvío.
+  - Sin coordenadas o sin coincidencias → `sin_calcular`.
+- `ManifiestosRepository.crear` guarda los pesos (`manifiesto_pesos`), crea las
+  entregas copiando el número de factura y calcula el destino (estado
+  `pendiente`).
+- `ManifiestosRepository.calcularDestino` / `fijarDestinoAprobado` (aprueba o
+  corrige, recalcula `localidad_mas_lejana`, `fletes_tabulador_id` y
+  `costo_flete`).
+- Corregido el bug que borraba `camion_id`/`costo_flete` al marcar la entrega
+  más lejana: `actualizarCabecera` solo escribe los campos enviados.
+
+### Interfaz
+
+- **Captura:** sección de **carga de productos (kg)** con validación de total
+  contra la capacidad del camión; el editor de líneas es ahora
+  **factura + cliente obligatorios** (sin selector PRO/Factura).
+- **Detalle del manifiesto (admin):** bloque **Destino** con estado, km,
+  botones **Aprobar / Corregir / Recalcular**; las entregas muestran su factura.
+- **Fletes:** el formulario de localidad permite fijar lat/lng con el mapa.
+- **Tarjetas/tabla de manifiestos:** muestran destino y estado.
+- **Entregas:** tarjetas y tabla admin muestran el número de factura.
+
+### Facturación
+
+- `FacturacionRepository` solo incluye manifiestos con `destino_estado`
+  `aprobado`/`corregido`; usa el `destino_aprobado` como fuente del flete.
+- La pantalla de Facturación muestra un aviso con los manifiestos del período
+  que **no se facturan** por no tener destino aprobado (con enlace al detalle).
+- La Bitácora usa el destino aprobado para el flete base.
+
+### Pruebas
+
+- `test/calculo_destino_test.dart`: destino más lejano, desvío, sin coordenadas,
+  sin localidades, sin entregas, `Manifiesto.destinoVisible`/`esFacturable`.
+- `flutter analyze` limpio; `flutter test` **156/156**.
+
+---
+
 ## Comandos de desarrollo
 
 ```
