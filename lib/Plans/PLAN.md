@@ -1304,6 +1304,21 @@ administrador **aprueba o corrige**. Solo se factura con destino aprobado.
 - **Tarjetas/tabla de manifiestos:** muestran destino y estado.
 - **Entregas:** tarjetas y tabla admin muestran el número de factura.
 
+### Desvíos automáticos (regla del negocio)
+
+- El **camión es el asignado al chofer** (y define la capacidad); si tiene uno
+  solo se preselecciona en la captura. El **flete base** se ubica en el tabulador
+  por el **destino más lejano** al origen (Maracay) según la capacidad.
+- Cada entrega tiene **una sola localidad** (calculada por geolocalización). Se
+  **eliminó** el marcado manual "Otra localidad (desvío)" y el selector manual de
+  localidad por entrega.
+- **Desvío** = **localidades distintas** del manifiesto que no son el destino
+  principal ni el origen. Una localidad cuenta **una sola vez** sin importar
+  cuántas entregas tenga (p. ej. Maracay-Cagua-Villa de Cura-San Juan de los
+  Morros → destino San Juan, **2 desvíos**: Cagua y Villa de Cura).
+- Monto del desvío = tarifa por capacidad × nº de localidades distintas
+  (`CalculoExtras.desvio`), y `CalculoExtras.desvios` deduplica las localidades.
+
 ### Facturación
 
 - `FacturacionRepository` solo incluye manifiestos con `destino_estado`
@@ -1314,9 +1329,12 @@ administrador **aprueba o corrige**. Solo se factura con destino aprobado.
 
 ### Pruebas
 
-- `test/calculo_destino_test.dart`: destino más lejano, desvío, sin coordenadas,
-  sin localidades, sin entregas, `Manifiesto.destinoVisible`/`esFacturable`.
-- `flutter analyze` limpio; `flutter test` **156/156**.
+- `test/calculo_destino_test.dart`: destino más lejano, **desvíos por localidades
+  distintas** (origen excluido), sin coordenadas, sin localidades, sin entregas,
+  `Manifiesto.destinoVisible`/`esFacturable`.
+- `test/calculo_extras_test.dart`: `CalculoExtras.desvios` (deduplica localidades,
+  ignora mayúsculas/espacios, vacío = 0).
+- `flutter analyze` limpio; `flutter test` **160/160**.
 
 ---
 

@@ -87,7 +87,23 @@ class CalculoExtras {
     return grupos + sinUbicacion;
   }
 
-  /// Monto del desvío por cantidad de entregas en "otra localidad" y capacidad.
+  /// Número de desvíos: **localidades distintas** entre las entregas (una
+  /// misma localidad cuenta una sola vez, sin importar cuántas entregas tenga).
+  static int desvios(Iterable<String?> localidades) {
+    final distintas = <String>{};
+    var sinNombre = 0;
+    for (final l in localidades) {
+      final v = l?.trim();
+      if (v == null || v.isEmpty) {
+        sinNombre++;
+      } else {
+        distintas.add(v.toUpperCase());
+      }
+    }
+    return distintas.length + sinNombre;
+  }
+
+  /// Monto del desvío por cantidad de localidades distintas y capacidad.
   static double desvio(
     double? capacidadKg,
     double fleteBase,

@@ -115,4 +115,21 @@ void main() {
       expect(r, isNull);
     });
   });
+
+  group('CalculoExtras.desvios', () {
+    test('cuenta localidades distintas, no entregas', () {
+      expect(
+        CalculoExtras.desvios(['CAGUA', 'CAGUA', 'VILLA DE CURA', null]),
+        3,
+      );
+    });
+
+    test('sin localidades es 0', () {
+      expect(CalculoExtras.desvios(const []), 0);
+    });
+
+    test('ignora mayúsculas y espacios', () {
+      expect(CalculoExtras.desvios(['cagua', ' CAGUA ']), 1);
+    });
+  });
 }

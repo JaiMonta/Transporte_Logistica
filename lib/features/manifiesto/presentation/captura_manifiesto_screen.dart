@@ -653,6 +653,12 @@ class _SelectorCamion extends ConsumerWidget {
                 : 'No tienes camiones asignados'),
           );
         }
+        // Preselecciona el único camión (el asignado al chofer suele ser uno).
+        if (valor == null && camiones.length == 1) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            onCambio(camiones.first.id);
+          });
+        }
         final valido = camiones.any((c) => c.id == valor) ? valor : null;
         return DropdownButtonFormField<String>(
           initialValue: valido,

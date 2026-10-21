@@ -122,6 +122,14 @@ class CalculoDestino {
     );
     final destino = masLejana == null ? null : asignadas[masLejana.id];
 
+    // Localidad de origen (la más cercana al punto de salida). Las entregas en
+    // el origen no son desvío.
+    final origen = CalculoExtras.localidadMasCercana(
+      origenLat,
+      origenLng,
+      puntosLocalidad,
+    );
+
     return ResultadoDestino(
       destino: destino?.localidad,
       destinoKm: destino?.km,
@@ -133,7 +141,8 @@ class CalculoDestino {
             distanciaKm: asignacionPorPunto[p.id]?.km,
             esOtraLocalidad: destino != null &&
                 asignacionPorPunto[p.id] != null &&
-                asignacionPorPunto[p.id]!.id != destino.id,
+                asignacionPorPunto[p.id]!.id != destino.id &&
+                (origen == null || asignacionPorPunto[p.id]!.id != origen.id),
           ),
       ],
     );

@@ -1,4 +1,5 @@
 import 'package:app_logistica/features/fletes/models/tabulador_flete.dart';
+import 'package:app_logistica/features/fletes/services/calculo_extras.dart';
 import 'package:app_logistica/features/manifiesto/models/manifiesto.dart';
 import 'package:app_logistica/features/manifiesto/services/calculo_destino.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -42,9 +43,46 @@ void main() {
       final maracay = r.entregas.firstWhere((e) => e.id == 'a');
       final valencia = r.entregas.firstWhere((e) => e.id == 'b');
       expect(maracay.localidad, 'MARACAY');
-      expect(maracay.esOtraLocalidad, isTrue);
+      expect(maracay.esOtraLocalidad, isFalse); // es el origen
       expect(valencia.localidad, 'VALENCIA');
       expect(valencia.esOtraLocalidad, isFalse);
+    });
+
+    test('desvíos = localidades distintas (sin origen ni destino)', () {
+      final r = CalculoDestino.calcular(
+        puntos: const [
+          PuntoCliente(id: 'mar', lat: 10.2460, lng: -67.5960),
+          PuntoCliente(id: 'cag', lat: 10.1854, lng: -67.4596),
+          PuntoCliente(id: 'vdc', lat: 10.0376, lng: -67.4895),
+          PuntoCliente(id: 'sjm', lat: 9.9115, lng: -67.3583),
+        ],
+        tabulador: const [
+          TabuladorFlete(
+              id: 'maracay', localidad: 'MARACAY', km: 10,
+              lat: 10.2469, lng: -67.5958),
+          TabuladorFlete(
+              id: 'cagua', localidad: 'CAGUA', km: 15,
+              lat: 10.1854, lng: -67.4596),
+          TabuladorFlete(
+              id: 'villacura', localidad: 'VILLA DE CURA', km: 25,
+              lat: 10.0376, lng: -67.4895),
+          TabuladorFlete(
+              id: 'sanjuan', localidad: 'SAN JUAN DE LOS MORROS', km: 45,
+              lat: 9.9115, lng: -67.3583),
+        ],
+        origenLat: _origenLat,
+        origenLng: _origenLng,
+      );
+      expect(r.destino, 'SAN JUAN DE LOS MORROS');
+      final desvios = CalculoExtras.desvios([
+        for (final e in r.entregas)
+          if (e.esOtraLocalidad) e.localidad,
+      ]);
+      expect(desvios, 2);
+      expect(
+        r.entregas.firstWhere((e) => e.id == 'mar').esOtraLocalidad,
+        isFalse,
+      );
     });
 
     test('sin coordenadas de clientes no calcula', () {

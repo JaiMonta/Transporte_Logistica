@@ -435,16 +435,20 @@ class FacturacionRepository {
       ));
     }
 
-    // Desvío: entregas marcadas "otra localidad".
-    final nDesvio =
-        entregas.where((e) => (e['es_otra_localidad'] as bool?) ?? false).length;
+    // Desvío: localidades distintas (calculadas por geolocalización) que no
+    // son el destino principal ni el origen. Una localidad cuenta una sola vez.
+    final nDesvio = CalculoExtras.desvios([
+      for (final e in entregas)
+        if ((e['es_otra_localidad'] as bool?) ?? false)
+          e['localidad'] as String?,
+    ]);
     final montoDesvio = CalculoExtras.desvio(capacidadKg, fleteBase, nDesvio);
     if (montoDesvio > 0) {
       out.add(Extra(
         id: '',
         manifiestoId: manifiestoId,
         tipo: TipoExtra.desvio,
-        descripcion: '$nDesvio desvío(s) a otra localidad',
+        descripcion: '$nDesvio desvío(s) a otras localidades',
         base: fleteBase,
         monto: montoDesvio,
         estado: EstadoExtra.aprobado,
