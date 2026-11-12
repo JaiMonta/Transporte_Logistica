@@ -1338,6 +1338,23 @@ administrador **aprueba o corrige**. Solo se factura con destino aprobado.
 
 ---
 
+## Keep-alive de Supabase (proyecto pausado)
+
+El proyecto Free `fmwwablhluztdvspujwj` se pausó por inactividad. Se restauró
+desde el dashboard y se dejó un mecanismo para evitar nuevas pausas mientras el
+proyecto queda en pausa de desarrollo:
+
+- Migración `20261112000000_keepalive.sql`: tabla `public.keepalive` (una sola
+  fila, sin datos de negocio) con `select` para `anon` vía RLS. **Aplicada** y
+  verificada: el endpoint REST responde `[{"pinged_at":"..."}]` (HTTP 200).
+- El ping debe ir a **PostgREST/Postgres**; `/auth/v1/health` responde 200 pero
+  no ejecuta SQL y no evita la pausa.
+- **UptimeRobot** (externo, cada 5 min) monitorea:
+  `https://fmwwablhluztdvspujwj.supabase.co/rest/v1/keepalive?select=pinged_at&apikey=<ANON_KEY>`
+- Detalle y verificación en `lib/Plans/KEEPALIVE.md`.
+
+---
+
 ## Comandos de desarrollo
 
 ```
